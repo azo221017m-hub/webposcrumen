@@ -79,7 +79,14 @@ export type ScreenType =
   | 'login' // Pantalla de login
   | 'home' // Pantalla principal/dashboard
   | 'config-usuarios' // Configuración de usuarios
-  | 'config-negocios'; // Configuración de negocios
+  | 'config-negocios' // Configuración de negocios
+  | 'config-productos' // Configuración de productos
+  | 'config-recetas' // Configuración de recetas
+  | 'config-perfil' // Configuración de perfil
+  | 'config-recibos' // Configuración de recibos
+  | 'iniciar-venta' // Iniciar nueva venta
+  | 'indicadores-ventas' // Indicadores de ventas
+  | 'sistema-configuracion'; // Configuración del sistema
 
 // Tipo para los indicadores del dashboard
 export interface Indicator {

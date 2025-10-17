@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'; // Importa hooks de React
 import type { Usuario, Indicator, ScreenType } from '../types'; // Importa tipos
 import '../styles/HomeScreen.css'; // Importa estilos específicos
 
-// Componente de navegación local (fallback) para evitar error de módulo faltante
+// Componente de navegación mejorado con menú dropdown
 interface NavigationProps {
   user: Usuario;
   onNavigate: (screen: ScreenType) => void;
@@ -15,28 +15,136 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ user, onNavigate, onLogout, showMobile, onToggleMobile }) => {
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  // Función para manejar dropdown
+  const toggleDropdown = (menu: string) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
+
+  // Función para manejar navegación y cerrar dropdown
+  const handleNavigate = (screen: ScreenType) => {
+    onNavigate(screen);
+    setOpenDropdown(null);
+  };
+
   return (
     <nav className={`navigation ${showMobile ? 'mobile-open' : ''}`}>
-      <div className="nav-top">
-        <div className="nav-brand">POSWEBCrumen</div>
-        <button className="mobile-toggle" onClick={onToggleMobile}>☰</button>
+      {/* Header de navegación */}
+      <div className="nav-header">
+        <div className="nav-brand">
+          <span className="brand-icon">🏪</span>
+          <span className="brand-text">POSWEBCrumen</span>
+        </div>
+        <button className="mobile-toggle" onClick={onToggleMobile}>
+          ☰
+        </button>
       </div>
 
-      <ul className="nav-list">
-        <li>
-          <button onClick={() => onNavigate('dashboard' as ScreenType)}>Dashboard</button>
-        </li>
-        <li>
-          <button onClick={() => onNavigate('config-usuarios' as ScreenType)}>Usuarios</button>
-        </li>
-        <li>
-          <button onClick={() => onNavigate('config-negocios' as ScreenType)}>Negocios</button>
-        </li>
-      </ul>
+      {/* Menú principal */}
+      <div className="nav-menu">
+        
+        {/* CONFIGURAR */}
+        <div className="nav-section">
+          <button 
+            className={`nav-section-btn ${openDropdown === 'config' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('config')}
+          >
+            <span className="nav-icon">⚙️</span>
+            <span className="nav-text">CONFIGURAR</span>
+            <span className="nav-arrow">{openDropdown === 'config' ? '▼' : '▶'}</span>
+          </button>
+          
+          {openDropdown === 'config' && (
+            <div className="nav-dropdown">
+              <button onClick={() => handleNavigate('config-usuarios' as ScreenType)}>
+                <span className="dropdown-icon">👥</span>
+                Usuarios
+              </button>
+              <button onClick={() => handleNavigate('config-productos' as ScreenType)}>
+                <span className="dropdown-icon">📦</span>
+                Productos
+              </button>
+              <button onClick={() => handleNavigate('config-recetas' as ScreenType)}>
+                <span className="dropdown-icon">📋</span>
+                Recetas
+              </button>
+              <button onClick={() => handleNavigate('config-perfil' as ScreenType)}>
+                <span className="dropdown-icon">👤</span>
+                Perfil
+              </button>
+              <button onClick={() => handleNavigate('config-recibos' as ScreenType)}>
+                <span className="dropdown-icon">🧾</span>
+                Recibos
+              </button>
+            </div>
+          )}
+        </div>
 
+        {/* VENTAS */}
+        <div className="nav-section">
+          <button 
+            className={`nav-section-btn ${openDropdown === 'ventas' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('ventas')}
+          >
+            <span className="nav-icon">💰</span>
+            <span className="nav-text">VENTAS</span>
+            <span className="nav-arrow">{openDropdown === 'ventas' ? '▼' : '▶'}</span>
+          </button>
+          
+          {openDropdown === 'ventas' && (
+            <div className="nav-dropdown">
+              <button onClick={() => handleNavigate('iniciar-venta' as ScreenType)}>
+                <span className="dropdown-icon">🛒</span>
+                Iniciar Venta
+              </button>
+              <button onClick={() => handleNavigate('indicadores-ventas' as ScreenType)}>
+                <span className="dropdown-icon">📊</span>
+                Indicadores
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* SISTEMA */}
+        <div className="nav-section">
+          <button 
+            className={`nav-section-btn ${openDropdown === 'sistema' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('sistema')}
+          >
+            <span className="nav-icon">🔧</span>
+            <span className="nav-text">SISTEMA</span>
+            <span className="nav-arrow">{openDropdown === 'sistema' ? '▼' : '▶'}</span>
+          </button>
+          
+          {openDropdown === 'sistema' && (
+            <div className="nav-dropdown">
+              <button onClick={() => handleNavigate('config-negocios' as ScreenType)}>
+                <span className="dropdown-icon">🏢</span>
+                Negocios
+              </button>
+              <button onClick={() => handleNavigate('sistema-configuracion' as ScreenType)}>
+                <span className="dropdown-icon">🔧</span>
+                Configuración
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer de navegación */}
       <div className="nav-footer">
-        <div className="nav-user">👤 {user.usuario}</div>
-        <button className="logout-button" onClick={onLogout}>Cerrar sesión</button>
+        <div className="nav-user">
+          <span className="user-icon">👤</span>
+          <div className="user-info">
+            <span className="user-name">{user.nombre || user.usuario}</span>
+            <span className="user-role">Administrador</span>
+          </div>
+        </div>
+        <button className="logout-button" onClick={onLogout}>
+          <span>🚪</span>
+          Cerrar Sesión
+        </button>
       </div>
     </nav>
   );
@@ -165,28 +273,137 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate, onLogout }) =
           </div>
         </header>
 
-        {/* Grid de indicadores */}
+        {/* Grid de 4 tarjetas principales */}
         <section className="indicators-section">
-          <div className="indicators-grid">
-            {indicators.map((indicator) => (
-              <div 
-                key={indicator.id}
-                className="indicator-card card"
-                onClick={() => handleIndicatorClick(indicator.id)}
-                style={{ borderLeft: `4px solid ${indicator.color}` }}
-              >
-                <div className="indicator-icon" style={{ color: indicator.color }}>
-                  {indicator.icon}
-                </div>
-                <div className="indicator-content">
-                  <h3 className="indicator-title">{indicator.title}</h3>
-                  <div className="indicator-value" style={{ color: indicator.color }}>
-                    {indicator.value}
-                  </div>
-                  <p className="indicator-description">{indicator.description}</p>
+          <div className="main-indicators-grid">
+            
+            {/* Tarjeta 1: Ventas del Día */}
+            <div className="indicator-card main-card ventas-card">
+              <div className="card-header">
+                <div className="card-icon">💰</div>
+                <div className="card-title">
+                  <h3>Ventas del Día</h3>
+                  <span className="card-subtitle">Ingresos actuales</span>
                 </div>
               </div>
-            ))}
+              <div className="card-content">
+                <div className="main-value">$25,480.00</div>
+                <div className="secondary-info">
+                  <span className="trend positive">+15.2% ↗️</span>
+                  <span className="comparison">vs ayer</span>
+                </div>
+                <div className="mini-stats">
+                  <div className="mini-stat">
+                    <span className="mini-label">Transacciones:</span>
+                    <span className="mini-value">47</span>
+                  </div>
+                  <div className="mini-stat">
+                    <span className="mini-label">Promedio:</span>
+                    <span className="mini-value">$541.70</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tarjeta 2: Servicios Activos */}
+            <div className="indicator-card main-card servicios-card">
+              <div className="card-header">
+                <div className="card-icon">🔧</div>
+                <div className="card-title">
+                  <h3>Servicios</h3>
+                  <span className="card-subtitle">Estado actual</span>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="main-value">12</div>
+                <div className="secondary-info">
+                  <span className="trend neutral">= Sin cambios</span>
+                  <span className="comparison">vs ayer</span>
+                </div>
+                <div className="mini-stats">
+                  <div className="mini-stat">
+                    <span className="mini-label">Completados:</span>
+                    <span className="mini-value">8</span>
+                  </div>
+                  <div className="mini-stat">
+                    <span className="mini-label">Pendientes:</span>
+                    <span className="mini-value">4</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tarjeta 3: Compras vs Ventas Netas */}
+            <div className="indicator-card main-card finanzas-card">
+              <div className="card-header">
+                <div className="card-icon">📊</div>
+                <div className="card-title">
+                  <h3>Compras + Gastos vs Ventas</h3>
+                  <span className="card-subtitle">Balance mensual</span>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="balance-info">
+                  <div className="balance-item">
+                    <span className="balance-label">Ventas:</span>
+                    <span className="balance-value positive">$125,480</span>
+                  </div>
+                  <div className="balance-item">
+                    <span className="balance-label">Gastos:</span>
+                    <span className="balance-value negative">$68,250</span>
+                  </div>
+                  <div className="balance-item main">
+                    <span className="balance-label">Utilidad:</span>
+                    <span className="balance-value profit">$57,230</span>
+                  </div>
+                </div>
+                <div className="secondary-info">
+                  <span className="trend positive">+8.5% ↗️</span>
+                  <span className="comparison">vs mes anterior</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tarjeta 4: Top 5 Productos */}
+            <div className="indicator-card main-card productos-card">
+              <div className="card-header">
+                <div className="card-icon">🏆</div>
+                <div className="card-title">
+                  <h3>Top 5 Productos</h3>
+                  <span className="card-subtitle">Más vendidos</span>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="top-list">
+                  <div className="top-item">
+                    <span className="rank">1.</span>
+                    <span className="item-name">Combo Especial</span>
+                    <span className="item-value">$2,450</span>
+                  </div>
+                  <div className="top-item">
+                    <span className="rank">2.</span>
+                    <span className="item-name">Hamburguesa Premium</span>
+                    <span className="item-value">$1,890</span>
+                  </div>
+                  <div className="top-item">
+                    <span className="rank">3.</span>
+                    <span className="item-name">Pizza Familiar</span>
+                    <span className="item-value">$1,650</span>
+                  </div>
+                  <div className="top-item">
+                    <span className="rank">4.</span>
+                    <span className="item-name">Bebidas Premium</span>
+                    <span className="item-value">$980</span>
+                  </div>
+                  <div className="top-item">
+                    <span className="rank">5.</span>
+                    <span className="item-name">Postre del Chef</span>
+                    <span className="item-value">$750</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
