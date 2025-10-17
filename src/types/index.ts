@@ -60,6 +60,7 @@ export interface CreateUsuarioData {
   usuario: string; // Nombre de usuario
   password: string; // Contraseña
   email: string; // Correo electrónico
+  activo?: number; // Estado del usuario (1=activo, 0=inactivo)
   usuarioAuditoria?: string; // Usuario que crea el registro
 }
 

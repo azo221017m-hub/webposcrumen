@@ -1,8 +1,9 @@
 // src/components/LoginScreen.tsx
-// Pantalla de acceso con validación de usuarios
+// Pantalla de acceso con validación de usuarios y mensajes Toast
 
 import { useState } from 'react'; // Importa hooks de React
 import type { LoginData } from '../types'; // Importa tipos
+import Toast from './Toast'; // Importa componente Toast
 import '../styles/LoginScreen.css'; // Importa estilos específicos
 
 // Interfaz para las props del componente
@@ -19,11 +20,33 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
     password: '' // Campo contraseña vacío
   });
 
-  // Estado para mensajes de error
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  // Estados para Toast
+  const [toast, setToast] = useState<{
+    isVisible: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isVisible: false,
+    message: '',
+    type: 'success'
+  });
 
   // Estado para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  // Función para mostrar toast
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({
+      isVisible: true,
+      message,
+      type
+    });
+  };
+
+  // Función para cerrar toast
+  const closeToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
+  };
 
   // Función para manejar cambios en los inputs
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -33,11 +56,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
       ...prev, // Mantiene los datos anteriores
       [name]: value // Actualiza solo el campo modificado
     }));
-    
-    // Limpia el mensaje de error al escribir
-    if (errorMessage) {
-      setErrorMessage('');
-    }
     
     console.log(`📝 Campo ${name} actualizado`); // Log de cambio
   };
@@ -50,13 +68,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
     
     // Validación básica de campos
     if (!formData.usuario.trim()) {
-      setErrorMessage('El usuario es requerido');
+      showToast('El usuario es requerido', 'error');
       console.log('❌ Usuario requerido'); // Log de error
       return;
     }
     
     if (!formData.password.trim()) {
-      setErrorMessage('La contraseña es requerida');
+      showToast('La contraseña es requerida', 'error');
       console.log('❌ Contraseña requerida'); // Log de error
       return;
     }
@@ -69,18 +87,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
       
       if (!success) {
         // Si falla el login, muestra mensaje de error
-        setErrorMessage('Usuario o contraseña incorrectos');
+        showToast('Usuario o contraseña incorrectos', 'error');
         console.log('❌ [LoginScreen] Credenciales incorrectas'); // Log de error
         
         // Limpia la contraseña por seguridad
         setFormData(prev => ({ ...prev, password: '' }));
       } else {
         console.log('✅ [LoginScreen] Login exitoso, debería navegar automáticamente'); // Log de éxito
+        showToast('¡Acceso exitoso! Bienvenido al sistema', 'success');
       }
       
     } catch (error) {
       console.error('💥 [LoginScreen] Error en login:', error); // Log de error
-      setErrorMessage('Error de conexión. Inténtalo de nuevo.');
+      showToast('Error de conexión. Inténtalo de nuevo.', 'error');
     }
   };
 
@@ -154,14 +173,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
               </div>
             </div>
 
-            {/* Mensaje de error */}
-            {errorMessage && (
-              <div className="error-message">
-                <span className="error-icon">⚠️</span>
-                {errorMessage}
-              </div>
-            )}
-
             {/* Botón de envío */}
             <button
               type="submit"
@@ -191,6 +202,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
 
         </div>
       </div>
+
+      {/* Componente Toast para mensajes */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={closeToast}
+      />
     </div>
   );
 };

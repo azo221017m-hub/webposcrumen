@@ -10,6 +10,7 @@ import corsMiddleware from './middlewares/cors'; // Importa middleware CORS
 import authRoutes from './routes/authRoutes'; // Rutas de autenticación
 import usuariosRoutes from './routes/usuariosRoutes'; // Rutas de usuarios
 import negociosRoutes from './routes/negociosRoutes'; // Rutas de negocios
+import rolesRoutes from './routes/rolesRoutes'; // Rutas de roles
 
 // Carga las variables de entorno
 dotenv.config();
@@ -50,6 +51,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes); // Rutas de autenticación
 app.use('/api/usuarios', usuariosRoutes); // Rutas de usuarios
 app.use('/api/negocios', negociosRoutes); // Rutas de negocios
+app.use('/api/roles', rolesRoutes); // Rutas de roles
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {

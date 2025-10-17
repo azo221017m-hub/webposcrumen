@@ -115,6 +115,15 @@ class ApiService {
     });
   }
 
+  // Método para obtener todos los roles
+  async getRoles(): Promise<ApiResponse<any[]>> {
+    console.log('👥 Obteniendo lista de roles'); // Log de consulta
+    
+    return this.request<any[]>('/api/roles', {
+      method: 'GET', // Método GET
+    });
+  }
+
   // Método para crear un nuevo negocio
   async createNegocio(negocioData: CreateNegocioData): Promise<ApiResponse<{ idNegocio: number; nombreNegocio: string }>> {
     console.log('🏢 Creando nuevo negocio:', negocioData.nombreNegocio); // Log de creación

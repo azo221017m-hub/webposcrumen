@@ -82,7 +82,7 @@ export const createUsuario = async (req: Request, res: Response): Promise<void> 
     const result = await executeQuery(`
       INSERT INTO tblposcrumenwebusuarios 
       (idNegocio, idRol, nombre, usuario, password, email, estatus, fechaRegistro, fechaActualizacion, usuarioAuditoria)
-      VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW(), ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)
     `, [
       userData.idNegocio,
       userData.idRol,
@@ -90,6 +90,7 @@ export const createUsuario = async (req: Request, res: Response): Promise<void> 
       userData.usuario,
       hashedPassword,
       userData.email,
+      userData.activo || 1, // Usa el valor del formulario o 1 por defecto
       userData.usuarioAuditoria || 'system'
     ]);
 
