@@ -2,7 +2,7 @@
 // Controlador para gestión de parámetros de negocio
 
 import type { Request, Response } from 'express'; // Importa tipos de Express
-import { executeQuery } from '../config/database'; // Importa función para ejecutar consultas
+import { executeQuery, executeTransaction } from '../config/database'; // Importa funciones para ejecutar consultas
 import type { ApiResponse, CreateParametrosNegocioData } from '../types'; // Importa tipos personalizados
 
 // Controlador para obtener parámetros de un negocio
@@ -117,7 +117,7 @@ export const createNegocioCompletoController = async (req: Request, res: Respons
     const { cliente, negocio, parametros } = req.body;
 
     // Inicia transacción
-    await executeQuery('START TRANSACTION', []);
+    await executeTransaction('START TRANSACTION');
 
     try {
       // Paso 1: Registrar cliente
@@ -176,7 +176,7 @@ export const createNegocioCompletoController = async (req: Request, res: Respons
       ]);
 
       // Confirma transacción
-      await executeQuery('COMMIT', []);
+      await executeTransaction('COMMIT');
       console.log('✅ Registro completo exitoso'); // Log de éxito total
 
       res.status(201).json({
@@ -191,7 +191,7 @@ export const createNegocioCompletoController = async (req: Request, res: Respons
 
     } catch (error) {
       // Revierte transacción en caso de error
-      await executeQuery('ROLLBACK', []);
+      await executeTransaction('ROLLBACK');
       throw error;
     }
 

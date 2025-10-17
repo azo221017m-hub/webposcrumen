@@ -53,5 +53,18 @@ export const executeQuery = async (query: string, params: any[] = []): Promise<a
   }
 };
 
+// Función específica para comandos de transacción (no soportan prepared statements)
+export const executeTransaction = async (command: string): Promise<any> => {
+  try {
+    console.log('🔄 Ejecutando comando de transacción:', command); // Log del comando
+    const [results] = await pool.query(command); // Usa query() en lugar de execute()
+    console.log('✅ Comando de transacción ejecutado exitosamente'); // Log de éxito
+    return results; // Retorna los resultados
+  } catch (error) {
+    console.error('❌ Error ejecutando comando de transacción:', error); // Log de error
+    throw error; // Propaga el error
+  }
+};
+
 // Exporta el pool para uso directo si es necesario
 export default pool;
