@@ -1,42 +1,35 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* src/App.css */
+/* Estilos específicos para el componente App */
+
+/* Contenedor principal de la aplicación */
+.app-container {
+  width: 100%; /* Ancho completo */
+  min-height: 100vh; /* Altura mínima completa */
+  margin: 0; /* Sin margen */
+  padding: 0; /* Sin padding */
+  box-sizing: border-box; /* Incluye padding y border en el tamaño */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Pantalla de carga */
+.loading-screen {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Fondo con gradiente */
+  color: white; /* Texto blanco */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Contenido de la pantalla de carga */
+.loading-content {
+  display: flex; /* Flexbox */
+  flex-direction: column; /* Dirección vertical */
+  align-items: center; /* Centra horizontalmente */
+  gap: 1rem; /* Espacio entre elementos */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Texto de la pantalla de carga */
+.loading-content p {
+  font-size: 1.2rem; /* Tamaño de fuente */
+  font-weight: 300; /* Peso ligero */
+  margin: 0; /* Sin margen */
+  letter-spacing: 1px; /* Espaciado entre letras */
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
+/* Eliminamos estilos del Vite template que ya no necesitamos */

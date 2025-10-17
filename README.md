@@ -1,73 +1,94 @@
-# React + TypeScript + Vite
+# POSWEBCrumen
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🏪 **Sistema de Punto de Venta Completo** - Aplicación fullstack desarrollada con React + TypeScript + Vite (Frontend) y Node.js + Express + MySQL (Backend).
 
-Currently, two official plugins are available:
+## 🚀 Características Principales
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+✅ **Pantalla de Presentación** - Logotipo animado con frases rotativas  
+✅ **Sistema de Autenticación** - Validación contra base de datos con control de intentos  
+✅ **Dashboard Principal** - Indicadores de ventas, servicios y estadísticas  
+✅ **Gestión de Usuarios** - CRUD completo para administrar usuarios  
+✅ **Gestión de Negocios** - CRUD completo para administrar negocios  
+✅ **Navegación Intuitiva** - Menú lateral con categorías organizadas  
+✅ **Responsive Design** - Funciona en desktop, tablet y móvil  
 
-## React Compiler
+## 🛠️ Tecnologías Utilizadas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Frontend
+- **React 18** con TypeScript
+- **Vite** como build tool
+- **CSS puro** para estilos (sin frameworks)
+- **Hooks personalizados** para lógica de negocio
+- **Fetch API** para comunicación con backend
 
-## Expanding the ESLint configuration
+### Backend
+- **Node.js** con Express
+- **TypeScript** para tipado estricto
+- **MySQL** como base de datos
+- **bcrypt** para encriptación de contraseñas
+- **CORS** configurado para frontend
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Base de Datos
+- **MySQL** alojado en Azure
+- Tablas: `tblposcrumenwebusuarios`, `tblposcrumenwebnegocio`, `tbl_access_attempts`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Ejecutar la Aplicación
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Desarrollo Local
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. **Iniciar Backend** (Terminal 1):
+```bash
+cd backend
+npm run dev
 ```
+✅ Backend corriendo en: `http://localhost:4000`
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **Iniciar Frontend** (Terminal 2):
+```bash
+npm run dev
 ```
+✅ Frontend corriendo en: `http://localhost:5173`
+
+## 🎯 Flujo de la Aplicación
+
+1. **Pantalla de Presentación** (5 frases, 2 segundos c/u)
+2. **Pantalla de Login** (validación con control de intentos)
+3. **Dashboard Principal** (4 indicadores + menú lateral)
+4. **Navegación por Módulos**:
+   - CONFIGURAR: Usuarios, Negocios, Productos, Recetas, Perfil, Recibos
+   - VENTAS: Iniciar Venta, Indicadores
+   - SISTEMA: Configuración, Reportes, Respaldos
+
+## 📋 API Endpoints
+
+### Autenticación
+- `POST /api/auth/login` - Login de usuarios
+
+### Usuarios
+- `GET /api/usuarios` - Obtener todos los usuarios
+- `POST /api/usuarios` - Crear nuevo usuario
+- `PUT /api/usuarios/:id` - Actualizar usuario
+
+### Negocios
+- `GET /api/negocios` - Obtener todos los negocios
+- `POST /api/negocios` - Crear nuevo negocio
+- `PUT /api/negocios/:id` - Actualizar negocio
+
+### Sistema
+- `GET /health` - Health check del servidor
+
+## 🧪 Testing
+
+Para probar la aplicación:
+
+1. ✅ Verificar backend: `http://localhost:4000/health`
+2. ✅ Acceder al frontend: `http://localhost:5173`
+3. ✅ Ver presentación animada
+4. ✅ Probar login con credenciales válidas
+5. ✅ Navegar por el dashboard
+6. ✅ Crear usuarios y negocios
+
+---
+
+**POSWEBCrumen v1.0.0** - Sistema de Punto de Venta Completo  
+Desarrollado con ❤️ por el equipo de CrumenDev

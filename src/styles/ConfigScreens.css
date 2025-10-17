@@ -1,0 +1,280 @@
+/* src/styles/ConfigScreens.css */
+/* Estilos para las pantallas de configuración */
+
+/* Contenedor principal de las pantallas de configuración */
+.config-screen {
+  min-height: 100vh; /* Altura mínima completa */
+  background-color: var(--bg-secondary); /* Fondo gris claro */
+  padding: 2rem; /* Padding interno */
+}
+
+/* Header de las pantallas de configuración */
+.config-header {
+  display: flex; /* Flexbox */
+  justify-content: space-between; /* Espacio entre elementos */
+  align-items: center; /* Centra verticalmente */
+  margin-bottom: 2rem; /* Margen inferior */
+  background: var(--bg-primary); /* Fondo blanco */
+  padding: 1.5rem; /* Padding interno */
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  box-shadow: var(--shadow-sm); /* Sombra pequeña */
+}
+
+/* Botón de regresar */
+.back-button {
+  background: var(--bg-secondary); /* Fondo gris claro */
+  border: 1px solid var(--border-color); /* Borde gris */
+  color: var(--text-primary); /* Color de texto */
+  padding: 0.75rem 1rem; /* Padding interno */
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  cursor: pointer; /* Cursor de mano */
+  font-size: 0.9rem; /* Tamaño de fuente */
+  transition: all var(--transition-fast); /* Transición rápida */
+  display: flex; /* Flexbox */
+  align-items: center; /* Centra verticalmente */
+  gap: 0.5rem; /* Espacio entre elementos */
+}
+
+/* Hover del botón de regresar */
+.back-button:hover {
+  background: var(--primary-color); /* Fondo azul */
+  color: white; /* Texto blanco */
+  border-color: var(--primary-color); /* Borde azul */
+}
+
+/* Título de la pantalla de configuración */
+.config-header h1 {
+  font-size: 1.75rem; /* Tamaño grande */
+  font-weight: 600; /* Peso semi-bold */
+  color: var(--text-primary); /* Color principal */
+  margin: 0; /* Sin margen */
+}
+
+/* Modal del formulario */
+.form-modal {
+  position: fixed; /* Posición fija */
+  top: 0; /* Desde arriba */
+  left: 0; /* Desde la izquierda */
+  width: 100vw; /* Ancho completo */
+  height: 100vh; /* Alto completo */
+  background: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  display: flex; /* Flexbox */
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  z-index: 1000; /* Encima de otros elementos */
+  padding: 1rem; /* Padding para móviles */
+}
+
+/* Tarjeta del formulario */
+.form-card {
+  background: var(--bg-primary); /* Fondo blanco */
+  max-width: 500px; /* Ancho máximo */
+  width: 100%; /* Ancho completo */
+  max-height: 90vh; /* Alto máximo */
+  overflow-y: auto; /* Scroll vertical si es necesario */
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  box-shadow: var(--shadow-lg); /* Sombra grande */
+}
+
+/* Título del formulario */
+.form-card h2 {
+  font-size: 1.5rem; /* Tamaño grande */
+  font-weight: 600; /* Peso semi-bold */
+  color: var(--text-primary); /* Color principal */
+  margin-bottom: 1.5rem; /* Margen inferior */
+  text-align: center; /* Texto centrado */
+}
+
+/* Grupo de campos del formulario */
+.form-group {
+  margin-bottom: 1rem; /* Margen inferior */
+}
+
+/* Textarea en formularios */
+.form-input[rows] {
+  resize: vertical; /* Permite redimensionar verticalmente */
+  min-height: 80px; /* Altura mínima */
+}
+
+/* Acciones del formulario */
+.form-actions {
+  display: flex; /* Flexbox */
+  gap: 1rem; /* Espacio entre botones */
+  justify-content: flex-end; /* Alinea a la derecha */
+  margin-top: 2rem; /* Margen superior */
+  padding-top: 1rem; /* Padding superior */
+  border-top: 1px solid var(--border-color); /* Borde superior */
+}
+
+/* Mensaje de estado */
+.message {
+  background: var(--accent-color); /* Fondo verde */
+  color: white; /* Texto blanco */
+  padding: 1rem; /* Padding interno */
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  margin-bottom: 1rem; /* Margen inferior */
+  text-align: center; /* Texto centrado */
+  font-weight: 500; /* Peso medium */
+}
+
+/* Contenedor de la tabla de datos */
+.data-table {
+  background: var(--bg-primary); /* Fondo blanco */
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  box-shadow: var(--shadow-sm); /* Sombra pequeña */
+  overflow: hidden; /* Oculta contenido que se desborda */
+  overflow-x: auto; /* Scroll horizontal si es necesario */
+}
+
+/* Tabla */
+.data-table table {
+  width: 100%; /* Ancho completo */
+  border-collapse: collapse; /* Colapsa bordes */
+  font-size: 0.9rem; /* Tamaño de fuente */
+}
+
+/* Header de la tabla */
+.data-table th {
+  background: var(--bg-secondary); /* Fondo gris claro */
+  color: var(--text-primary); /* Color de texto */
+  font-weight: 600; /* Peso semi-bold */
+  padding: 1rem; /* Padding interno */
+  text-align: left; /* Texto a la izquierda */
+  border-bottom: 1px solid var(--border-color); /* Borde inferior */
+  white-space: nowrap; /* No rompe líneas */
+}
+
+/* Celdas de la tabla */
+.data-table td {
+  padding: 1rem; /* Padding interno */
+  border-bottom: 1px solid var(--border-color); /* Borde inferior */
+  vertical-align: middle; /* Alineación vertical */
+}
+
+/* Hover de las filas */
+.data-table tbody tr:hover {
+  background: var(--bg-secondary); /* Fondo gris claro */
+}
+
+/* Estado activo/inactivo */
+.status {
+  padding: 0.25rem 0.75rem; /* Padding interno */
+  border-radius: 20px; /* Bordes muy redondeados */
+  font-size: 0.8rem; /* Tamaño pequeño */
+  font-weight: 500; /* Peso medium */
+  text-transform: uppercase; /* Texto en mayúsculas */
+  letter-spacing: 0.5px; /* Espaciado entre letras */
+}
+
+/* Estado activo */
+.status.active {
+  background: rgba(16, 185, 129, 0.1); /* Fondo verde claro */
+  color: var(--accent-color); /* Color verde */
+}
+
+/* Estado inactivo */
+.status.inactive {
+  background: rgba(239, 68, 68, 0.1); /* Fondo rojo claro */
+  color: var(--error-color); /* Color rojo */
+}
+
+/* Botón pequeño */
+.btn-small {
+  background: var(--primary-color); /* Fondo azul */
+  color: white; /* Texto blanco */
+  border: none; /* Sin borde */
+  padding: 0.5rem 1rem; /* Padding interno */
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  font-size: 0.8rem; /* Tamaño pequeño */
+  cursor: pointer; /* Cursor de mano */
+  transition: background-color var(--transition-fast); /* Transición de color */
+  font-weight: 500; /* Peso medium */
+}
+
+/* Hover del botón pequeño */
+.btn-small:hover {
+  background: var(--primary-dark); /* Color más oscuro */
+}
+
+/* Estado de carga */
+.loading {
+  text-align: center; /* Texto centrado */
+  padding: 3rem; /* Padding generoso */
+  color: var(--text-secondary); /* Color gris */
+  font-size: 1.1rem; /* Tamaño de fuente */
+}
+
+/* Responsive design para tablets */
+@media (max-width: 1024px) {
+  .config-screen {
+    padding: 1.5rem; /* Reduce padding */
+  }
+  
+  .config-header {
+    flex-direction: column; /* Dirección vertical */
+    gap: 1rem; /* Espacio entre elementos */
+    text-align: center; /* Texto centrado */
+  }
+  
+  .config-header h1 {
+    order: -1; /* Pone el título primero */
+  }
+}
+
+/* Responsive design para móviles */
+@media (max-width: 768px) {
+  .config-screen {
+    padding: 1rem; /* Reduce padding */
+  }
+  
+  .config-header {
+    padding: 1rem; /* Reduce padding */
+  }
+  
+  .config-header h1 {
+    font-size: 1.5rem; /* Reduce tamaño */
+  }
+  
+  /* Formulario en móvil */
+  .form-modal {
+    padding: 0.5rem; /* Reduce padding */
+  }
+  
+  .form-card {
+    max-height: 95vh; /* Aumenta altura máxima */
+  }
+  
+  /* Tabla en móvil */
+  .data-table {
+    overflow-x: scroll; /* Scroll horizontal obligatorio */
+  }
+  
+  .data-table table {
+    min-width: 600px; /* Ancho mínimo para scroll */
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.75rem; /* Reduce padding */
+    font-size: 0.85rem; /* Reduce tamaño de fuente */
+  }
+  
+  /* Acciones del formulario en móvil */
+  .form-actions {
+    flex-direction: column; /* Dirección vertical */
+    gap: 0.75rem; /* Reduce espacio */
+  }
+  
+  .form-actions button {
+    width: 100%; /* Ancho completo */
+  }
+}
+
+/* Mejoras para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important; /* Animaciones casi instantáneas */
+    animation-iteration-count: 1 !important; /* Solo una iteración */
+    transition-duration: 0.01ms !important; /* Transiciones casi instantáneas */
+  }
+}
