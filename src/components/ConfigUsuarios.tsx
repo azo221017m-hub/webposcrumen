@@ -2,7 +2,7 @@
 // Componente para gestión de usuarios
 
 import { useState, useEffect } from 'react'; // Importa hooks de React
-import type { Usuario, CreateUsuarioData, ScreenType } from '../types'; // Importa tipos
+import type { Usuario, CreateUsuarioData } from '../types'; // Importa tipos
 import apiService from '../services/api'; // Importa servicio de API
 import '../styles/ConfigScreens.css'; // Importa estilos
 

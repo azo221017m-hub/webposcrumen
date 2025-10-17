@@ -25,6 +25,7 @@ class ApiService {
       
       // Construye la URL completa
       const url = `${this.baseURL}${endpoint}`;
+      console.log(`🌐 URL completa: ${url}`); // Log de URL
       
       // Configuración por defecto de la petición
       const config: RequestInit = {
@@ -35,11 +36,15 @@ class ApiService {
         ...options, // Opciones adicionales
       };
 
+      console.log(`⚙️ Configuración de la petición:`, config); // Log de configuración
+
       // Realiza la petición
       const response = await fetch(url, config);
+      console.log(`📊 Status de respuesta: ${response.status}`); // Log de status
       
       // Parsea la respuesta JSON
       const data: ApiResponse<T> = await response.json();
+      console.log(`📦 Datos de respuesta completos:`, data); // Log de datos completos
       
       // Log del resultado
       if (data.success) {

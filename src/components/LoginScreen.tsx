@@ -63,19 +63,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
 
     try {
       // Intenta realizar el login
+      console.log('🚀 [LoginScreen] Enviando datos de login:', { usuario: formData.usuario, password: '***' }); // Log de envío
       const success = await onLogin(formData);
+      console.log('📋 [LoginScreen] Resultado del login:', success); // Log de resultado
       
       if (!success) {
         // Si falla el login, muestra mensaje de error
         setErrorMessage('Usuario o contraseña incorrectos');
-        console.log('❌ Credenciales incorrectas'); // Log de error
+        console.log('❌ [LoginScreen] Credenciales incorrectas'); // Log de error
         
         // Limpia la contraseña por seguridad
         setFormData(prev => ({ ...prev, password: '' }));
+      } else {
+        console.log('✅ [LoginScreen] Login exitoso, debería navegar automáticamente'); // Log de éxito
       }
       
     } catch (error) {
-      console.error('💥 Error en login:', error); // Log de error
+      console.error('💥 [LoginScreen] Error en login:', error); // Log de error
       setErrorMessage('Error de conexión. Inténtalo de nuevo.');
     }
   };
@@ -106,7 +110,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
                 Usuario
               </label>
               <div className="input-container">
-                <span className="input-icon">👤</span>
+                
                 <input
                   type="text"
                   id="usuario"
@@ -127,7 +131,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
                 Contraseña
               </label>
               <div className="input-container">
-                <span className="input-icon">🔒</span>
+                
                 <input
                   type={showPassword ? 'text' : 'password'} // Alterna entre texto y contraseña
                   id="password"

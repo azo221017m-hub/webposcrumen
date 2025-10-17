@@ -31,9 +31,21 @@ export const loginController = async (req: Request, res: Response): Promise<void
       [usuario]
     );
 
+    console.log(`📊 Usuarios encontrados: ${usuarios ? usuarios.length : 0}`); // Log de resultados
+    if (usuarios && usuarios.length > 0) {
+      console.log('👤 Datos del usuario encontrado:', {
+        idUsuario: usuarios[0].idUsuario,
+        usuario: usuarios[0].usuario,
+        nombre: usuarios[0].nombre,
+        estatus: usuarios[0].estatus,
+        email: usuarios[0].email,
+        passwordHash: usuarios[0].password ? '***EXISTE***' : '***VACIO***'
+      }); // Log de datos del usuario (sin mostrar contraseña)
+    }
+
     // Si no existe el usuario
     if (!usuarios || usuarios.length === 0) {
-      console.log('❌ Usuario no encontrado'); // Log de error
+      console.log('❌ Usuario no encontrado en la base de datos'); // Log de error
       await registerFailedAttempt(usuario); // Registra intento fallido
       res.status(401).json({
         success: false,
@@ -46,8 +58,9 @@ export const loginController = async (req: Request, res: Response): Promise<void
     const user: Usuario = usuarios[0]; // Obtiene el primer usuario encontrado
 
     // Verifica si el usuario está bloqueado
+    console.log(`🔍 Verificando estatus del usuario: ${user.estatus}`); // Log de verificación de estatus
     if (user.estatus === 9) {
-      console.log('🚫 Usuario bloqueado por seguridad'); // Log de bloqueo
+      console.log('🚫 Usuario bloqueado por seguridad (estatus = 9)'); // Log de bloqueo
       res.status(403).json({
         success: false,
         message: 'Usuario bloqueado por seguridad',
@@ -58,7 +71,7 @@ export const loginController = async (req: Request, res: Response): Promise<void
 
     // Verifica si el usuario está activo
     if (user.estatus !== 1) {
-      console.log('⚠️ Usuario inactivo'); // Log de estado
+      console.log(`⚠️ Usuario inactivo (estatus = ${user.estatus}, esperado = 1)`); // Log de estado
       res.status(403).json({
         success: false,
         message: 'Usuario inactivo',
@@ -67,8 +80,34 @@ export const loginController = async (req: Request, res: Response): Promise<void
       return;
     }
 
+    console.log('✅ Usuario activo, verificando contraseña...'); // Log de verificación
+    
     // Verifica la contraseña
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log(`🔐 Comparando contraseñas - Input: ${password.length} caracteres, Hash: ${user.password ? user.password.length : 0} caracteres`);
+    
+    let isValidPassword = false;
+    
+    // Detecta si la contraseña está hasheada con bcrypt (debe tener 60 caracteres y empezar con $2b$)
+    if (user.password && user.password.length === 60 && user.password.startsWith('$2b$')) {
+      console.log('🔒 Contraseña hasheada detectada, usando bcrypt.compare'); // Log de hash detectado
+      isValidPassword = await bcrypt.compare(password, user.password);
+    } else {
+      console.log('📝 Contraseña en texto plano detectada, comparando directamente'); // Log de texto plano
+      isValidPassword = password === user.password;
+      
+      // Si la contraseña es correcta, actualiza a bcrypt para seguridad futura
+      if (isValidPassword) {
+        console.log('🔄 Actualizando contraseña a bcrypt para seguridad futura'); // Log de actualización
+        const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS || '10'));
+        await executeQuery(
+          'UPDATE tblposcrumenwebusuarios SET password = ? WHERE idUsuario = ?',
+          [hashedPassword, user.idUsuario]
+        );
+        console.log('✅ Contraseña actualizada exitosamente'); // Log de éxito
+      }
+    }
+    
+    console.log(`🔍 Resultado de comparación de contraseña: ${isValidPassword}`); // Log del resultado
     
     if (!isValidPassword) {
       console.log('❌ Contraseña incorrecta'); // Log de error

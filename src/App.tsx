@@ -18,7 +18,7 @@ import './App.css'; // Estilos específicos de App
 
 // Componente principal de la aplicación
 function App() {
-  // Estado para la pantalla actual
+  // Estado para la pantalla actual - siempre inicia con presentation
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('presentation');
   
   // Hook de autenticación
@@ -26,18 +26,26 @@ function App() {
 
   // Efecto para manejar cambios en el estado de autenticación
   useEffect(() => {
-    console.log('🔄 Estado de autenticación cambió:', { isAuthenticated, user: user?.usuario }); // Log de cambio
+    console.log('🔄 [App] Estado de autenticación cambió:', { 
+      isAuthenticated, 
+      user: user?.usuario, 
+      currentScreen,
+      isLoading 
+    }); // Log de cambio
     
     // Si está autenticado y no está en una pantalla válida, va al home
     if (isAuthenticated && currentScreen !== 'home' && currentScreen !== 'config-usuarios' && currentScreen !== 'config-negocios') {
+      console.log('🏠 [App] Redirigiendo a home - usuario autenticado'); // Log de redirección
+      console.log('📱 [App] Cambiando currentScreen de', currentScreen, 'a home'); // Log de cambio de pantalla
       setCurrentScreen('home');
     }
     
     // Si no está autenticado y no está en login o presentación, va a login
     if (!isAuthenticated && !isLoading && currentScreen !== 'login' && currentScreen !== 'presentation') {
+      console.log('🔐 [App] Redirigiendo a login - usuario no autenticado'); // Log de redirección
       setCurrentScreen('login');
     }
-  }, [isAuthenticated, isLoading, currentScreen, user]);
+  }, [isAuthenticated, isLoading, user]); // Removido currentScreen de las dependencias para evitar loops
 
   // Función para manejar el completado de la presentación
   const handlePresentationComplete = (): void => {

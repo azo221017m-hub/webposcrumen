@@ -18,63 +18,46 @@ export const useAuth = (): AuthContextType => {
 
   // Efecto para cargar datos de autenticación al iniciar
   useEffect(() => {
-    console.log('🔍 Verificando estado de autenticación...'); // Log de verificación
-    
-    // Busca datos del usuario en localStorage
-    const savedUser = localStorage.getItem('poscrumen_user');
-    const savedAuth = localStorage.getItem('poscrumen_authenticated');
-    
-    if (savedUser && savedAuth === 'true') {
-      try {
-        // Parsea y restaura el usuario guardado
-        const userData: Usuario = JSON.parse(savedUser);
-        setUser(userData); // Establece el usuario
-        setIsAuthenticated(true); // Marca como autenticado
-        console.log('✅ Usuario restaurado desde localStorage:', userData.usuario); // Log de restauración
-      } catch (error) {
-        console.error('❌ Error parseando usuario guardado:', error); // Log de error
-        // Limpia datos corruptos
-        localStorage.removeItem('poscrumen_user');
-        localStorage.removeItem('poscrumen_authenticated');
-      }
-    }
-    
-    setIsLoading(false); // Termina la carga
+    console.log('🔍 Inicializando sistema de autenticación...'); // Log de inicialización
+    setIsLoading(false); // Termina la carga inmediatamente
   }, []);
 
   // Función para realizar login
   const login = async (loginData: LoginData): Promise<boolean> => {
     try {
-      console.log('🔐 Intentando login...'); // Log de intento
+      console.log('🔐 [useAuth] Intentando login...'); // Log de intento
       setIsLoading(true); // Inicia la carga
       
       // Llama a la API para autenticarse
       const response = await apiService.login(loginData);
+      console.log('📡 [useAuth] Respuesta completa del login:', response); // Log de respuesta completa
       
       if (response.success && response.data?.user) {
         // Login exitoso
         const userData = response.data.user;
+        console.log('👤 [useAuth] Datos del usuario recibidos:', userData); // Log de datos del usuario
         
         setUser(userData); // Establece el usuario
+        console.log('👤 [useAuth] Usuario establecido en estado:', userData); // Log de establecimiento
+        
         setIsAuthenticated(true); // Marca como autenticado
+        console.log('🔓 [useAuth] isAuthenticated establecido a: true'); // Log de autenticación
         
-        // Guarda en localStorage para persistencia
-        localStorage.setItem('poscrumen_user', JSON.stringify(userData));
-        localStorage.setItem('poscrumen_authenticated', 'true');
-        
-        console.log('✅ Login exitoso para:', userData.usuario); // Log de éxito
+        console.log('✅ [useAuth] Login exitoso para:', userData.usuario); // Log de éxito
+        console.log('🔄 [useAuth] Estado final - isAuthenticated:', true, 'user:', userData.usuario); // Log de estado
         setIsLoading(false); // Termina la carga
         return true; // Retorna éxito
         
       } else {
         // Login fallido
-        console.log('❌ Login fallido:', response.message); // Log de fallo
+        console.log('❌ [useAuth] Login fallido:', response.message); // Log de fallo
+        console.log('📄 [useAuth] Respuesta completa:', response); // Log de respuesta completa
         setIsLoading(false); // Termina la carga
         return false; // Retorna fallo
       }
       
     } catch (error) {
-      console.error('💥 Error en login:', error); // Log de error
+      console.error('💥 [useAuth] Error en login:', error); // Log de error
       setIsLoading(false); // Termina la carga
       return false; // Retorna fallo
     }
@@ -87,10 +70,6 @@ export const useAuth = (): AuthContextType => {
     // Limpia el estado
     setUser(null); // Remueve el usuario
     setIsAuthenticated(false); // Marca como no autenticado
-    
-    // Limpia localStorage
-    localStorage.removeItem('poscrumen_user');
-    localStorage.removeItem('poscrumen_authenticated');
     
     console.log('✅ Sesión cerrada exitosamente'); // Log de éxito
   };

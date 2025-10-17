@@ -3,8 +3,44 @@
 
 import { useState, useEffect } from 'react'; // Importa hooks de React
 import type { Usuario, Indicator, ScreenType } from '../types'; // Importa tipos
-import Navigation from './Navigation'; // Importa componente de navegación
 import '../styles/HomeScreen.css'; // Importa estilos específicos
+
+// Componente de navegación local (fallback) para evitar error de módulo faltante
+interface NavigationProps {
+  user: Usuario;
+  onNavigate: (screen: ScreenType) => void;
+  onLogout: () => void;
+  showMobile: boolean;
+  onToggleMobile: () => void;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ user, onNavigate, onLogout, showMobile, onToggleMobile }) => {
+  return (
+    <nav className={`navigation ${showMobile ? 'mobile-open' : ''}`}>
+      <div className="nav-top">
+        <div className="nav-brand">POSWEBCrumen</div>
+        <button className="mobile-toggle" onClick={onToggleMobile}>☰</button>
+      </div>
+
+      <ul className="nav-list">
+        <li>
+          <button onClick={() => onNavigate('dashboard' as ScreenType)}>Dashboard</button>
+        </li>
+        <li>
+          <button onClick={() => onNavigate('config-usuarios' as ScreenType)}>Usuarios</button>
+        </li>
+        <li>
+          <button onClick={() => onNavigate('config-negocios' as ScreenType)}>Negocios</button>
+        </li>
+      </ul>
+
+      <div className="nav-footer">
+        <div className="nav-user">👤 {user.usuario}</div>
+        <button className="logout-button" onClick={onLogout}>Cerrar sesión</button>
+      </div>
+    </nav>
+  );
+};
 
 // Interfaz para las props del componente
 interface HomeScreenProps {
@@ -160,14 +196,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate, onLogout }) =
           <div className="actions-grid">
             <button 
               className="action-button"
-              onClick={() => onNavigate('config-usuarios')}
+              onClick={() => onNavigate('config-usuarios' as ScreenType)}
             >
               <span className="action-icon">👥</span>
               <span>Gestionar Usuarios</span>
             </button>
             <button 
               className="action-button"
-              onClick={() => onNavigate('config-negocios')}
+              onClick={() => onNavigate('config-negocios' as ScreenType)}
             >
               <span className="action-icon">🏢</span>
               <span>Gestionar Negocios</span>
