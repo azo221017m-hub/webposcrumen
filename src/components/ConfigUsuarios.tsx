@@ -17,14 +17,16 @@ interface Rol {
 // Interfaz para las props del componente
 interface ConfigUsuariosProps {
   currentUser: Usuario | null; // Usuario actual logueado
+  onBack?: () => void; // Función para regresar (opcional)
 }
 
 /**
  * Componente ConfigUsuarios
  * Gestiona la configuración de usuarios con formularios y lista
  * @param currentUser Usuario actualmente logueado
+ * @param onBack Función para regresar al HomeScreen
  */
-const ConfigUsuarios: React.FC<ConfigUsuariosProps> = ({ currentUser }) => {
+const ConfigUsuarios: React.FC<ConfigUsuariosProps> = ({ currentUser, onBack }) => {
   // Estados del componente
   const [usuarios, setUsuarios] = useState<Usuario[]>([]); // Lista de usuarios
   const [negocios, setNegocios] = useState<Negocio[]>([]); // Lista de negocios
@@ -195,7 +197,17 @@ const ConfigUsuarios: React.FC<ConfigUsuariosProps> = ({ currentUser }) => {
 
       {/* Encabezado */}
       <div className="config-header">
-        <h1>Configuración de Usuarios</h1>
+        <div className="header-left">
+          {onBack && (
+            <button 
+              className="btn-secondary"
+              onClick={onBack}
+            >
+              ← Regresar
+            </button>
+          )}
+          <h1>Configuración de Usuarios</h1>
+        </div>
         <button 
           className="btn-primary"
           onClick={() => setShowForm(true)}

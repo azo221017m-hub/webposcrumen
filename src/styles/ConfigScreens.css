@@ -20,6 +20,81 @@
   box-shadow: var(--shadow-sm); /* Sombra pequeña */
 }
 
+/* Contenedor izquierdo del header */
+.header-left {
+  display: flex; /* Flexbox */
+  align-items: center; /* Centra verticalmente */
+  gap: 1rem; /* Espacio entre elementos */
+}
+
+/* Estilo para celdas de dirección largas */
+.address-cell {
+  max-width: 200px; /* Ancho máximo */
+  overflow: hidden; /* Oculta desbordamiento */
+  text-overflow: ellipsis; /* Agrega puntos suspensivos */
+  white-space: nowrap; /* No permite salto de línea */
+}
+
+/* Hover para mostrar dirección completa */
+.address-cell:hover {
+  white-space: normal; /* Permite salto de línea */
+  word-break: break-word; /* Rompe palabras largas */
+  overflow: visible; /* Muestra contenido */
+}
+
+/* Estilos para FormularioNegocio */
+.formulario-negocio {
+  display: grid; /* Grid layout */
+  grid-template-columns: 1fr; /* Una columna */
+  gap: 2rem; /* Espacio entre secciones */
+  margin-bottom: 2rem; /* Margen inferior */
+}
+
+/* Secciones del formulario */
+.form-section {
+  width: 100%; /* Ancho completo */
+}
+
+/* Grid para los campos del formulario */
+.form-grid {
+  display: grid; /* Grid layout */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Columnas responsivas */
+  gap: 1rem; /* Espacio entre campos */
+  margin-top: 1rem; /* Margen superior */
+}
+
+/* Campo que ocupa el ancho completo */
+.form-group-full {
+  grid-column: 1 / -1; /* Ocupa todas las columnas */
+}
+
+/* Botones de acción para formulario completo */
+.form-actions-full {
+  display: flex; /* Flexbox */
+  justify-content: center; /* Centra horizontalmente */
+  gap: 1rem; /* Espacio entre botones */
+  margin-top: 2rem; /* Margen superior */
+  padding: 1.5rem; /* Padding interno */
+  background: var(--bg-primary); /* Fondo blanco */
+  border-radius: var(--border-radius); /* Bordes redondeados */
+  box-shadow: var(--shadow-sm); /* Sombra pequeña */
+}
+
+/* Responsive para formulario de negocio */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr; /* Una sola columna en móvil */
+  }
+  
+  .form-actions-full {
+    flex-direction: column; /* Botones en columna */
+  }
+  
+  .form-actions-full button {
+    width: 100%; /* Botones a ancho completo */
+  }
+}
+
 /* Botón de regresar */
 .back-button {
   background: var(--bg-secondary); /* Fondo gris claro */

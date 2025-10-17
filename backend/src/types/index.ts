@@ -75,3 +75,34 @@ export interface CreateNegocioData {
   telefono: string; // Teléfono
   usuario: string; // Usuario que crea el registro
 }
+
+// Tipo para datos de registro de rol
+export interface CreateRolData {
+  nombreRol: string; // Nombre del rol
+  descripcion: string; // Descripción del rol
+  estatus?: number; // Estado del rol (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+}
+
+// Tipo para datos de registro de cliente
+export interface CreateClienteData {
+  nombre: string; // Nombre del cliente
+  telefono: string; // Teléfono del cliente
+  email: string; // Email del cliente
+  direccion: string; // Dirección del cliente
+  estatus?: number; // Estado del cliente (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+}
+
+// Tipo para datos de registro de parámetros de negocio
+export interface CreateParametrosNegocioData {
+  idNegocio: number; // ID del negocio asociado
+  tipoNegocio: string; // Tipo de negocio
+  impresionRecibo?: number; // Impresión de recibo (1=sí, 0=no)
+  encabezado: string; // Encabezado del recibo
+  pie: string; // Pie del recibo
+  tipoRecibo: string; // Tipo de recibo
+  envioMensaje?: number; // Envío de mensaje (1=sí, 0=no)
+  estatus?: number; // Estado (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+}

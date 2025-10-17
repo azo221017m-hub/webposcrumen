@@ -61,6 +61,18 @@ const Navigation: React.FC<NavigationProps> = ({ user, onNavigate, onLogout, sho
                 <span className="dropdown-icon">👥</span>
                 Usuarios
               </button>
+              <button onClick={() => handleNavigate('config-roles' as ScreenType)}>
+                <span className="dropdown-icon">🎭</span>
+                Roles
+              </button>
+              <button onClick={() => handleNavigate('config-clientes' as ScreenType)}>
+                <span className="dropdown-icon">👤</span>
+                Clientes
+              </button>
+              <button onClick={() => handleNavigate('formulario-negocio' as ScreenType)}>
+                <span className="dropdown-icon">🏢</span>
+                Registro Negocio
+              </button>
               <button onClick={() => handleNavigate('config-productos' as ScreenType)}>
                 <span className="dropdown-icon">📦</span>
                 Productos
@@ -443,13 +455,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate, onLogout }) =
               <span className="action-icon">🏢</span>
               <span>Gestionar Negocios</span>
             </button>
-            <button className="action-button">
-              <span className="action-icon">🛒</span>
-              <span>Nueva Venta</span>
+            <button 
+              className="action-button"
+              onClick={() => onNavigate('config-roles' as ScreenType)}
+            >
+              <span className="action-icon">🎭</span>
+              <span>Gestionar Roles</span>
             </button>
-            <button className="action-button">
-              <span className="action-icon">📦</span>
-              <span>Inventario</span>
+            <button 
+              className="action-button"
+              onClick={() => onNavigate('config-clientes' as ScreenType)}
+            >
+              <span className="action-icon">�</span>
+              <span>Gestionar Clientes</span>
             </button>
           </div>
         </section>

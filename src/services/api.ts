@@ -115,12 +115,79 @@ class ApiService {
     });
   }
 
-  // Método para obtener todos los roles
+  // Método para obtener todos los roles (simplificado para dropdowns)
   async getRoles(): Promise<ApiResponse<any[]>> {
     console.log('👥 Obteniendo lista de roles'); // Log de consulta
     
     return this.request<any[]>('/api/roles', {
       method: 'GET', // Método GET
+    });
+  }
+
+  // Método para obtener todos los roles completos (para gestión)
+  async getRolesComplete(): Promise<ApiResponse<any[]>> {
+    console.log('👥 Obteniendo lista completa de roles'); // Log de consulta
+    
+    return this.request<any[]>('/api/roles/complete', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear un nuevo rol
+  async createRol(rolData: any): Promise<ApiResponse<{ idRol: number; nombreRol: string }>> {
+    console.log('👥 Creando nuevo rol:', rolData.nombreRol); // Log de creación
+    
+    return this.request<{ idRol: number; nombreRol: string }>('/api/roles', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(rolData), // Datos del rol en JSON
+    });
+  }
+
+  // Método para obtener todos los clientes
+  async getClientes(): Promise<ApiResponse<any[]>> {
+    console.log('👥 Obteniendo lista de clientes'); // Log de consulta
+    
+    return this.request<any[]>('/api/clientes', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear un nuevo cliente
+  async createCliente(clienteData: any): Promise<ApiResponse<{ idCliente: number; nombre: string }>> {
+    console.log('👥 Creando nuevo cliente:', clienteData.nombre); // Log de creación
+    
+    return this.request<{ idCliente: number; nombre: string }>('/api/clientes', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(clienteData), // Datos del cliente en JSON
+    });
+  }
+
+  // Método para obtener parámetros de un negocio
+  async getParametrosNegocio(idNegocio: number): Promise<ApiResponse<any[]>> {
+    console.log('⚙️ Obteniendo parámetros del negocio:', idNegocio); // Log de consulta
+    
+    return this.request<any[]>(`/api/parametros-negocio/${idNegocio}`, {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear parámetros de negocio
+  async createParametrosNegocio(parametrosData: any): Promise<ApiResponse<{ idParametro: number; idNegocio: number }>> {
+    console.log('⚙️ Creando parámetros de negocio'); // Log de creación
+    
+    return this.request<{ idParametro: number; idNegocio: number }>('/api/parametros-negocio', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(parametrosData), // Datos de parámetros en JSON
+    });
+  }
+
+  // Método para registro completo de negocio (cliente + negocio + parámetros)
+  async createNegocioCompleto(negocioCompletoData: any): Promise<ApiResponse<{ idCliente: number; idNegocio: number; numerocliente: string }>> {
+    console.log('🏢 Creando negocio completo'); // Log de creación
+    
+    return this.request<{ idCliente: number; idNegocio: number; numerocliente: string }>('/api/parametros-negocio/completo', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(negocioCompletoData), // Datos completos en JSON
     });
   }
 

@@ -10,11 +10,17 @@ import PresentationScreen from './components/PresentationScreen'; // Pantalla de
 import LoginScreen from './components/LoginScreen'; // Pantalla de login
 import HomeScreen from './components/HomeScreen'; // Pantalla principal
 import ConfigNegocios from './components/ConfigNegocios'; // Configuración de negocios
-import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de negocios
+import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de usuarios
+import ConfigRoles from './components/ConfigRoles'; // Configuración de roles
+import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
+import FormularioNegocio from './components/FormularioNegocio'; // Formulario completo de negocio
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
 const ConfigUsuariosAny = ConfigUsuarios as any;
+const ConfigRolesAny = ConfigRoles as any;
+const ConfigClientesAny = ConfigClientes as any;
+const FormularioNegocioAny = FormularioNegocio as any;
 
 // Importa estilos
 import './styles/global.css'; // Estilos globales
@@ -122,7 +128,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('👥 Renderizando configuración de usuarios'); // Log de renderizado
-        return <ConfigUsuariosAny onBack={handleBackToHome} />;
+        return <ConfigUsuariosAny currentUser={user} onBack={handleBackToHome} />;
 
       case 'config-negocios':
         if (!isAuthenticated || !user) {
@@ -132,6 +138,33 @@ function App() {
         }
         console.log('🏢 Renderizando configuración de negocios'); // Log de renderizado
         return <ConfigNegocios onBack={handleBackToHome} />;
+
+      case 'config-roles':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('👥 Renderizando configuración de roles'); // Log de renderizado
+        return <ConfigRolesAny currentUser={user} onBack={handleBackToHome} />;
+
+      case 'config-clientes':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('👥 Renderizando configuración de clientes'); // Log de renderizado
+        return <ConfigClientesAny currentUser={user} onBack={handleBackToHome} />;
+
+      case 'formulario-negocio':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('🏢 Renderizando formulario de negocio completo'); // Log de renderizado
+        return <FormularioNegocioAny currentUser={user} onBack={handleBackToHome} />;
 
       default:
         console.log('❓ Pantalla desconocida, redirigiendo a presentación'); // Log de error

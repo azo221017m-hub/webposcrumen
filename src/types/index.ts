@@ -74,6 +74,91 @@ export interface CreateNegocioData {
   usuario?: string; // Usuario que crea el registro
 }
 
+// Tipo para datos de rol
+export interface Rol {
+  idRol: number; // ID único del rol
+  nombreRol: string; // Nombre del rol
+  descripcion: string; // Descripción del rol
+  estatus: number; // Estado del rol (1=activo, 0=inactivo)
+  fechaRegistro: string; // Fecha de registro
+  fechaActualizacion: string; // Fecha de actualización
+  usuario: string; // Usuario que modificó
+}
+
+// Tipo para datos de registro de rol
+export interface CreateRolData {
+  nombreRol: string; // Nombre del rol
+  descripcion: string; // Descripción del rol
+  estatus?: number; // Estado del rol (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+}
+
+// Tipo para datos de cliente
+export interface Cliente {
+  idCliente: number; // ID único del cliente
+  nombre: string; // Nombre del cliente
+  telefono: string; // Teléfono del cliente
+  email: string; // Email del cliente
+  direccion: string; // Dirección del cliente
+  estatus: number; // Estado del cliente (1=activo, 0=inactivo)
+  fechaRegistro: string; // Fecha de registro
+  fechaActualizacion: string; // Fecha de actualización
+  usuario: string; // Usuario que modificó
+}
+
+// Tipo para datos de registro de cliente
+export interface CreateClienteData {
+  nombre: string; // Nombre del cliente
+  telefono: string; // Teléfono del cliente
+  email: string; // Email del cliente
+  direccion: string; // Dirección del cliente
+  estatus?: number; // Estado del cliente (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+}
+
+// Tipo para parámetros de negocio
+export interface ParametrosNegocio {
+  idParametro: number; // ID único del parámetro
+  idNegocio: number; // ID del negocio asociado
+  tipoNegocio: string; // Tipo de negocio
+  impresionRecibo: number; // Impresión de recibo (1=sí, 0=no)
+  encabezado: string; // Encabezado del recibo
+  pie: string; // Pie del recibo
+  tipoRecibo: string; // Tipo de recibo
+  envioMensaje: number; // Envío de mensaje (1=sí, 0=no)
+  estatus: number; // Estado (1=activo, 0=inactivo)
+  fechaRegistro: string; // Fecha de registro
+  fechaActualizacion: string; // Fecha de actualización
+  usuario: string; // Usuario que modificó
+}
+
+// Tipo para datos de registro de parámetros de negocio
+export interface CreateParametrosNegocioData {
+  idNegocio: number; // ID del negocio asociado
+  tipoNegocio: string; // Tipo de negocio
+  impresionRecibo?: number; // Impresión de recibo (1=sí, 0=no)
+  encabezado: string; // Encabezado del recibo
+  pie: string; // Pie del recibo
+  tipoRecibo: string; // Tipo de recibo
+  envioMensaje?: number; // Envío de mensaje (1=sí, 0=no)
+  estatus?: number; // Estado (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+}
+
+// Tipo para registro completo de negocio (cliente + negocio + parámetros)
+export interface CreateNegocioCompletoData {
+  cliente: CreateClienteData; // Datos del cliente
+  negocio: {
+    nombreNegocio: string; // Nombre del negocio
+    rfc: string; // RFC
+    direccion: string; // Dirección
+    telefono: string; // Teléfono
+    estatusCliente?: number; // Estado del cliente (1=activo, 0=inactivo)
+    usuario?: string; // Usuario que crea el registro
+  };
+  parametros: CreateParametrosNegocioData; // Parámetros del negocio
+}
+
 // Tipo para las pantallas de la aplicación
 export type ScreenType = 
   | 'presentation' // Pantalla de presentación inicial
@@ -81,6 +166,9 @@ export type ScreenType =
   | 'home' // Pantalla principal/dashboard
   | 'config-usuarios' // Configuración de usuarios
   | 'config-negocios' // Configuración de negocios
+  | 'config-roles' // Configuración de roles
+  | 'config-clientes' // Configuración de clientes
+  | 'formulario-negocio' // Formulario completo de negocio
   | 'config-productos' // Configuración de productos
   | 'config-recetas' // Configuración de recetas
   | 'config-perfil' // Configuración de perfil
