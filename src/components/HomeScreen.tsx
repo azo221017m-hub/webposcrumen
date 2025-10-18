@@ -32,7 +32,11 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, showMobile, onToggl
       {/* Header de navegación */}
       <div className="nav-header">
         <div className="nav-brand">
-          <span className="brand-icon">🏪</span>
+          <img 
+            src="/logowebposcrumen.svg" 
+            alt="POSWEBCrumen Logo" 
+            className="brand-logo"
+          />
           <span className="brand-text">POSWEBCrumen</span>
         </div>
         <button className="mobile-toggle" onClick={onToggleMobile}>

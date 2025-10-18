@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Usuario } from '../types';
 import InsumosSelector from './InsumosSelector';
+import Toast from './Toast';
 import '../styles/ConfigScreens.css';
 
 //// Interfaces para Recetas
@@ -82,6 +83,23 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
   // Estados para errores
   const [errorCritico, setErrorCritico] = useState<string | null>(null);
 
+  // Estados para Toast
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('info');
+
+  // Función para mostrar Toast
+  const mostrarToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    
+    // Auto-ocultar después de 2 segundos
+    setTimeout(() => {
+      setShowToast(false);
+    }, 2000);
+  };
+
   // Cargar recetas al montar el componente
   useEffect(() => {
     cargarRecetas();
@@ -134,7 +152,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
   // Función para agregar insumo
   const agregarInsumo = (): void => {
     if (insumos.length >= 40) {
-      alert('Máximo 40 insumos permitidos por receta');
+      mostrarToast('Máximo 40 insumos permitidos por receta', 'error');
       return;
     }
 
@@ -152,7 +170,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
   // Función para eliminar insumo
   const eliminarInsumo = (index: number): void => {
     if (insumos.length <= 1) {
-      alert('Debe tener al menos un insumo');
+      mostrarToast('Debe tener al menos un insumo', 'error');
       return;
     }
 
@@ -180,7 +198,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     try {
       // Validar que el insumo tenga los datos necesarios
       if (!insumoEncontrado || !insumoEncontrado.nomInsumo) {
-        alert('Error: Datos del insumo incompletos');
+        mostrarToast('Error: Datos del insumo incompletos', 'error');
         return;
       }
 
@@ -190,7 +208,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
       if (indexVacio === -1) {
         // No hay espacios vacíos, agregar uno nuevo
         if (insumos.length >= 40) {
-          alert('Máximo 40 insumos permitidos por receta');
+          mostrarToast('Máximo 40 insumos permitidos por receta', 'error');
           return;
         }
         
@@ -220,10 +238,10 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
 
       
       console.log('✅ Insumo agregado a la receta:', insumoEncontrado.nomInsumo);
-      alert(`✅ Insumo "${insumoEncontrado.nomInsumo}" agregado a la receta`);
+      mostrarToast(`Insumo "${insumoEncontrado.nomInsumo}" agregado`, 'success');
     } catch (error) {
       console.error('❌ Error al agregar insumo a la receta:', error);
-      alert('Error al agregar el insumo a la receta');
+      mostrarToast('Error al agregar el insumo', 'error');
     }
   };
 
@@ -241,12 +259,12 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
   const guardarReceta = async (): Promise<void> => {
     // Validaciones
     if (!nombreReceta.trim()) {
-      alert('El nombre de la receta es obligatorio');
+      mostrarToast('El nombre de la receta es obligatorio', 'error');
       return;
     }
 
     if (!instrucciones.trim()) {
-      alert('Las instrucciones son obligatorias');
+      mostrarToast('Las instrucciones son obligatorias', 'error');
       return;
     }
 
@@ -258,7 +276,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     );
 
     if (insumosValidos.length === 0) {
-      alert('Debe agregar al menos un insumo válido');
+      mostrarToast('Debe agregar al menos un insumo válido', 'error');
       return;
     }
 
@@ -296,7 +314,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
 
       if (data.success) {
         console.log('✅ Receta guardada exitosamente');
-        alert(editingReceta ? 'Receta actualizada exitosamente' : 'Receta creada exitosamente');
+        mostrarToast(editingReceta ? 'Receta actualizada exitosamente' : 'Receta creada exitosamente', 'success');
         limpiarFormulario();
         setShowForm(false);
         cargarRecetas();
@@ -358,11 +376,11 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
         }]);
         setShowForm(true);
       } else {
-        alert('Error al cargar detalles de la receta');
+        mostrarToast('Error al cargar detalles de la receta', 'error');
       }
     } catch (error) {
       console.error('❌ Error al cargar detalles:', error);
-      alert('Error de conexión al cargar detalles');
+      mostrarToast('Error de conexión al cargar detalles', 'error');
     }
   };
 
@@ -384,14 +402,14 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
       const data = await response.json();
 
       if (data.success) {
-        alert('Receta eliminada exitosamente');
+        mostrarToast('Receta eliminada exitosamente', 'success');
         cargarRecetas();
       } else {
-        alert(data.message || 'Error al eliminar receta');
+        mostrarToast(data.message || 'Error al eliminar receta', 'error');
       }
     } catch (error) {
       console.error('❌ Error al eliminar receta:', error);
-      alert('Error de conexión al eliminar receta');
+      mostrarToast('Error de conexión al eliminar receta', 'error');
     }
   };
 
@@ -746,17 +764,16 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
             )}
           </div>
         </div>
-
-        {/* Botón de regresar */}
-        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-          <button 
-            className="btn btn-secondary btn-lg"
-            onClick={() => onNavigate('home')}
-          >
-            🏠 Regresar al Dashboard
-          </button>
-        </div>
       </div>
+
+      {/* Toast para notificaciones */}
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 };

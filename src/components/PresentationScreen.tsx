@@ -74,10 +74,11 @@ const PresentationScreen: React.FC<PresentationScreenProps> = ({ onComplete }) =
         
         {/* Logotipo animado con efecto de pulso */}
         <div className="logo-container">
-          <div className="logo-circle">
-            <span className="logo-text">POS</span>
-            <span className="logo-subtext">Crumen</span>
-          </div>
+          <img 
+            src="/logocrumenpos.svg" 
+            alt="POSWEBCrumen Logo" 
+            className="presentation-logo"
+          />
         </div>
 
         {/* Contenedor de frases con animación de fade */}
