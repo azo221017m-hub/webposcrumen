@@ -13,6 +13,9 @@ import negociosRoutes from './routes/negociosRoutes'; // Rutas de negocios
 import rolesRoutes from './routes/rolesRoutes'; // Rutas de roles
 import clientesRoutes from './routes/clientesRoutes'; // Rutas de clientes
 import parametrosNegocioRoutes from './routes/parametrosNegocioRoutes'; // Rutas de parámetros
+import categoriasRoutes from './routes/categoriasRoutes'; // Rutas de categorías
+import productosRoutes from './routes/productosRoutes'; // Rutas de productos
+import insumosRoutes from './routes/insumosRoutes'; // Rutas de insumos
 
 // Carga las variables de entorno
 dotenv.config();
@@ -56,6 +59,9 @@ app.use('/api/negocios', negociosRoutes); // Rutas de negocios
 app.use('/api/roles', rolesRoutes); // Rutas de roles
 app.use('/api/clientes', clientesRoutes); // Rutas de clientes
 app.use('/api/parametros-negocio', parametrosNegocioRoutes); // Rutas de parámetros
+app.use('/api/categorias', categoriasRoutes); // Rutas de categorías
+app.use('/api/productos', productosRoutes); // Rutas de productos
+app.use('/api/insumos', insumosRoutes); // Rutas de insumos
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {

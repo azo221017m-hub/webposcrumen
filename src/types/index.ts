@@ -168,6 +168,8 @@ export type ScreenType =
   | 'config-negocios' // Configuración de negocios
   | 'config-roles' // Configuración de roles
   | 'config-clientes' // Configuración de clientes
+  | 'config-categorias' // Configuración de categorías
+  | 'config-insumos' // Configuración de insumos
   | 'formulario-negocio' // Formulario completo de negocio
   | 'config-productos' // Configuración de productos
   | 'config-recetas' // Configuración de recetas
@@ -185,4 +187,83 @@ export interface Indicator {
   description: string; // Descripción del indicador
   icon: string; // Icono a mostrar
   color: string; // Color del indicador
+}
+
+// Tipo para datos de categoría
+export interface Categoria {
+  idCategoria: number; // ID único de la categoría
+  nombre: string; // Nombre de la categoría
+  descripcion: string; // Descripción de la categoría
+  estatus: number; // Estado de la categoría (1=activo, 0=inactivo)
+  fechaRegistro: string; // Fecha de registro
+  fechaActualizacion: string; // Fecha de última actualización
+  usuario: string; // Usuario que registró la categoría
+}
+
+// Tipo para datos de registro de categoría
+export interface CreateCategoriaData {
+  nombre: string; // Nombre de la categoría
+  descripcion: string; // Descripción de la categoría
+  estatus?: number; // Estado (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+}
+
+// Tipo para datos de producto
+export interface Producto {
+  idProducto: number; // ID único del producto
+  idCategoria: number; // ID de la categoría
+  idReceta?: number; // ID de la receta (opcional)
+  nombre: string; // Nombre del producto
+  descripcion: string; // Descripción del producto
+  precio: number; // Precio del producto
+  existencia: number; // Existencia disponible
+  estatus: number; // Estado del producto (1=activo, 0=inactivo)
+  fechaRegistro: string; // Fecha de registro
+  fechaActualizacion: string; // Fecha de última actualización
+  usuario: string; // Usuario que registró el producto
+  idNegocio: number; // ID del negocio al que pertenece
+  imagenProducto?: string; // Imagen del producto (base64)
+}
+
+// Tipo para datos de registro de producto
+export interface CreateProductoData {
+  idCategoria: number; // ID de la categoría
+  idReceta?: number; // ID de la receta (opcional)
+  nombre: string; // Nombre del producto
+  descripcion: string; // Descripción del producto
+  precio: number; // Precio del producto
+  existencia: number; // Existencia inicial
+  estatus?: number; // Estado (1=activo, 0=inactivo)
+  usuario?: string; // Usuario que crea el registro
+  idNegocio: number; // ID del negocio
+  imagenProducto?: File; // Archivo de imagen del producto
+}
+
+// Tipo para datos de insumo
+export interface Insumo {
+  idInsumo: number; // ID único del insumo
+  nomInsumo: string; // Nombre del insumo
+  costoPromPond: number; // Costo promedio ponderado
+  umInsumo: string; // Unidad de medida del insumo
+  tipoInsumo: 'PIEZA' | 'CONSUMO'; // Tipo de insumo
+  existencia: number; // Existencia disponible
+  stockMinimo: number; // Stock mínimo
+  precioVta: number; // Precio de venta
+  idCategoria: number; // ID de la categoría
+  fechaRegistro: string; // Fecha de registro
+  fechaActualizacion: string; // Fecha de última actualización
+  usuario: string; // Usuario que registró el insumo
+}
+
+// Tipo para datos de registro de insumo
+export interface CreateInsumoData {
+  nomInsumo: string; // Nombre del insumo
+  costoPromPond: number; // Costo promedio ponderado
+  umInsumo: string; // Unidad de medida del insumo
+  tipoInsumo: 'PIEZA' | 'CONSUMO'; // Tipo de insumo (según requerimiento)
+  existencia: number; // Existencia inicial
+  stockMinimo: number; // Stock mínimo
+  precioVta: number; // Precio de venta
+  idCategoria: number; // ID de la categoría
+  usuario?: string; // Usuario que crea el registro (opcional, se llenará automáticamente)
 }

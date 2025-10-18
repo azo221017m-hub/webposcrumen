@@ -29,12 +29,21 @@ class ApiService {
       
       // Configuración por defecto de la petición
       const config: RequestInit = {
-        headers: {
-          'Content-Type': 'application/json', // Tipo de contenido JSON
-          ...options.headers, // Headers adicionales
-        },
         ...options, // Opciones adicionales
       };
+
+      // Solo agregar Content-Type si no es FormData
+      if (!(options.body instanceof FormData)) {
+        config.headers = {
+          'Content-Type': 'application/json', // Tipo de contenido JSON
+          ...options.headers, // Headers adicionales
+        };
+      } else {
+        // Para FormData, usar headers proporcionados (sin Content-Type)
+        config.headers = {
+          ...options.headers, // Headers adicionales
+        };
+      }
 
       console.log(`⚙️ Configuración de la petición:`, config); // Log de configuración
 
@@ -219,9 +228,187 @@ class ApiService {
       method: 'GET', // Método GET
     });
   }
+
+  // ===== MÉTODOS PARA CATEGORÍAS =====
+
+  // Método para obtener todas las categorías
+  async getCategorias(): Promise<ApiResponse<any[]>> {
+    console.log('📂 Obteniendo categorías'); // Log de obtención
+    
+    return this.request<any[]>('/api/categorias', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para obtener categorías para dropdown
+  async getCategoriasDropdown(): Promise<ApiResponse<any[]>> {
+    console.log('📋 Obteniendo categorías para dropdown'); // Log de obtención
+    
+    return this.request<any[]>('/api/categorias/dropdown', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear una nueva categoría
+  async createCategoria(categoriaData: any): Promise<ApiResponse<{ idCategoria: number }>> {
+    console.log('📂 Creando nueva categoría'); // Log de creación
+    
+    return this.request<{ idCategoria: number }>('/api/categorias', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(categoriaData), // Datos de la categoría en JSON
+    });
+  }
+
+  // Método para actualizar una categoría existente
+  async updateCategoria(id: number, categoriaData: any): Promise<ApiResponse<{ idCategoria: number }>> {
+    console.log('✏️ Actualizando categoría ID:', id); // Log de actualización
+    
+    return this.request<{ idCategoria: number }>(`/api/categorias/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(categoriaData), // Datos actualizados en JSON
+    });
+  }
+
+  // Método para eliminar una categoría
+  async deleteCategoria(id: number, data: any): Promise<ApiResponse<{ idCategoria: number }>> {
+    console.log('🗑️ Eliminando categoría ID:', id); // Log de eliminación
+    
+    return this.request<{ idCategoria: number }>(`/api/categorias/${id}`, {
+      method: 'DELETE', // Método DELETE
+      body: JSON.stringify(data), // Datos adicionales
+    });
+  }
+
+  // ===== MÉTODOS PARA PRODUCTOS =====
+
+  // Método para obtener todos los productos
+  async getProductos(): Promise<ApiResponse<any[]>> {
+    console.log('📦 Obteniendo productos'); // Log de obtención
+    
+    return this.request<any[]>('/api/productos', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para obtener productos por negocio
+  async getProductosByNegocio(idNegocio: number): Promise<ApiResponse<any[]>> {
+    console.log('📦 Obteniendo productos del negocio:', idNegocio); // Log de obtención
+    
+    return this.request<any[]>(`/api/productos/negocio/${idNegocio}`, {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear un nuevo producto (con imagen)
+  async createProducto(productoData: FormData): Promise<ApiResponse<{ idProducto: number }>> {
+    console.log('📦 Creando nuevo producto'); // Log de creación
+    
+    // Para FormData, no establecer Content-Type (el navegador lo hace automáticamente)
+    return this.request<{ idProducto: number }>('/api/productos', {
+      method: 'POST', // Método POST
+      headers: {}, // Headers vacíos para FormData
+      body: productoData, // FormData con imagen
+    });
+  }
+
+  // Método para actualizar un producto existente (con imagen)
+  async updateProducto(id: number, productoData: FormData): Promise<ApiResponse<{ idProducto: number }>> {
+    console.log('✏️ Actualizando producto ID:', id); // Log de actualización
+    
+    return this.request<{ idProducto: number }>(`/api/productos/${id}`, {
+      method: 'PUT', // Método PUT
+      headers: {}, // Headers vacíos para FormData
+      body: productoData, // FormData con imagen
+    });
+  }
+
+  // Método para eliminar un producto
+  async deleteProducto(id: number, data: any): Promise<ApiResponse<{ idProducto: number }>> {
+    console.log('🗑️ Eliminando producto ID:', id); // Log de eliminación
+    
+    return this.request<{ idProducto: number }>(`/api/productos/${id}`, {
+      method: 'DELETE', // Método DELETE
+      body: JSON.stringify(data), // Datos adicionales
+    });
+  }
+
+  // ===== MÉTODOS PARA INSUMOS =====
+
+  // Método para obtener todos los insumos
+  async getInsumos(): Promise<ApiResponse<any[]>> {
+    console.log('📦 Obteniendo lista de insumos'); // Log de operación
+    
+    return this.request<any[]>('/api/insumos', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear un nuevo insumo
+  async createInsumo(insumoData: any): Promise<ApiResponse<{ idInsumo: number }>> {
+    console.log('📦 Creando nuevo insumo:', insumoData); // Log de creación
+    
+    return this.request<{ idInsumo: number }>('/api/insumos', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(insumoData), // Datos del insumo en JSON
+    });
+  }
+
+  // Método para actualizar un insumo existente
+  async updateInsumo(id: number, insumoData: any): Promise<ApiResponse<{ idInsumo: number }>> {
+    console.log('📦 Actualizando insumo ID:', id, 'Datos:', insumoData); // Log de actualización
+    
+    return this.request<{ idInsumo: number }>(`/api/insumos/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(insumoData), // Datos actualizados en JSON
+    });
+  }
+
+  // Método para eliminar un insumo
+  async deleteInsumo(id: number, data: any): Promise<ApiResponse<{ idInsumo: number }>> {
+    console.log('🗑️ Eliminando insumo ID:', id); // Log de eliminación
+    
+    return this.request<{ idInsumo: number }>(`/api/insumos/${id}`, {
+      method: 'DELETE', // Método DELETE
+      body: JSON.stringify(data), // Datos adicionales
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
 const apiService = new ApiService();
 
 export default apiService;
+
+// Exportaciones individuales para compatibilidad
+export const login = (loginData: LoginData) => apiService.login(loginData);
+export const getUsuarios = () => apiService.getUsuarios();
+export const createUsuario = (userData: CreateUsuarioData) => apiService.createUsuario(userData);
+export const updateUsuario = (id: number, userData: Partial<CreateUsuarioData>) => apiService.updateUsuario(id, userData);
+export const getRoles = () => apiService.getRoles();
+export const getClientes = () => apiService.getClientes();
+export const createCliente = (clienteData: any) => apiService.createCliente(clienteData);
+export const createNegocioCompleto = (data: any) => apiService.createNegocioCompleto(data);
+export const getNegocios = () => apiService.getNegocios();
+export const createNegocio = (negocioData: CreateNegocioData) => apiService.createNegocio(negocioData);
+export const updateNegocio = (id: number, negocioData: Partial<CreateNegocioData>) => apiService.updateNegocio(id, negocioData);
+export const healthCheck = () => apiService.healthCheck();
+
+// Exportaciones para categorías
+export const getCategorias = () => apiService.getCategorias();
+export const getCategoriasDropdown = () => apiService.getCategoriasDropdown();
+export const createCategoria = (categoriaData: any) => apiService.createCategoria(categoriaData);
+export const updateCategoria = (id: number, categoriaData: any) => apiService.updateCategoria(id, categoriaData);
+export const deleteCategoria = (id: number, data: any) => apiService.deleteCategoria(id, data);
+
+// Exportaciones para productos
+export const getProductos = () => apiService.getProductos();
+export const getProductosByNegocio = (idNegocio: number) => apiService.getProductosByNegocio(idNegocio);
+export const createProducto = (productoData: FormData) => apiService.createProducto(productoData);
+export const updateProducto = (id: number, productoData: FormData) => apiService.updateProducto(id, productoData);
+export const deleteProducto = (id: number, data: any) => apiService.deleteProducto(id, data);
+
+// Exportaciones para insumos
+export const getInsumos = () => apiService.getInsumos();
+export const createInsumo = (insumoData: any) => apiService.createInsumo(insumoData);
+export const updateInsumo = (id: number, insumoData: any) => apiService.updateInsumo(id, insumoData);
+export const deleteInsumo = (id: number, data: any) => apiService.deleteInsumo(id, data);

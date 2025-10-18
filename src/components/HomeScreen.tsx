@@ -69,6 +69,14 @@ const Navigation: React.FC<NavigationProps> = ({ user, onNavigate, onLogout, sho
                 <span className="dropdown-icon">👤</span>
                 Clientes
               </button>
+              <button onClick={() => handleNavigate('config-categorias' as ScreenType)}>
+                <span className="dropdown-icon">🏷️</span>
+                Categorías
+              </button>
+              <button onClick={() => handleNavigate('config-insumos' as ScreenType)}>
+                <span className="dropdown-icon">🧪</span>
+                Insumos
+              </button>
               <button onClick={() => handleNavigate('formulario-negocio' as ScreenType)}>
                 <span className="dropdown-icon">🏢</span>
                 Registro Negocio
@@ -292,18 +300,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate, onLogout }) =
             {/* Indicadores dinámicos (datos cargados) */}
             <div className="dynamic-indicators">
               {indicators.map((ind) => (
-                <button
+                <div
                   key={ind.id}
-                  className="indicator-summary"
+                  className="indicator-card dynamic-card"
                   onClick={() => handleIndicatorClick(ind.id)}
-                  type="button"
+                  style={{ cursor: 'pointer' }}
                 >
-                  <span className="indicator-icon" style={{ color: ind.color }}>{ind.icon}</span>
-                  <div className="indicator-text">
-                    <div className="indicator-title">{ind.title}</div>
-                    <div className="indicator-value">{ind.value}</div>
+                  <div className="card-header">
+                    <div className="card-icon" style={{ color: ind.color }}>{ind.icon}</div>
+                    <div className="card-title">
+                      <h3>{ind.title}</h3>
+                      <span className="card-subtitle">{ind.description}</span>
+                    </div>
                   </div>
-                </button>
+                  <div className="card-content">
+                    <div className="main-value">{ind.value}</div>
+                  </div>
+                </div>
               ))}
             </div>
 

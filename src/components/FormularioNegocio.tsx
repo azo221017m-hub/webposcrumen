@@ -351,14 +351,16 @@ const FormularioNegocio: React.FC<FormularioNegocioProps> = ({ currentUser, onBa
             <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Tipo de Negocio</label>
-                <input
-                  type="text"
+                <select
                   className="form-input"
                   value={formData.parametros.tipoNegocio}
                   onChange={(e) => updateParametrosData('tipoNegocio', e.target.value)}
-                  placeholder="Ej: Restaurante, Tienda, etc."
                   required
-                />
+                >
+                  <option value="">Selecciona tipo de negocio</option>
+                  <option value="A granel">A granel</option>
+                  <option value="Con Platillos">Con Platillos</option>
+                </select>
               </div>
               
               <div className="form-group">

@@ -7,7 +7,7 @@ import '../styles/Toast.css';
 // Interfaz para las props del Toast
 interface ToastProps {
   message: string; // Mensaje a mostrar
-  type: 'success' | 'error'; // Tipo de mensaje
+  type: 'success' | 'error' | 'info'; // Tipo de mensaje
   isVisible: boolean; // Si está visible
   onClose: () => void; // Función para cerrar
   duration?: number; // Duración en milisegundos (opcional)

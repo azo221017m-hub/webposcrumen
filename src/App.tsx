@@ -13,14 +13,20 @@ import ConfigNegocios from './components/ConfigNegocios'; // Configuración de n
 import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de usuarios
 import ConfigRoles from './components/ConfigRoles'; // Configuración de roles
 import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
+import ConfigCategorias from './components/ConfigCategorias'; // Configuración de categorías
+import ConfigInsumos from './components/ConfigInsumos'; // Configuración de insumos
 import FormularioNegocio from './components/FormularioNegocio'; // Formulario completo de negocio
+import ConfigProductos from './components/ConfigProductos'; // Configuración de productos
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
 const ConfigUsuariosAny = ConfigUsuarios as any;
 const ConfigRolesAny = ConfigRoles as any;
 const ConfigClientesAny = ConfigClientes as any;
+const ConfigCategoriasAny = ConfigCategorias as any;
+const ConfigInsumosAny = ConfigInsumos as any;
 const FormularioNegocioAny = FormularioNegocio as any;
+const ConfigProductosAny = ConfigProductos as any;
 
 // Importa estilos
 import './styles/global.css'; // Estilos globales
@@ -156,6 +162,33 @@ function App() {
         }
         console.log('👥 Renderizando configuración de clientes'); // Log de renderizado
         return <ConfigClientesAny currentUser={user} onBack={handleBackToHome} />;
+
+      case 'config-categorias':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('🏷️ Renderizando configuración de categorías'); // Log de renderizado
+        return <ConfigCategoriasAny onNavigate={handleNavigate} currentUser={user} />;
+
+      case 'config-insumos':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📦 Renderizando configuración de insumos'); // Log de renderizado
+        return <ConfigInsumosAny onNavigate={handleNavigate} currentUser={user} />;
+
+      case 'config-productos':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📦 Renderizando configuración de productos'); // Log de renderizado
+        return <ConfigProductosAny user={user} onNavigate={handleNavigate} />;
 
       case 'formulario-negocio':
         if (!isAuthenticated || !user) {
