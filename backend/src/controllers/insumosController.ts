@@ -451,3 +451,59 @@ export const deleteInsumoController = async (req: Request, res: Response): Promi
     });
   }
 };
+
+// Controlador para buscar insumos por filtro de nombre
+export const buscarInsumosController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { filtro } = req.params;
+    
+    console.log('🔍 Buscando insumos con filtro:', filtro);
+
+    // Validar que el filtro no esté vacío
+    if (!filtro || filtro.trim().length < 2) {
+      res.status(400).json({
+        success: false,
+        message: 'El filtro debe tener al menos 2 caracteres',
+        data: []
+      });
+      return;
+    }
+
+    // Query para buscar insumos que coincidan con el filtro
+    const query = `
+      SELECT 
+        idInsumo,
+        nomInsumo,
+        umInsumo,
+        costoPromPond,
+        tipoInsumo,
+        existencia,
+        idCategoria
+      FROM tblposcrumenwebinsumos
+      WHERE nomInsumo LIKE ? 
+      ORDER BY nomInsumo
+      LIMIT 10
+    `;
+
+    const searchTerm = `%${filtro.trim()}%`;
+    const insumos = await executeQuery(query, [searchTerm]);
+    
+    console.log(`✅ ${insumos.length} insumos encontrados con filtro "${filtro}"`);
+
+    res.status(200).json({
+      success: true,
+      message: `${insumos.length} insumos encontrados`,
+      data: insumos
+    });
+
+  } catch (error) {
+    console.error('❌ Error al buscar insumos:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al buscar insumos',
+      data: [],
+      error: process.env.NODE_ENV === 'development' ? error : undefined
+    });
+  }
+};
