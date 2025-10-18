@@ -10,53 +10,73 @@
 
 /* Configuración del elemento raíz */
 :root {
-  /* Paleta de colores verdes principales */
-  --primary-color: #22c55e; /* Verde principal */
-  --primary-dark: #166534; /* Verde oscuro */
-  --primary-light: #4ade80; /* Verde claro */
+  /* Paleta de colores café arena profesional */
+  --primary-color: #8B4513; /* Café chocolate principal */
+  --primary-dark: #654321; /* Café muy oscuro */
+  --primary-light: #D2691E; /* Naranja chocolate claro */
   
-  /* Colores secundarios verdes */
-  --secondary-color: #15803d; /* Verde medio */
-  --accent-color: #84cc16; /* Verde lima de acento */
-  --warning-color: #f59e0b; /* Amarillo de advertencia */
-  --error-color: #ef4444; /* Rojo de error */
+  /* Colores secundarios café arena */
+  --secondary-color: #A0522D; /* Café siena */
+  --accent-color: #DEB887; /* Arena */
+  --warning-color: #CD853F; /* Perú */
+  --error-color: #DC143C; /* Rojo carmesí */
   
-  /* Colores de fondo verdes suaves */
-  --bg-primary: #ffffff; /* Fondo blanco principal */
-  --bg-secondary: #f0fdf4; /* Fondo verde muy claro */
-  --bg-light: #dcfce7; /* Fondo verde claro */
-  --bg-dark: #166534; /* Fondo verde oscuro */
+  /* Colores de fondo café arena graduales */
+  --bg-primary: linear-gradient(135deg, #F5DEB3 0%, #DEB887 50%, #D2B48C 100%); /* Arena claro */
+  --bg-secondary: linear-gradient(135deg, #DEB887 0%, #D2B48C 50%, #BC9A6A 100%); /* Arena medio */
+  --bg-light: #FAF0E6; /* Lino muy claro */
+  --bg-dark: linear-gradient(135deg, #654321 0%, #8B4513 50%, #A0522D 100%); /* Café oscuro */
   
-  /* Colores de texto */
-  --text-primary: #166534; /* Texto principal verde oscuro */
-  --text-secondary: #15803d; /* Texto secundario verde medio */
-  --text-light: #65a30d; /* Texto verde claro */
-  --text-white: #ffffff; /* Texto blanco */
-  --text-muted: #6b7280; /* Texto gris suave */
+  /* Colores de texto café */
+  --text-primary: #3E2723; /* Café muy oscuro para texto principal */
+  --text-secondary: #5D4037; /* Café oscuro para texto secundario */
+  --text-light: #8D6E63; /* Café grisáceo claro */
+  --text-white: #FAF0E6; /* Lino para texto sobre fondos oscuros */
+  --text-muted: #A1887F; /* Café gris suave */
   
-  /* Sombras verdes suaves */
-  --shadow-sm: 0 1px 2px 0 rgb(34 197 94 / 0.05); /* Sombra pequeña verde */
-  --shadow-md: 0 4px 6px -1px rgb(34 197 94 / 0.1); /* Sombra mediana verde */
-  --shadow-lg: 0 10px 15px -3px rgb(34 197 94 / 0.1); /* Sombra grande verde */
+  /* Sombras café suaves */
+  --shadow-sm: 0 2px 8px rgba(139, 69, 19, 0.15); /* Sombra pequeña café */
+  --shadow-md: 0 4px 12px rgba(139, 69, 19, 0.25); /* Sombra mediana café */
+  --shadow-lg: 0 8px 25px rgba(139, 69, 19, 0.35); /* Sombra grande café */
   
-  /* Bordes */
-  --border-radius: 8px; /* Radio de borde estándar */
-  --border-color: #d1fae5; /* Color de borde verde claro */
-  --border-color-dark: #a7f3d0; /* Color de borde verde más intenso */
+  /* Bordes café arena */
+  --border-radius: 16px; /* Radio de borde moderno aumentado */
+  --border-color: rgba(139, 69, 19, 0.2); /* Color de borde café translúcido */
+  --border-color-dark: rgba(139, 69, 19, 0.4); /* Color de borde café más intenso */
   
-  /* Transiciones */
-  --transition-fast: 0.15s ease-in-out; /* Transición rápida */
-  --transition-normal: 0.3s ease-in-out; /* Transición normal */
+  /* Efectos glassmorphism café arena */
+  --glass-bg: rgba(245, 222, 179, 0.2); /* Fondo glassmorphism arena */
+  --glass-border: rgba(139, 69, 19, 0.3); /* Borde glassmorphism café */
+  
+  /* Transiciones premium */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Transición rápida premium */
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transición normal premium */
 }
 
 /* Configuración del body */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente del sistema */
+  font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Fuente moderna */
   font-size: 16px; /* Tamaño de fuente base */
   line-height: 1.6; /* Altura de línea */
-  color: var(--text-primary); /* Color de texto principal */
-  background-color: var(--bg-secondary); /* Fondo gris claro */
+  color: var(--text-primary); /* Color de texto café oscuro */
+  background: var(--bg-secondary); /* Fondo arena degradado */
   overflow-x: hidden; /* Evita scroll horizontal */
+  position: relative; /* Para efectos */
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(160, 82, 45, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(222, 184, 135, 0.03) 0%, transparent 70%);
+  pointer-events: none; /* No interfiere con interacciones */
+  z-index: -1; /* Detrás del contenido */
 }
 
 /* Contenedor principal de la aplicación */

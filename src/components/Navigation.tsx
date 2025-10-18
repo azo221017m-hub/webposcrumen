@@ -187,12 +187,7 @@ const Navigation: React.FC<NavigationProps> = ({
       </div>
 
       {/* Footer con botón de logout */}
-      <div className="nav-footer">
-        <button className="nav-logout" onClick={handleLogout}>
-          <span className="nav-item-icon">🚪</span>
-          Cerrar Sesión
-        </button>
-      </div>
+      
     </nav>
   );
 };

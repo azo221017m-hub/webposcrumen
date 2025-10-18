@@ -8,30 +8,35 @@
   left: 0; /* Desde la izquierda */
   width: 280px; /* Ancho fijo */
   height: 100vh; /* Altura completa */
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); /* Gradiente oscuro moderno */
+  background: linear-gradient(135deg, 
+    #8B4513 0%,     /* Café chocolate */
+    #A0522D 25%,    /* Café siena */ 
+    #DEB887 60%,    /* Arena claro */
+    #F5DEB3 100%    /* Trigo claro */
+  ); /* Gradiente café arena profesional */
   backdrop-filter: blur(20px); /* Efecto glassmorphism */
   -webkit-backdrop-filter: blur(20px); /* Safari support */
-  color: #e2e8f0; /* Texto claro */
+  color: #3E2723; /* Texto café oscuro */
   overflow: hidden; /* Sin scroll en el contenedor principal */
   z-index: 1000; /* Encima de otros elementos */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Transición premium */
   box-shadow: 
-    4px 0 24px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.05); /* Sombra moderna con borde sutil */
+    4px 0 24px rgba(139, 69, 19, 0.3),
+    0 0 0 1px rgba(160, 82, 45, 0.2); /* Sombra café con borde sutil */
   display: flex; /* Flexbox para estructura */
   flex-direction: column; /* Columna vertical */
-  border-right: 1px solid rgba(255, 255, 255, 0.1); /* Borde glassmorphism */
+  border-right: 1px solid rgba(139, 69, 19, 0.3); /* Borde café glassmorphism */
 }
 
 /* Header de la navegación */
 .nav-header {
   padding: 2rem 1.5rem 1.5rem 1.5rem; /* Padding interno aumentado */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Borde glassmorphism */
+  border-bottom: 1px solid rgba(139, 69, 19, 0.3); /* Borde café glassmorphism */
   display: flex; /* Flexbox */
   justify-content: space-between; /* Espacio entre elementos */
   align-items: center; /* Centra verticalmente */
   flex-shrink: 0; /* No se encoge */
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%); /* Fondo glassmorphism */
+  background: linear-gradient(135deg, rgba(160, 82, 45, 0.2) 0%, rgba(139, 69, 19, 0.1) 100%); /* Fondo café glassmorphism */
   position: relative; /* Para efectos */
 }
 
@@ -42,7 +47,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(139, 69, 19, 0.4) 50%, transparent 100%);
 }
 
 /* Logo en la navegación */
@@ -95,21 +100,21 @@
   display: flex; /* Flexbox */
   align-items: center; /* Centra verticalmente */
   gap: 1rem; /* Espacio entre elementos */
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%); /* Glassmorphism */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Borde glassmorphism */
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.15) 0%, rgba(160, 82, 45, 0.1) 100%); /* Glassmorphism café */
+  border-bottom: 1px solid rgba(139, 69, 19, 0.2); /* Borde café glassmorphism */
   flex-shrink: 0; /* No se encoge */
   margin: 0 1rem; /* Margen lateral */
   border-radius: 16px; /* Bordes redondeados */
   backdrop-filter: blur(10px); /* Efecto blur */
   -webkit-backdrop-filter: blur(10px); /* Safari support */
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1); /* Sombra interna y externa */
+    0 4px 12px rgba(139, 69, 19, 0.2),
+    inset 0 1px 0 rgba(245, 222, 179, 0.3); /* Sombra café */
   transition: all 0.3s ease; /* Transición suave */
 }
 
 .nav-user:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.25) 0%, rgba(160, 82, 45, 0.15) 100%);
   transform: translateY(-1px); /* Levantamiento sutil */
 }
 
@@ -118,16 +123,16 @@
   width: 48px; /* Ancho aumentado */
   height: 48px; /* Alto aumentado */
   border-radius: 50%; /* Círculo completo */
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradiente moderno */
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #D2691E 100%); /* Gradiente café */
   display: flex; /* Flexbox */
   align-items: center; /* Centra verticalmente */
   justify-content: center; /* Centra horizontalmente */
   font-size: 1.4rem; /* Tamaño del icono */
-  color: white; /* Color blanco */
+  color: #F5DEB3; /* Color arena claro */
   box-shadow: 
-    0 4px 12px rgba(102, 126, 234, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2); /* Sombras múltiples */
-  border: 2px solid rgba(255, 255, 255, 0.2); /* Borde glassmorphism */
+    0 4px 12px rgba(139, 69, 19, 0.4),
+    inset 0 1px 0 rgba(245, 222, 179, 0.3); /* Sombras café */
+  border: 2px solid rgba(245, 222, 179, 0.3); /* Borde arena glassmorphism */
   transition: all 0.3s ease; /* Transición suave */
   position: relative; /* Para efectos */
   overflow: hidden; /* Para animaciones */
@@ -140,7 +145,7 @@
   left: 50%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  background: linear-gradient(135deg, rgba(245, 222, 179, 0.4) 0%, transparent 70%);
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
   transition: transform 0.3s ease;
@@ -161,11 +166,11 @@
   font-weight: 700; /* Peso más bold */
   font-size: 1rem; /* Tamaño de fuente aumentado */
   margin-bottom: 0.25rem; /* Margen inferior aumentado */
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); /* Gradiente de texto */
+  background: linear-gradient(135deg, #3E2723 0%, #5D4037 100%); /* Gradiente café oscuro */
   -webkit-background-clip: text; /* Clip para gradiente */
   -webkit-text-fill-color: transparent; /* Transparente para mostrar gradiente */
   background-clip: text;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  text-shadow: 0 1px 2px rgba(139, 69, 19, 0.3); /* Sombra café */
   transition: all 0.3s ease; /* Transición suave */
   text-transform: capitalize; /* Primera letra mayúscula */
 }
@@ -173,7 +178,7 @@
 /* Rol del usuario */
 .nav-user-role {
   font-size: 0.8rem; /* Tamaño pequeño */
-  color: #94a3b8; /* Color gris-azul moderno */
+  color: #6D4C41; /* Color café grisáceo */
   text-transform: uppercase; /* Mayúsculas */
   letter-spacing: 1px; /* Espaciado de letras */
   font-weight: 500; /* Peso medio */
@@ -183,12 +188,12 @@
 
 /* Efectos hover para información del usuario */
 .nav-user:hover .nav-user-name {
-  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6)); /* Glow effect */
+  filter: drop-shadow(0 0 8px rgba(139, 69, 19, 0.6)); /* Glow café */
 }
 
 .nav-user:hover .nav-user-role {
   opacity: 1; /* Opacidad completa al hover */
-  color: #cbd5e1; /* Color más claro al hover */
+  color: #5D4037; /* Color más oscuro al hover */
 }
 
 /* Menú principal */
@@ -351,79 +356,11 @@
   transform: scale(1.1); /* Escala al hover */
 }
 
-/* Footer de la navegación */
-.nav-footer {
-  padding: 2rem 1.5rem 1.5rem; /* Padding interno con más espacio superior */
-  border-top: 1px solid rgba(102, 126, 234, 0.2); /* Borde superior moderno */
-  flex-shrink: 0; /* No se encoge */
-  background: rgba(15, 15, 35, 0.2); /* Fondo glassmorphism sutil */
-  backdrop-filter: blur(10px); /* Efecto glassmorphism */
-  position: relative; /* Para efectos */
-}
+/* Footer de la navegación - REMOVIDO POR REQUERIMIENTOS */
+/* El footer ya no existe en el componente */
 
-.nav-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 1.5rem;
-  right: 1.5rem;
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.4) 50%, transparent 100%);
-  border-radius: 1px;
-}
-
-/* Botón de logout */
-.nav-logout {
-  width: 100%; /* Ancho completo */
-  background: rgba(239, 68, 68, 0.1); /* Fondo rojo glassmorphism */
-  border: 1px solid rgba(239, 68, 68, 0.2); /* Borde rojo sutil */
-  color: #f87171; /* Color rojo claro */
-  padding: 1rem; /* Padding interno aumentado */
-  border-radius: 12px; /* Bordes redondeados modernos */
-  backdrop-filter: blur(10px); /* Efecto glassmorphism */
-  display: flex; /* Flexbox */
-  align-items: center; /* Centra verticalmente */
-  justify-content: center; /* Centra horizontalmente */
-  gap: 0.75rem; /* Espacio entre elementos aumentado */
-  cursor: pointer; /* Cursor de mano */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transición premium */
-  font-weight: 600; /* Peso semi-bold */
-  font-size: 0.95rem; /* Tamaño de fuente */
-  position: relative; /* Para efectos */
-  overflow: hidden; /* Para animaciones */
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1); /* Sombra sutil */
-}
-
-/* Efecto shimmer para logout button */
-.nav-logout::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.6s ease;
-}
-
-/* Hover del botón de logout */
-.nav-logout:hover {
-  background: rgba(239, 68, 68, 0.2); /* Fondo rojo más visible */
-  border-color: rgba(239, 68, 68, 0.4); /* Borde más intenso */
-  color: #fca5a5; /* Color más claro al hover */
-  transform: translateY(-2px) scale(1.02); /* Levantamiento y escala */
-  box-shadow: 
-    0 8px 25px rgba(239, 68, 68, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1); /* Sombras múltiples */
-}
-
-.nav-logout:hover::before {
-  left: 100%; /* Efecto shimmer */
-}
-
-.nav-logout:active {
-  transform: translateY(-1px) scale(0.98); /* Efecto de presión */
-}
+/* Botón de logout - REMOVIDO POR REQUERIMIENTOS */
+/* El botón de logout ya no existe en el componente */
 
 /* Responsive design para móviles */
 @media (max-width: 768px) {

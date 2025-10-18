@@ -1,11 +1,51 @@
 /* src/styles/ConfigScreens.css */
-/* Estilos para las pantallas de configuración */
+/* Estilos modernos café arena para las pantallas de configuración */
+
+/* Variables CSS para paleta café arena profesional */
+:root {
+  /* Colores principales café arena */
+  --bg-primary: linear-gradient(135deg, #F5DEB3 0%, #DEB887 50%, #D2B48C 100%); /* Arena claro */
+  --bg-secondary: linear-gradient(135deg, #DEB887 0%, #D2B48C 50%, #BC9A6A 100%); /* Arena medio */
+  --bg-tertiary: linear-gradient(135deg, #A0522D 0%, #8B4513 50%, #654321 100%); /* Café oscuro */
+  
+  /* Colores de texto */
+  --text-primary: #3E2723; /* Café muy oscuro */
+  --text-secondary: #5D4037; /* Café oscuro */
+  --text-accent: #8B4513; /* Café medio */
+  --text-light: #F5DEB3; /* Arena claro */
+  
+  /* Bordes y sombras */
+  --border-color: rgba(139, 69, 19, 0.2); /* Borde café translúcido */
+  --border-radius: 16px; /* Bordes redondeados modernos */
+  --shadow-sm: 0 4px 12px rgba(139, 69, 19, 0.15); /* Sombra suave café */
+  --shadow-md: 0 8px 25px rgba(139, 69, 19, 0.25); /* Sombra media café */
+  --shadow-lg: 0 12px 40px rgba(139, 69, 19, 0.35); /* Sombra grande café */
+  
+  /* Efectos glassmorphism */
+  --glass-bg: rgba(245, 222, 179, 0.2); /* Fondo glassmorphism arena */
+  --glass-border: rgba(139, 69, 19, 0.3); /* Borde glassmorphism café */
+}
 
 /* Contenedor principal de las pantallas de configuración */
 .config-screen {
   min-height: 100vh; /* Altura mínima completa */
-  background-color: var(--bg-secondary); /* Fondo verde muy claro */
+  background: var(--bg-secondary); /* Fondo arena degradado */
   padding: 2rem; /* Padding interno */
+  position: relative; /* Para efectos */
+  overflow-x: hidden; /* Sin scroll horizontal */
+}
+
+.config-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(160, 82, 45, 0.1) 0%, transparent 50%);
+  pointer-events: none; /* No interfiere con interacciones */
 }
 
 /* Header de las pantallas de configuración */
@@ -14,18 +54,82 @@
   justify-content: space-between; /* Espacio entre elementos */
   align-items: center; /* Centra verticalmente */
   margin-bottom: 2rem; /* Margen inferior */
-  background: var(--bg-primary); /* Fondo blanco */
-  padding: 1.5rem; /* Padding interno */
+  background: var(--glass-bg); /* Fondo glassmorphism arena */
+  backdrop-filter: blur(20px); /* Efecto glassmorphism */
+  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  padding: 2rem; /* Padding interno aumentado */
   border-radius: var(--border-radius); /* Bordes redondeados */
-  box-shadow: var(--shadow-sm); /* Sombra verde suave */
-  border: 1px solid var(--border-color); /* Borde verde claro */
+  box-shadow: var(--shadow-md); /* Sombra café media */
+  border: 1px solid var(--glass-border); /* Borde glassmorphism café */
+  position: relative; /* Para efectos */
+  overflow: hidden; /* Para animaciones */
+}
+
+.config-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(139, 69, 19, 0.6) 20%, 
+    rgba(160, 82, 45, 0.8) 50%, 
+    rgba(139, 69, 19, 0.6) 80%, 
+    transparent 100%
+  ); /* Línea decorativa café superior */
+}
+
+.config-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--glass-border) 50%, transparent 100%);
 }
 
 /* Contenedor izquierdo del header */
 .header-left {
   display: flex; /* Flexbox */
   align-items: center; /* Centra verticalmente */
-  gap: 1rem; /* Espacio entre elementos */
+  gap: 1.5rem; /* Espacio entre elementos aumentado */
+}
+
+/* Títulos de las pantallas de configuración */
+.config-title {
+  font-size: 2rem; /* Tamaño grande */
+  font-weight: 800; /* Extra bold */
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%); /* Gradiente café */
+  -webkit-background-clip: text; /* Clip para gradiente */
+  -webkit-text-fill-color: transparent; /* Transparente para mostrar gradiente */
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(139, 69, 19, 0.2); /* Sombra café sutil */
+  margin: 0; /* Sin margen */
+  letter-spacing: -0.5px; /* Espaciado ajustado */
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+.config-title:hover {
+  filter: drop-shadow(0 0 12px rgba(139, 69, 19, 0.6)); /* Glow café al hover */
+}
+
+/* Iconos en los títulos */
+.config-icon {
+  font-size: 2.2rem; /* Tamaño del icono */
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #D2691E 100%); /* Gradiente café */
+  -webkit-background-clip: text; /* Clip para gradiente */
+  -webkit-text-fill-color: transparent; /* Transparente para mostrar gradiente */
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(139, 69, 19, 0.3)); /* Sombra café */
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+.config-icon:hover {
+  filter: drop-shadow(0 0 16px rgba(139, 69, 19, 0.8)); /* Glow intenso al hover */
+  transform: scale(1.1) rotate(5deg); /* Escala y rotación sutil */
 }
 
 /* Estilo para celdas de dirección largas */
@@ -98,24 +202,51 @@
 
 /* Botón de regresar */
 .back-button {
-  background: var(--bg-secondary); /* Fondo gris claro */
-  border: 1px solid var(--border-color); /* Borde gris */
-  color: var(--text-primary); /* Color de texto */
-  padding: 0.75rem 1rem; /* Padding interno */
+  background: var(--glass-bg); /* Fondo glassmorphism arena */
+  backdrop-filter: blur(10px); /* Efecto glassmorphism */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  border: 1px solid var(--glass-border); /* Borde café glassmorphism */
+  color: var(--text-primary); /* Color de texto café */
+  padding: 1rem 1.5rem; /* Padding interno aumentado */
   border-radius: var(--border-radius); /* Bordes redondeados */
   cursor: pointer; /* Cursor de mano */
-  font-size: 0.9rem; /* Tamaño de fuente */
-  transition: all var(--transition-fast); /* Transición rápida */
+  font-size: 0.95rem; /* Tamaño de fuente */
+  font-weight: 600; /* Peso semi-bold */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transición premium */
   display: flex; /* Flexbox */
   align-items: center; /* Centra verticalmente */
-  gap: 0.5rem; /* Espacio entre elementos */
+  gap: 0.75rem; /* Espacio entre elementos aumentado */
+  box-shadow: var(--shadow-sm); /* Sombra café */
+  position: relative; /* Para efectos */
+  overflow: hidden; /* Para animaciones */
+}
+
+.back-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+  transition: left 0.6s ease;
 }
 
 /* Hover del botón de regresar */
 .back-button:hover {
-  background: var(--primary-color); /* Fondo azul */
-  color: white; /* Texto blanco */
-  border-color: var(--primary-color); /* Borde azul */
+  background: rgba(139, 69, 19, 0.2); /* Fondo café glassmorphism */
+  color: var(--text-secondary); /* Texto café más oscuro */
+  border-color: rgba(139, 69, 19, 0.4); /* Borde café más intenso */
+  transform: translateY(-2px) scale(1.02); /* Levantamiento y escala */
+  box-shadow: var(--shadow-md); /* Sombra café más intensa */
+}
+
+.back-button:hover::before {
+  left: 100%; /* Efecto shimmer */
+}
+
+.back-button:active {
+  transform: translateY(-1px) scale(0.98); /* Efecto de presión */
 }
 
 /* Título de la pantalla de configuración */
@@ -143,22 +274,47 @@
 
 /* Tarjeta del formulario */
 .form-card {
-  background: var(--bg-primary); /* Fondo blanco */
-  max-width: 500px; /* Ancho máximo */
+  background: var(--glass-bg); /* Fondo glassmorphism arena */
+  backdrop-filter: blur(20px); /* Efecto glassmorphism */
+  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  max-width: 600px; /* Ancho máximo aumentado */
   width: 100%; /* Ancho completo */
   max-height: 90vh; /* Alto máximo */
   overflow-y: auto; /* Scroll vertical si es necesario */
   border-radius: var(--border-radius); /* Bordes redondeados */
-  box-shadow: var(--shadow-lg); /* Sombra grande */
+  box-shadow: var(--shadow-lg); /* Sombra grande café */
+  border: 1px solid var(--glass-border); /* Borde glassmorphism café */
+  padding: 2rem; /* Padding interno */
+  position: relative; /* Para efectos */
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    rgba(139, 69, 19, 0.6) 0%, 
+    rgba(160, 82, 45, 0.8) 50%, 
+    rgba(139, 69, 19, 0.6) 100%
+  ); /* Línea decorativa café superior */
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 /* Título del formulario */
 .form-card h2 {
-  font-size: 1.5rem; /* Tamaño grande */
-  font-weight: 600; /* Peso semi-bold */
-  color: var(--text-primary); /* Color principal */
-  margin-bottom: 1.5rem; /* Margen inferior */
+  font-size: 1.75rem; /* Tamaño aumentado */
+  font-weight: 800; /* Extra bold */
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%); /* Gradiente café */
+  -webkit-background-clip: text; /* Clip para gradiente */
+  -webkit-text-fill-color: transparent; /* Transparente para mostrar gradiente */
+  background-clip: text;
+  margin-bottom: 2rem; /* Margen inferior aumentado */
   text-align: center; /* Texto centrado */
+  text-shadow: 0 2px 4px rgba(139, 69, 19, 0.2); /* Sombra café */
+  letter-spacing: -0.5px; /* Espaciado ajustado */
 }
 
 /* Grupo de campos del formulario */
