@@ -9,12 +9,11 @@ import '../styles/HomeScreen.css'; // Importa estilos específicos
 interface NavigationProps {
   user: Usuario;
   onNavigate: (screen: ScreenType) => void;
-  onLogout: () => void;
-  showMobile: boolean;
+   showMobile: boolean;
   onToggleMobile: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ user, onNavigate, onLogout, showMobile, onToggleMobile }) => {
+const Navigation: React.FC<NavigationProps> = ({ onNavigate, showMobile, onToggleMobile }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Función para manejar dropdown
@@ -152,20 +151,7 @@ const Navigation: React.FC<NavigationProps> = ({ user, onNavigate, onLogout, sho
         </div>
       </div>
 
-      {/* Footer de navegación */}
-      <div className="nav-footer">
-        <div className="nav-user">
-          <span className="user-icon">👤</span>
-          <div className="user-info">
-            <span className="user-name">{user.nombre || user.usuario}</span>
-            <span className="user-role">Administrador</span>
-          </div>
-        </div>
-        <button className="logout-button" onClick={onLogout}>
-          <span>🚪</span>
-          Cerrar Sesión
-        </button>
-      </div>
+     
     </nav>
   );
 };
@@ -178,7 +164,7 @@ interface HomeScreenProps {
 }
 
 // Componente de pantalla principal
-const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate, onLogout }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate }) => {
   // Estado para los indicadores del dashboard
   const [indicators, setIndicators] = useState<Indicator[]>([]);
 
@@ -261,7 +247,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate, onLogout }) =
       <Navigation 
         user={user}
         onNavigate={onNavigate}
-        onLogout={onLogout}
         showMobile={showMobileMenu}
         onToggleMobile={() => setShowMobileMenu(!showMobileMenu)}
       />

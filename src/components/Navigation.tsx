@@ -8,8 +8,7 @@ import '../styles/Navigation.css'; // Importa estilos específicos
 interface NavigationProps {
   user: Usuario; // Usuario autenticado
   onNavigate: (screen: ScreenType) => void; // Función de navegación
-  onLogout: () => void; // Función de logout
-  showMobile: boolean; // Mostrar en móvil
+   showMobile: boolean; // Mostrar en móvil
   onToggleMobile: () => void; // Toggle del menú móvil
 }
 
@@ -17,8 +16,7 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ 
   user, 
   onNavigate, 
-  onLogout, 
-  showMobile, 
+   showMobile, 
   onToggleMobile 
 }) => {
 
@@ -31,12 +29,7 @@ const Navigation: React.FC<NavigationProps> = ({
     }
   };
 
-  // Función para manejar logout
-  const handleLogout = (): void => {
-    console.log('🚪 Cerrando sesión desde navegación'); // Log de logout
-    onLogout(); // Ejecuta logout
-  };
-
+  
   return (
     <nav className={`navigation ${showMobile ? 'mobile-open' : ''}`}>
       
@@ -161,7 +154,7 @@ const Navigation: React.FC<NavigationProps> = ({
         <div className="nav-section">
           <div className="nav-section-title">
             <span className="nav-section-icon">🔧</span>
-            SISTEMA
+            SISTEM4
           </div>
           <ul className="nav-items">
             <li>
@@ -179,15 +172,14 @@ const Navigation: React.FC<NavigationProps> = ({
             <li>
               <button className="nav-item">
                 <span className="nav-item-icon">🔄</span>
-                Respaldos
+                Respald0s
               </button>
             </li>
           </ul>
         </div>
       </div>
 
-      {/* Footer con botón de logout */}
-      
+           
     </nav>
   );
 };
