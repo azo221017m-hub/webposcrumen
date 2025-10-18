@@ -211,11 +211,42 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
   };
 
   // Función para formatear números como moneda
-  const formatearMoneda = (valor: number): string => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN'
-    }).format(valor);
+  const formatearMoneda = (valor: any): string => {
+    try {
+      const numero = Number(valor);
+      if (isNaN(numero)) return '$0.00';
+      return new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN'
+      }).format(numero);
+    } catch (error) {
+      console.error('Error formateando moneda:', error);
+      return '$0.00';
+    }
+  };
+
+  // Función para formatear números decimales de forma segura
+  const formatearDecimal = (valor: any, decimales: number = 3): string => {
+    try {
+      const numero = Number(valor);
+      if (isNaN(numero)) return '0.000';
+      return numero.toFixed(decimales);
+    } catch (error) {
+      console.error('Error formateando decimal:', error);
+      return '0.000';
+    }
+  };
+
+  // Función para comparar stock de forma segura
+  const esStockBajo = (existencia: any, stockMinimo: any): boolean => {
+    try {
+      const exist = Number(existencia);
+      const minimo = Number(stockMinimo);
+      if (isNaN(exist) || isNaN(minimo)) return false;
+      return exist <= minimo;
+    } catch (error) {
+      return false;
+    }
   };
 
   // Función para obtener nombre de categoría
@@ -458,11 +489,11 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
                       <td className="insumo-categoria">{obtenerNombreCategoria(insumo.idCategoria)}</td>
                       <td className="text-right insumo-costo">{formatearMoneda(insumo.costoPromPond)}</td>
                       <td className="text-right insumo-existencia">
-                        <span className={insumo.existencia <= insumo.stockMinimo ? 'stock-bajo' : ''}>
-                          {insumo.existencia.toFixed(3)}
+                        <span className={esStockBajo(insumo.existencia, insumo.stockMinimo) ? 'stock-bajo' : ''}>
+                          {formatearDecimal(insumo.existencia, 3)}
                         </span>
                       </td>
-                      <td className="text-right insumo-stock-min">{insumo.stockMinimo.toFixed(3)}</td>
+                      <td className="text-right insumo-stock-min">{formatearDecimal(insumo.stockMinimo, 3)}</td>
                       <td className="text-right insumo-precio">{formatearMoneda(insumo.precioVta)}</td>
                       <td className="text-date insumo-fecha">{formatearFecha(insumo.fechaRegistro)}</td>
                       <td className="insumo-usuario">{insumo.usuario}</td>

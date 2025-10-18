@@ -239,16 +239,16 @@ export interface CreateProductoData {
   imagenProducto?: File; // Archivo de imagen del producto
 }
 
-// Tipo para datos de insumo
+// Tipo para datos de insumo (como viene del backend)
 export interface Insumo {
   idInsumo: number; // ID único del insumo
   nomInsumo: string; // Nombre del insumo
-  costoPromPond: number; // Costo promedio ponderado
+  costoPromPond: string | number; // Costo promedio ponderado (decimal de MySQL)
   umInsumo: string; // Unidad de medida del insumo
   tipoInsumo: 'PIEZA' | 'CONSUMO'; // Tipo de insumo
-  existencia: number; // Existencia disponible
-  stockMinimo: number; // Stock mínimo
-  precioVta: number; // Precio de venta
+  existencia: string | number; // Existencia disponible (decimal de MySQL)
+  stockMinimo: string | number; // Stock mínimo (decimal de MySQL)
+  precioVta: string | number; // Precio de venta (decimal de MySQL)
   idCategoria: number; // ID de la categoría
   fechaRegistro: string; // Fecha de registro
   fechaActualizacion: string; // Fecha de última actualización
