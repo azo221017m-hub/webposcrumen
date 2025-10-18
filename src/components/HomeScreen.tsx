@@ -278,18 +278,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate }) => {
           </div>
         </header>
 
-        {/* Grid de 4 tarjetas principales */}
+        {/* Grid de indicadores mejorado */}
         <section className="indicators-section">
           <div className="main-indicators-grid">
             
-            {/* Indicadores dinámicos (datos cargados) */}
+            {/* Indicadores dinámicos agrupados */}
             <div className="dynamic-indicators">
               {indicators.map((ind) => (
                 <div
                   key={ind.id}
                   className="indicator-card dynamic-card"
                   onClick={() => handleIndicatorClick(ind.id)}
-                  style={{ cursor: 'pointer' }}
                 >
                   <div className="card-header">
                     <div className="card-icon" style={{ color: ind.color }}>{ind.icon}</div>
