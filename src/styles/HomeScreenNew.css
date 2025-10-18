@@ -1,20 +1,23 @@
 /* HomeScreen.css - Diseño mejorado con tema VSCode */
 
-/* Variables CSS para tema VSCode */
+/* Variables CSS para tema teal corporativo */
 :root {
   /* Colores principales */
-  --vscode-bg-primary: #1e1e1e;
-  --vscode-bg-secondary: #252526;
-  --vscode-bg-tertiary: #2d2d30;
-  --vscode-accent: #007acc;
-  --vscode-accent-hover: #1177bb;
-  --vscode-text-primary: #cccccc;
-  --vscode-text-secondary: #969696;
-  --vscode-text-muted: #6a6a6a;
-  --vscode-border: #3e3e42;
-  --vscode-success: #4ec9b0;
-  --vscode-error: #f44747;
-  --vscode-warning: #ffcc02;
+  --vscode-bg-primary: #134e4a;
+  --vscode-bg-secondary: #115e59;
+  --vscode-bg-tertiary: #0f766e;
+  --vscode-accent: #14b8a6;
+  --vscode-accent-hover: #0d9488;
+  --vscode-accent-light: #2dd4bf;
+  --vscode-secondary: #5eead4;
+  --vscode-secondary-hover: #2dd4bf;
+  --vscode-text-primary: #f0fdfa;
+  --vscode-text-secondary: #ccfbf1;
+  --vscode-text-muted: #99f6e4;
+  --vscode-border: #0f766e;
+  --vscode-success: #059669;
+  --vscode-error: #dc2626;
+  --vscode-warning: #d97706;
   
   /* Efectos */
   --vscode-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -39,6 +42,9 @@
   color: var(--vscode-text-primary);
   font-family: 'Segoe UI', Consolas, 'Courier New', monospace;
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 /* Navegación lateral */
@@ -200,10 +206,11 @@
 .main-content {
   flex: 1;
   margin-left: 300px;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--vscode-bg-primary);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* Header principal */
@@ -257,7 +264,7 @@
 /* Área de dashboard */
 .dashboard-area {
   flex: 1;
-  padding: 2rem;
+  padding: 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -265,47 +272,51 @@
   text-align: center;
   position: relative;
   overflow: auto;
+  min-height: calc(100vh - 80px); /* Restamos la altura del header */
 }
 
 /* Logo principal centrado */
 .dashboard-logo {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   animation: logoFloat 3s ease-in-out infinite;
+  transform: scale(1.2);
 }
 
 .dashboard-logo img {
-  max-width: 200px;
+  max-width: 250px;
   height: auto;
   filter: drop-shadow(var(--vscode-shadow));
 }
 
 /* Mensaje de bienvenida */
 .welcome-message {
-  max-width: 600px;
-  margin-bottom: 2rem;
+  max-width: 700px;
+  margin-bottom: 3rem;
 }
 
 .welcome-title {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   background: linear-gradient(135deg, var(--vscode-accent), var(--vscode-success));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 0 30px rgba(0, 122, 204, 0.3);
 }
 
 .welcome-subtitle {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: var(--vscode-text-secondary);
   line-height: 1.6;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 .welcome-description {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--vscode-text-muted);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* Cards de estadísticas */

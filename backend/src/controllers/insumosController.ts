@@ -455,9 +455,13 @@ export const deleteInsumoController = async (req: Request, res: Response): Promi
 // Controlador para buscar insumos por filtro de nombre
 export const buscarInsumosController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { filtro } = req.params;
+    // Soportar tanto parámetros de ruta como query parameters
+    const filtroParam = req.params.filtro;
+    const { busqueda, tipo } = req.query;
     
-    console.log('🔍 Buscando insumos con filtro:', filtro);
+    const filtro = filtroParam || busqueda as string;
+    
+    console.log('🔍 Buscando insumos con filtro:', filtro, 'Tipo:', tipo);
 
     // Validar que el filtro no esté vacío
     if (!filtro || filtro.trim().length < 2) {
@@ -469,8 +473,8 @@ export const buscarInsumosController = async (req: Request, res: Response): Prom
       return;
     }
 
-    // Query para buscar insumos que coincidan con el filtro
-    const query = `
+    // Construir query dinámicamente según los filtros
+    let query = `
       SELECT 
         idInsumo,
         nomInsumo,
@@ -480,15 +484,22 @@ export const buscarInsumosController = async (req: Request, res: Response): Prom
         existencia,
         idCategoria
       FROM tblposcrumenwebinsumos
-      WHERE nomInsumo LIKE ? 
-      ORDER BY nomInsumo
-      LIMIT 10
+      WHERE nomInsumo LIKE ?
     `;
-
-    const searchTerm = `%${filtro.trim()}%`;
-    const insumos = await executeQuery(query, [searchTerm]);
     
-    console.log(`✅ ${insumos.length} insumos encontrados con filtro "${filtro}"`);
+    const queryParams: any[] = [`%${filtro.trim()}%`];
+    
+    // Agregar filtro por tipo si se especifica
+    if (tipo && tipo !== 'ALL') {
+      query += ' AND tipoInsumo = ?';
+      queryParams.push(tipo);
+    }
+    
+    query += ' ORDER BY nomInsumo LIMIT 20';
+
+    const insumos = await executeQuery(query, queryParams);
+    
+    console.log(`✅ ${insumos.length} insumos encontrados con filtro "${filtro}" ${tipo ? `tipo "${tipo}"` : ''}`);
 
     res.status(200).json({
       success: true,

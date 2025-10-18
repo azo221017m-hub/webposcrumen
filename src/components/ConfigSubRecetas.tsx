@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Usuario, ScreenType } from '../types';
 import Toast from './Toast';
+import InsumosSelector from './InsumosSelector';
 import '../styles/ConfigScreens.css';
 
 // Interfaces para Sub-Recetas
@@ -42,13 +43,7 @@ interface ConfigSubRecetasProps {
   onNavigate: (screen: ScreenType) => void;
 }
 
-interface InsumoConsumo {
-  idInsumo: number;
-  nomInsumo: string;
-  umInsumo: string;
-  costoPromPond: number;
-  existencia: number;
-}
+
 
 const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate }) => {
   // Estados principales
@@ -74,12 +69,6 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
     usuario: user.usuario,
     idNegocio: 1
   }]);
-
-  // Estados para buscador de insumos
-  const [terminoBusqueda, setTerminoBusqueda] = useState<string>('');
-  const [resultadosBusqueda, setResultadosBusqueda] = useState<InsumoConsumo[]>([]);
-  const [buscandoInsumos, setBuscandoInsumos] = useState<boolean>(false);
-  const [mostrarResultados, setMostrarResultados] = useState<boolean>(false);
 
   // Estados para Toast
   const [showToast, setShowToast] = useState(false);
@@ -172,71 +161,17 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
   };
 
   // Función para buscar insumos de consumo
-  const buscarInsumosConsumo = async (): Promise<void> => {
-    if (!terminoBusqueda || terminoBusqueda.trim().length < 2) {
-      mostrarToast('Ingrese al menos 2 caracteres para buscar', 'error');
-      return;
-    }
-
-    try {
-      setBuscandoInsumos(true);
-      setMostrarResultados(false);
-      
-      const url = `/api/sub-recetas/insumos-consumo/buscar/${encodeURIComponent(terminoBusqueda)}`;
-      console.log(`🔍 Buscando insumos de consumo: "${terminoBusqueda}"`);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(`📊 Respuesta búsqueda:`, data);
-
-      if (data.success) {
-        const resultados = data.data || [];
-        setResultadosBusqueda(resultados);
-        setMostrarResultados(true);
-        
-        console.log(`✅ ${resultados.length} insumos de consumo encontrados`);
-        
-        if (resultados.length === 0) {
-          mostrarToast('No se encontraron insumos de consumo con ese término', 'info');
-        } else {
-          mostrarToast(`${resultados.length} insumos encontrados`, 'success');
-        }
-      } else {
-        setResultadosBusqueda([]);
-        setMostrarResultados(false);
-        mostrarToast('Error al buscar insumos: ' + (data.message || 'Error desconocido'), 'error');
-      }
-    } catch (error) {
-      console.error('❌ Error al buscar insumos:', error);
-      setResultadosBusqueda([]);
-      setMostrarResultados(false);
-      mostrarToast('Error de conexión al buscar insumos', 'error');
-    } finally {
-      setBuscandoInsumos(false);
-    }
-  };
-
-  // Función para agregar insumo encontrado a la sub-receta
-  const agregarInsumoASubReceta = (insumoEncontrado: InsumoConsumo): void => {
+  // Función para manejar selección de insumos desde InsumosSelector
+  const handleInsumoSelect = (insumo: any): void => {
     try {
       // Validar que el insumo tenga los datos necesarios
-      if (!insumoEncontrado || !insumoEncontrado.nomInsumo) {
+      if (!insumo || !insumo.nomInsumo) {
         mostrarToast('Error: Datos del insumo incompletos', 'error');
         return;
       }
 
       // Buscar el primer insumo vacío o agregar uno nuevo
-      let indexVacio = insumos.findIndex(insumo => !insumo.nombreInsumoSubr.trim());
+      let indexVacio = insumos.findIndex(item => !item.nombreInsumoSubr.trim());
       
       if (indexVacio === -1) {
         // No hay espacios vacíos, agregar uno nuevo
@@ -246,11 +181,11 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
         }
         
         const nuevoInsumo: DetalleSubReceta = {
-          nombreInsumoSubr: insumoEncontrado.nomInsumo || '',
-          umInsumoSubr: insumoEncontrado.umInsumo || '',
+          nombreInsumoSubr: insumo.nomInsumo || '',
+          umInsumoSubr: insumo.umInsumo || '',
           cantidadUsoSubr: 0,
-          costoInsumoSubr: typeof insumoEncontrado.costoPromPond === 'number' ? 
-            insumoEncontrado.costoPromPond : parseFloat(String(insumoEncontrado.costoPromPond || 0)),
+          costoInsumoSubr: typeof insumo.costoPromPond === 'number' ? 
+            insumo.costoPromPond : parseFloat(String(insumo.costoPromPond || 0)),
           estatus: 1,
           usuario: user.usuario,
           idNegocio: 1
@@ -262,26 +197,23 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
         const nuevosInsumos = [...insumos];
         nuevosInsumos[indexVacio] = {
           ...nuevosInsumos[indexVacio],
-          nombreInsumoSubr: insumoEncontrado.nomInsumo || '',
-          umInsumoSubr: insumoEncontrado.umInsumo || '',
-          costoInsumoSubr: typeof insumoEncontrado.costoPromPond === 'number' ? 
-            insumoEncontrado.costoPromPond : parseFloat(String(insumoEncontrado.costoPromPond || 0))
+          nombreInsumoSubr: insumo.nomInsumo || '',
+          umInsumoSubr: insumo.umInsumo || '',
+          costoInsumoSubr: typeof insumo.costoPromPond === 'number' ? 
+            insumo.costoPromPond : parseFloat(String(insumo.costoPromPond || 0))
         };
         setInsumos(nuevosInsumos);
       }
       
-      // Limpiar resultados de búsqueda
-      setMostrarResultados(false);
-      setResultadosBusqueda([]);
-      setTerminoBusqueda('');
-      
-      console.log('✅ Insumo agregado a la sub-receta:', insumoEncontrado.nomInsumo);
-      mostrarToast(`Insumo "${insumoEncontrado.nomInsumo}" agregado`, 'success');
+      console.log('✅ Insumo agregado a la sub-receta:', insumo.nomInsumo);
+      mostrarToast(`Insumo "${insumo.nomInsumo}" agregado`, 'success');
     } catch (error) {
       console.error('❌ Error al agregar insumo a la sub-receta:', error);
       mostrarToast('Error al agregar el insumo', 'error');
     }
   };
+
+
 
   // Función para calcular costo total automáticamente
   useEffect(() => {
@@ -392,9 +324,6 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
     }]);
     setEditingSubReceta(null);
     setError(null);
-    setMostrarResultados(false);
-    setResultadosBusqueda([]);
-    setTerminoBusqueda('');
   };
 
   // Función para editar sub-receta
@@ -592,75 +521,13 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
                 {/* Buscador de Insumos de Consumo */}
                 <div className="form-section">
                   <h3>🔍 Buscador de Insumos de Consumo</h3>
-                  <div className="form-row">
-                    <div className="form-group" style={{ flex: '1' }}>
-                      <label className="form-label">Buscar Insumo por Nombre</label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={terminoBusqueda}
-                        onChange={(e) => setTerminoBusqueda(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            buscarInsumosConsumo();
-                          }
-                        }}
-                        placeholder="Escriba el nombre del insumo de consumo..."
-                        maxLength={50}
-                      />
-                    </div>
-                    <div className="form-group" style={{ flex: '0 0 auto', marginTop: '1.5rem' }}>
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={buscarInsumosConsumo}
-                        disabled={buscandoInsumos || terminoBusqueda.trim().length < 2}
-                      >
-                        {buscandoInsumos ? '🔍 Buscando...' : '🔍 Buscar'}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Resultados de búsqueda */}
-                  {mostrarResultados && (
-                    <div className="search-results">
-                      <h4>Insumos de Consumo Encontrados ({resultadosBusqueda.length})</h4>
-                      {resultadosBusqueda.length === 0 ? (
-                        <div className="no-results">
-                          <p>No se encontraron insumos de consumo con ese término.</p>
-                        </div>
-                      ) : (
-                        <div className="results-grid">
-                          {resultadosBusqueda.map((insumo, index) => (
-                            <div key={index} className="result-card">
-                              <div className="result-info">
-                                <h5>{insumo.nomInsumo}</h5>
-                                <div className="result-details">
-                                  <span className="result-um">📏 {insumo.umInsumo || 'N/A'}</span>
-                                  <span className="result-price">
-                                    💰 ${typeof insumo.costoPromPond === 'number' ? 
-                                      insumo.costoPromPond.toFixed(2) : 
-                                      parseFloat(String(insumo.costoPromPond || 0)).toFixed(2)}
-                                  </span>
-                                  {insumo.existencia !== undefined && (
-                                    <span className="result-stock">📦 Stock: {insumo.existencia}</span>
-                                  )}
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                className="btn btn-success btn-sm"
-                                onClick={() => agregarInsumoASubReceta(insumo)}
-                              >
-                                ➕ Agregar a Sub-Receta
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {/* Selector de Insumos */}
+                  <InsumosSelector 
+                    onInsumoSelect={handleInsumoSelect}
+                    filtroTipo="CONSUMO"
+                    label="Buscar Insumos de Consumo"
+                    placeholder="Buscar insumos para agregar a la sub-receta..."
+                  />
                 </div>
 
                 {/* Insumos */}

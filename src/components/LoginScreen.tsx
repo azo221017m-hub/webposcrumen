@@ -4,7 +4,7 @@
 import { useState } from 'react'; // Importa hooks de React
 import type { LoginData } from '../types'; // Importa tipos
 import Toast from './Toast'; // Importa componente Toast
-import '../styles/LoginScreen.css'; // Importa estilos específicos
+import '../styles/LoginScreenNew.css'; // Importa estilos específicos
 
 // Interfaz para las props del componente
 interface LoginScreenProps {
@@ -104,7 +104,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
   };
 
   return (
-    <div className="login-screen fullscreen">
+    <div className="login-screen">
       {/* Contenedor principal del login */}
       <div className="login-container">
         

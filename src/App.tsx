@@ -98,8 +98,13 @@ function App() {
       return (
         <div className="loading-screen fullscreen center-content">
           <div className="loading-content">
+            <img 
+              src="/logocrumenpos.svg" 
+              alt="Logo Crumen POS" 
+              className="loading-logo"
+            />
             <div className="spinner"></div>
-            <p>Cargando POSWEBCrumen...</p>
+            <p>PosWebCrumen Cargando</p>
           </div>
         </div>
       );

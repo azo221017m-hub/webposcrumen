@@ -3,9 +3,10 @@
 
 import React, { useState, useEffect } from 'react';
 import type { Usuario } from '../types';
+import InsumosSelector from './InsumosSelector';
 import '../styles/ConfigScreens.css';
 
-// Interfaces para Recetas
+//// Interfaces para Recetas
 interface Receta {
   idReceta?: number;
   nombreReceta: string;
@@ -78,11 +79,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     idNegocio: 1
   }]);
 
-  // Estados para buscador de insumos
-  const [terminoBusqueda, setTerminoBusqueda] = useState<string>('');
-  const [resultadosBusqueda, setResultadosBusqueda] = useState<any[]>([]);
-  const [buscandoInsumos, setBuscandoInsumos] = useState<boolean>(false);
-  const [mostrarResultados, setMostrarResultados] = useState<boolean>(false);
+  // Estados para errores
   const [errorCritico, setErrorCritico] = useState<string | null>(null);
 
   // Cargar recetas al montar el componente
@@ -170,97 +167,12 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     setInsumos(nuevosInsumos);
   };
 
-  // Función para buscar insumos en la tabla
-  const buscarInsumosEnTabla = async (): Promise<void> => {
-    if (!terminoBusqueda || terminoBusqueda.trim().length < 2) {
-      alert('Ingrese al menos 2 caracteres para buscar');
-      return;
-    }
 
-    try {
-      setErrorCritico(null); // Limpiar errores previos
-      setBuscandoInsumos(true);
-      setMostrarResultados(false);
-      
-      const url = `/api/insumos/buscar/${encodeURIComponent(terminoBusqueda)}`;
-      console.log(`🔍 Buscando insumos con término: "${terminoBusqueda}"`);
-      console.log(`📡 URL de búsqueda: ${url}`);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
-      console.log(`📊 Response status: ${response.status}`);
-      console.log(`📊 Response ok: ${response.ok}`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(`📊 Response data:`, data);
-      console.log(`📊 Type of data.data:`, typeof data.data);
-      console.log(`📊 Array.isArray(data.data):`, Array.isArray(data.data));
-
-      if (data.success) {
-        console.log(`🎯 Entrando a data.success === true`);
-        const resultados = data.data || [];
-        console.log(`🎯 Resultados procesados:`, resultados);
-        
-        // Log detallado de cada insumo encontrado
-        resultados.forEach((insumo: any, index: number) => {
-          console.log(`🔍 Insumo ${index + 1}:`, {
-            nomInsumo: insumo.nomInsumo,
-            umInsumo: insumo.umInsumo,
-            costoPromPond: insumo.costoPromPond,
-            costoPromPondType: typeof insumo.costoPromPond,
-            existencia: insumo.existencia
-          });
-        });
-        
-        setResultadosBusqueda(resultados);
-        console.log(`🎯 setResultadosBusqueda ejecutado`);
-        
-        setMostrarResultados(true);
-        console.log(`🎯 setMostrarResultados(true) ejecutado`);
-        
-        console.log(`✅ ${resultados.length} insumos encontrados`);
-        
-        if (resultados.length === 0) {
-          alert('No se encontraron insumos con ese término de búsqueda');
-        } else {
-          console.log(`🎯 Mostrando ${resultados.length} resultados`);
-        }
-      } else {
-        setResultadosBusqueda([]);
-        setMostrarResultados(false);
-        alert('Error al buscar insumos: ' + (data.message || 'Error desconocido'));
-      }
-    } catch (error) {
-      console.error('❌ Error al buscar insumos:', error);
-      
-      // Resetear estados en caso de error
-      setResultadosBusqueda([]);
-      setMostrarResultados(false);
-      
-      // Mostrar error específico al usuario
-      if (error instanceof Error) {
-        if (error.message.includes('HTTP error')) {
-          alert(`Error del servidor: ${error.message}`);
-        } else if (error.message.includes('Failed to fetch')) {
-          alert('Error de conexión: No se puede conectar al servidor. Verifique que el backend esté funcionando.');
-        } else {
-          alert(`Error: ${error.message}`);
-        }
-      } else {
-        alert('Error desconocido al buscar insumos');
-      }
-    } finally {
-      setBuscandoInsumos(false);
-    }
+  // Función para manejar selección de insumo del selector
+  const handleInsumoSelect = (insumoEncontrado: any): void => {
+    console.log('🎯 Insumo seleccionado para agregar a receta:', insumoEncontrado);
+    agregarInsumoAReceta(insumoEncontrado);
   };
 
   // Función para agregar insumo encontrado a la receta
@@ -305,10 +217,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
         setInsumos(nuevosInsumos);
       }
       
-      // Limpiar resultados de búsqueda
-      setMostrarResultados(false);
-      setResultadosBusqueda([]);
-      setTerminoBusqueda('');
+
       
       console.log('✅ Insumo agregado a la receta:', insumoEncontrado.nomInsumo);
       alert(`✅ Insumo "${insumoEncontrado.nomInsumo}" agregado a la receta`);
@@ -486,20 +395,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     }
   };
 
-  // Log de estado cada vez que cambia
-  useEffect(() => {
-    console.log(`🔄 Estado actualizado - mostrarResultados:`, mostrarResultados);
-    console.log(`🔄 Estado actualizado - resultadosBusqueda:`, resultadosBusqueda);
-  }, [mostrarResultados, resultadosBusqueda]);
 
-  // Log de render
-  console.log(`🎨 Renderizando ConfigRecetas - mostrarResultados:`, mostrarResultados);
-  console.log(`🎨 Renderizando ConfigRecetas - resultadosBusqueda:`, resultadosBusqueda);
-  
-  // Log adicional cuando se debe mostrar resultados
-  if (mostrarResultados) {
-    console.log(`🎯 DEBE MOSTRAR RESULTADOS - cantidad de items:`, resultadosBusqueda.length);
-  }
 
   return (
     <div className="config-screen">
@@ -638,74 +534,16 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                   </div>
                 </div>
 
-                {/* Buscador de Insumos */}
+                {/* Buscador de Insumos Mejorado */}
                 <div className="form-section">
-                  <h3>🔍 Buscador de Insumos</h3>
-                  <div className="form-row">
-                    <div className="form-group" style={{ flex: '1' }}>
-                      <label className="form-label">Buscar Insumo por Nombre</label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={terminoBusqueda}
-                        onChange={(e) => setTerminoBusqueda(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            buscarInsumosEnTabla();
-                          }
-                        }}
-                        placeholder="Escriba el nombre del insumo a buscar..."
-                        maxLength={50}
-                      />
-                    </div>
-                    <div className="form-group" style={{ flex: '0 0 auto', marginTop: '1.5rem' }}>
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={buscarInsumosEnTabla}
-                        disabled={buscandoInsumos || terminoBusqueda.trim().length < 2}
-                      >
-                        {buscandoInsumos ? '🔍 Buscando...' : '🔍 Buscar'}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Resultados de búsqueda */}
-                  {mostrarResultados && (
-                    <div className="search-results">
-                      <h4>Resultados de Búsqueda ({resultadosBusqueda.length})</h4>
-                      {resultadosBusqueda.length === 0 ? (
-                        <div className="no-results">
-                          <p>No se encontraron insumos con ese término de búsqueda.</p>
-                        </div>
-                      ) : (
-                        <div className="results-grid">
-                          {resultadosBusqueda.map((insumo, index) => (
-                            <div key={index} className="result-card">
-                              <div className="result-info">
-                                <h5>{insumo.nomInsumo}</h5>
-                                <div className="result-details">
-                                  <span className="result-um">📏 {insumo.umInsumo || 'N/A'}</span>
-                                  <span className="result-price">💰 ${typeof insumo.costoPromPond === 'number' ? insumo.costoPromPond.toFixed(2) : parseFloat(insumo.costoPromPond || 0).toFixed(2)}</span>
-                                  {insumo.existencia !== undefined && (
-                                    <span className="result-stock">📦 Stock: {insumo.existencia}</span>
-                                  )}
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                className="btn btn-success btn-sm"
-                                onClick={() => agregarInsumoAReceta(insumo)}
-                              >
-                                ➕ Agregar a Receta
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <h3>🔍 Agregar Insumos a la Receta</h3>
+                  <InsumosSelector
+                    onInsumoSelect={handleInsumoSelect}
+                    filtroTipo="CONSUMO"
+                    placeholder="Buscar insumos por nombre..."
+                    label="Buscar y Seleccionar Insumo"
+                    selectedInsumos={insumos.map((_, index) => index)}
+                  />
                 </div>
 
                 {/* Insumos */}
