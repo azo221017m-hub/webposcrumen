@@ -128,6 +128,11 @@ const startServer = async (): Promise<void> => {
       console.log('   - GET  /api/negocios'); // Obtener negocios
       console.log('   - POST /api/negocios'); // Crear negocio
       console.log('   - PUT  /api/negocios/:id'); // Actualizar negocio
+      console.log('   - GET  /api/categorias'); // Obtener categorías
+      console.log('   - POST /api/categorias'); // Crear categoría
+      console.log('   - GET  /api/categorias/dropdown'); // Dropdown categorías
+      console.log('   - GET  /api/insumos'); // Obtener insumos
+      console.log('   - POST /api/insumos'); // Crear insumo
     });
     
   } catch (error) {
