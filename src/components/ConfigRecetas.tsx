@@ -1,7 +1,7 @@
 // src/components/ConfigRecetas.tsx
 // Componente para gestión de recetas
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Usuario } from '../types';
 import '../styles/ConfigScreens.css';
 
@@ -83,6 +83,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
   const [resultadosBusqueda, setResultadosBusqueda] = useState<any[]>([]);
   const [buscandoInsumos, setBuscandoInsumos] = useState<boolean>(false);
   const [mostrarResultados, setMostrarResultados] = useState<boolean>(false);
+  const [errorCritico, setErrorCritico] = useState<string | null>(null);
 
   // Cargar recetas al montar el componente
   useEffect(() => {
@@ -107,8 +108,20 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
       const data = await response.json();
 
       if (data.success) {
-        setRecetas(data.data);
         console.log('✅ Recetas cargadas:', data.data.length);
+        
+        // Log detallado de cada receta para verificar tipos de datos
+        data.data.forEach((receta, index) => {
+          console.log(`📋 Receta ${index + 1}:`, {
+            nombreReceta: receta.nombreReceta,
+            costoReceta: receta.costoReceta,
+            costoRecetaType: typeof receta.costoReceta,
+            totalInsumos: receta.totalInsumos,
+            totalInsumosType: typeof receta.totalInsumos
+          });
+        });
+        
+        setRecetas(data.data);
       } else {
         setError(data.message || 'Error al cargar recetas');
         console.error('❌ Error en respuesta:', data.message);
@@ -165,6 +178,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     }
 
     try {
+      setErrorCritico(null); // Limpiar errores previos
       setBuscandoInsumos(true);
       setMostrarResultados(false);
       
@@ -188,25 +202,62 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
 
       const data = await response.json();
       console.log(`📊 Response data:`, data);
+      console.log(`📊 Type of data.data:`, typeof data.data);
+      console.log(`📊 Array.isArray(data.data):`, Array.isArray(data.data));
 
       if (data.success) {
-        setResultadosBusqueda(data.data);
-        setMostrarResultados(true);
-        console.log(`✅ ${data.data.length} insumos encontrados`);
+        console.log(`🎯 Entrando a data.success === true`);
+        const resultados = data.data || [];
+        console.log(`🎯 Resultados procesados:`, resultados);
         
-        if (data.data.length === 0) {
+        // Log detallado de cada insumo encontrado
+        resultados.forEach((insumo, index) => {
+          console.log(`🔍 Insumo ${index + 1}:`, {
+            nomInsumo: insumo.nomInsumo,
+            umInsumo: insumo.umInsumo,
+            costoPromPond: insumo.costoPromPond,
+            costoPromPondType: typeof insumo.costoPromPond,
+            existencia: insumo.existencia
+          });
+        });
+        
+        setResultadosBusqueda(resultados);
+        console.log(`🎯 setResultadosBusqueda ejecutado`);
+        
+        setMostrarResultados(true);
+        console.log(`🎯 setMostrarResultados(true) ejecutado`);
+        
+        console.log(`✅ ${resultados.length} insumos encontrados`);
+        
+        if (resultados.length === 0) {
           alert('No se encontraron insumos con ese término de búsqueda');
+        } else {
+          console.log(`🎯 Mostrando ${resultados.length} resultados`);
         }
       } else {
         setResultadosBusqueda([]);
         setMostrarResultados(false);
-        alert('Error al buscar insumos: ' + data.message);
+        alert('Error al buscar insumos: ' + (data.message || 'Error desconocido'));
       }
     } catch (error) {
       console.error('❌ Error al buscar insumos:', error);
+      
+      // Resetear estados en caso de error
       setResultadosBusqueda([]);
       setMostrarResultados(false);
-      alert('Error de conexión al buscar insumos');
+      
+      // Mostrar error específico al usuario
+      if (error instanceof Error) {
+        if (error.message.includes('HTTP error')) {
+          alert(`Error del servidor: ${error.message}`);
+        } else if (error.message.includes('Failed to fetch')) {
+          alert('Error de conexión: No se puede conectar al servidor. Verifique que el backend esté funcionando.');
+        } else {
+          alert(`Error: ${error.message}`);
+        }
+      } else {
+        alert('Error desconocido al buscar insumos');
+      }
     } finally {
       setBuscandoInsumos(false);
     }
@@ -214,52 +265,65 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
 
   // Función para agregar insumo encontrado a la receta
   const agregarInsumoAReceta = (insumoEncontrado: any): void => {
-    // Buscar el primer insumo vacío o agregar uno nuevo
-    let indexVacio = insumos.findIndex(insumo => !insumo.nombreInsumo.trim());
-    
-    if (indexVacio === -1) {
-      // No hay espacios vacíos, agregar uno nuevo
-      if (insumos.length >= 40) {
-        alert('Máximo 40 insumos permitidos por receta');
+    try {
+      // Validar que el insumo tenga los datos necesarios
+      if (!insumoEncontrado || !insumoEncontrado.nomInsumo) {
+        alert('Error: Datos del insumo incompletos');
         return;
       }
+
+      // Buscar el primer insumo vacío o agregar uno nuevo
+      let indexVacio = insumos.findIndex(insumo => !insumo.nombreInsumo.trim());
       
-      const nuevoInsumo: DetalleReceta = {
-        nombreInsumo: insumoEncontrado.nomInsumo,
-        umInsumo: insumoEncontrado.umInsumo,
-        cantidadUso: 0,
-        costoInsumo: insumoEncontrado.costoPromPond,
-        estatus: 1,
-        usuario: user.usuario,
-        idNegocio: 1
-      };
+      if (indexVacio === -1) {
+        // No hay espacios vacíos, agregar uno nuevo
+        if (insumos.length >= 40) {
+          alert('Máximo 40 insumos permitidos por receta');
+          return;
+        }
+        
+        const nuevoInsumo: DetalleReceta = {
+          nombreInsumo: insumoEncontrado.nomInsumo || '',
+          umInsumo: insumoEncontrado.umInsumo || 'pza',
+          cantidadUso: 0,
+          costoInsumo: typeof insumoEncontrado.costoPromPond === 'number' ? insumoEncontrado.costoPromPond : parseFloat(insumoEncontrado.costoPromPond || 0),
+          estatus: 1,
+          usuario: user.usuario,
+          idNegocio: 1
+        };
+        
+        setInsumos([...insumos, nuevoInsumo]);
+      } else {
+        // Usar el espacio vacío existente
+        const nuevosInsumos = [...insumos];
+        nuevosInsumos[indexVacio] = {
+          ...nuevosInsumos[indexVacio],
+          nombreInsumo: insumoEncontrado.nomInsumo || '',
+          umInsumo: insumoEncontrado.umInsumo || 'pza',
+          costoInsumo: typeof insumoEncontrado.costoPromPond === 'number' ? insumoEncontrado.costoPromPond : parseFloat(insumoEncontrado.costoPromPond || 0)
+        };
+        setInsumos(nuevosInsumos);
+      }
       
-      setInsumos([...insumos, nuevoInsumo]);
-    } else {
-      // Usar el espacio vacío existente
-      const nuevosInsumos = [...insumos];
-      nuevosInsumos[indexVacio] = {
-        ...nuevosInsumos[indexVacio],
-        nombreInsumo: insumoEncontrado.nomInsumo,
-        umInsumo: insumoEncontrado.umInsumo,
-        costoInsumo: insumoEncontrado.costoPromPond
-      };
-      setInsumos(nuevosInsumos);
+      // Limpiar resultados de búsqueda
+      setMostrarResultados(false);
+      setResultadosBusqueda([]);
+      setTerminoBusqueda('');
+      
+      console.log('✅ Insumo agregado a la receta:', insumoEncontrado.nomInsumo);
+      alert(`✅ Insumo "${insumoEncontrado.nomInsumo}" agregado a la receta`);
+    } catch (error) {
+      console.error('❌ Error al agregar insumo a la receta:', error);
+      alert('Error al agregar el insumo a la receta');
     }
-    
-    // Limpiar resultados de búsqueda
-    setMostrarResultados(false);
-    setResultadosBusqueda([]);
-    setTerminoBusqueda('');
-    
-    console.log('✅ Insumo agregado a la receta:', insumoEncontrado.nomInsumo);
-    alert(`✅ Insumo "${insumoEncontrado.nomInsumo}" agregado a la receta`);
   };
 
   // Función para calcular costo total automáticamente
   useEffect(() => {
     const costoTotal = insumos.reduce((total, insumo) => {
-      return total + (insumo.cantidadUso * insumo.costoInsumo);
+      const cantidad = typeof insumo.cantidadUso === 'number' ? insumo.cantidadUso : parseFloat(insumo.cantidadUso || 0);
+      const costo = typeof insumo.costoInsumo === 'number' ? insumo.costoInsumo : parseFloat(insumo.costoInsumo || 0);
+      return total + (cantidad * costo);
     }, 0);
     setCostoReceta(costoTotal);
   }, [insumos]);
@@ -422,9 +486,43 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     }
   };
 
+  // Log de estado cada vez que cambia
+  useEffect(() => {
+    console.log(`🔄 Estado actualizado - mostrarResultados:`, mostrarResultados);
+    console.log(`🔄 Estado actualizado - resultadosBusqueda:`, resultadosBusqueda);
+  }, [mostrarResultados, resultadosBusqueda]);
+
+  // Log de render
+  console.log(`🎨 Renderizando ConfigRecetas - mostrarResultados:`, mostrarResultados);
+  console.log(`🎨 Renderizando ConfigRecetas - resultadosBusqueda:`, resultadosBusqueda);
+  
+  // Log adicional cuando se debe mostrar resultados
+  if (mostrarResultados) {
+    console.log(`🎯 DEBE MOSTRAR RESULTADOS - cantidad de items:`, resultadosBusqueda.length);
+  }
+
   return (
     <div className="config-screen">
       <div className="config-container">
+        
+        {/* Verificación de error crítico */}
+        {errorCritico && (
+          <div className="error-message" style={{ margin: '2rem 0' }}>
+            <span className="error-icon">💥</span>
+            <strong>Error crítico:</strong> {errorCritico}
+            <br />
+            <button 
+              className="btn btn-primary" 
+              onClick={() => {
+                setErrorCritico(null);
+                window.location.reload();
+              }}
+              style={{ marginTop: '1rem' }}
+            >
+              🔄 Recargar Página
+            </button>
+          </div>
+        )}
         
         {/* Header */}
         <div className="config-header">
@@ -532,7 +630,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                       <input
                         type="number"
                         className="form-input"
-                        value={costoReceta.toFixed(2)}
+                        value={(typeof costoReceta === 'number' ? costoReceta : parseFloat(costoReceta || 0)).toFixed(2)}
                         readOnly
                         style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
                       />
@@ -588,8 +686,8 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                               <div className="result-info">
                                 <h5>{insumo.nomInsumo}</h5>
                                 <div className="result-details">
-                                  <span className="result-um">📏 {insumo.umInsumo}</span>
-                                  <span className="result-price">💰 ${insumo.costoPromPond.toFixed(2)}</span>
+                                  <span className="result-um">📏 {insumo.umInsumo || 'N/A'}</span>
+                                  <span className="result-price">💰 ${typeof insumo.costoPromPond === 'number' ? insumo.costoPromPond.toFixed(2) : parseFloat(insumo.costoPromPond || 0).toFixed(2)}</span>
                                   {insumo.existencia !== undefined && (
                                     <span className="result-stock">📦 Stock: {insumo.existencia}</span>
                                   )}
@@ -699,7 +797,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                             <input
                               type="text"
                               className="form-input"
-                              value={`$${(insumo.cantidadUso * insumo.costoInsumo).toFixed(2)}`}
+                              value={`$${((typeof insumo.cantidadUso === 'number' ? insumo.cantidadUso : parseFloat(insumo.cantidadUso || 0)) * (typeof insumo.costoInsumo === 'number' ? insumo.costoInsumo : parseFloat(insumo.costoInsumo || 0))).toFixed(2)}`}
                               readOnly
                               style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
                             />
@@ -767,11 +865,11 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                               </small>
                             </td>
                             <td>
-                              <strong>${receta.costoReceta.toFixed(2)}</strong>
+                              <strong>${typeof receta.costoReceta === 'number' ? receta.costoReceta.toFixed(2) : parseFloat(receta.costoReceta || 0).toFixed(2)}</strong>
                             </td>
                             <td>
                               <span className="status-badge status-active">
-                                {receta.totalInsumos || 0} insumos
+                                {typeof receta.totalInsumos === 'number' ? receta.totalInsumos : parseInt(receta.totalInsumos || 0)} insumos
                               </span>
                             </td>
                             <td>
