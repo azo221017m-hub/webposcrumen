@@ -2,14 +2,14 @@
 // Pantalla principal con dashboard y navegación
 
 import { useState, useEffect } from 'react'; // Importa hooks de React
-import type { Usuario, Indicator, ScreenType } from '../types'; // Importa tipos
-import '../styles/HomeScreen.css'; // Importa estilos específicos
+import type { Usuario, ScreenType, Pedido } from '../types'; // Importa tipos
+import '../styles/HomeScreenNew.css'; // Importa estilos específicos
 
 // Componente de navegación mejorado con menú dropdown
 interface NavigationProps {
   user: Usuario;
   onNavigate: (screen: ScreenType) => void;
-   showMobile: boolean;
+  showMobile: boolean;
   onToggleMobile: () => void;
 }
 
@@ -32,16 +32,18 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, showMobile, onToggl
       {/* Header de navegación */}
       <div className="nav-header">
         <div className="nav-brand">
+              <button className="mobile-toggle" onClick={onToggleMobile}>
+          ☰
+        </button>
           <img 
             src="/logowebposcrumen.svg" 
             alt="POSWEBCrumen Logo" 
             className="brand-logo"
           />
-          <span className="brand-text">POSWEBCrumen</span>
+          
         </div>
-        <button className="mobile-toggle" onClick={onToggleMobile}>
-          ☰
-        </button>
+        <span className="brand-text">POSWEBCrumen v.25.A.100</span>
+      
       </div>
 
       {/* Menú principal */}
@@ -158,9 +160,244 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, showMobile, onToggl
           )}
         </div>
       </div>
-
-     
     </nav>
+  );
+};
+
+// Componente de pedidos desde POSdeClientes
+const OrdersComponent: React.FC = () => {
+  // Datos simulados de 10 pedidos tipo comanda
+  const mockOrders: Pedido[] = [
+    {
+      idPedido: 'PED001',
+      numeroComanda: 'COM-001',
+      cliente: 'María González',
+      productos: [
+        { nombre: 'Café Americano', cantidad: 2, precio: 35.00, subtotal: 70.00 },
+        { nombre: 'Croissant', cantidad: 1, precio: 45.00, subtotal: 45.00 }
+      ],
+      total: 115.00,
+      formaPago: 'EFECTIVO',
+      estado: 'PENDIENTE',
+      fechaPedido: '2025-10-18',
+      horaPedido: '08:30',
+      mesa: 'Mesa 5'
+    },
+    {
+      idPedido: 'PED002',
+      numeroComanda: 'COM-002',
+      cliente: 'Carlos Ruiz',
+      productos: [
+        { nombre: 'Hamburguesa Clásica', cantidad: 1, precio: 120.00, subtotal: 120.00 },
+        { nombre: 'Papas Fritas', cantidad: 1, precio: 45.00, subtotal: 45.00 },
+        { nombre: 'Refresco Cola', cantidad: 2, precio: 25.00, subtotal: 50.00 }
+      ],
+      total: 215.00,
+      formaPago: 'TARJETA',
+      estado: 'PREPARANDO',
+      fechaPedido: '2025-10-18',
+      horaPedido: '09:15',
+      mesa: 'Mesa 2'
+    },
+    {
+      idPedido: 'PED003',
+      numeroComanda: 'COM-003',
+      cliente: 'Ana Martínez',
+      productos: [
+        { nombre: 'Ensalada César', cantidad: 1, precio: 85.00, subtotal: 85.00 },
+        { nombre: 'Agua Natural', cantidad: 1, precio: 20.00, subtotal: 20.00 }
+      ],
+      total: 105.00,
+      formaPago: 'TRANSFERENCIA',
+      estado: 'LISTO',
+      fechaPedido: '2025-10-18',
+      horaPedido: '09:45',
+      mesa: 'Mesa 7'
+    },
+    {
+      idPedido: 'PED004',
+      numeroComanda: 'COM-004',
+      cliente: 'Roberto Silva',
+      productos: [
+        { nombre: 'Pizza Margherita', cantidad: 1, precio: 180.00, subtotal: 180.00 },
+        { nombre: 'Cerveza', cantidad: 2, precio: 40.00, subtotal: 80.00 }
+      ],
+      total: 260.00,
+      formaPago: 'EFECTIVO',
+      estado: 'PREPARANDO',
+      fechaPedido: '2025-10-18',
+      horaPedido: '10:20',
+      mesa: 'Mesa 3'
+    },
+    {
+      idPedido: 'PED005',
+      numeroComanda: 'COM-005',
+      cliente: 'Elena Vásquez',
+      productos: [
+        { nombre: 'Tacos al Pastor', cantidad: 3, precio: 25.00, subtotal: 75.00 },
+        { nombre: 'Agua de Horchata', cantidad: 1, precio: 30.00, subtotal: 30.00 }
+      ],
+      total: 105.00,
+      formaPago: 'EFECTIVO',
+      estado: 'PENDIENTE',
+      fechaPedido: '2025-10-18',
+      horaPedido: '10:55',
+      mesa: 'Mesa 1'
+    },
+    {
+      idPedido: 'PED006',
+      numeroComanda: 'COM-006',
+      cliente: 'Miguel Torres',
+      productos: [
+        { nombre: 'Sopa del Día', cantidad: 1, precio: 65.00, subtotal: 65.00 },
+        { nombre: 'Pan Integral', cantidad: 2, precio: 15.00, subtotal: 30.00 },
+        { nombre: 'Jugo Natural', cantidad: 1, precio: 35.00, subtotal: 35.00 }
+      ],
+      total: 130.00,
+      formaPago: 'TARJETA',
+      estado: 'LISTO',
+      fechaPedido: '2025-10-18',
+      horaPedido: '11:30',
+      mesa: 'Mesa 6'
+    },
+    {
+      idPedido: 'PED007',
+      numeroComanda: 'COM-007',
+      cliente: 'Laura Morales',
+      productos: [
+        { nombre: 'Pasta Alfredo', cantidad: 1, precio: 145.00, subtotal: 145.00 },
+        { nombre: 'Vino Tinto Copa', cantidad: 1, precio: 60.00, subtotal: 60.00 }
+      ],
+      total: 205.00,
+      formaPago: 'MIXTO',
+      estado: 'PREPARANDO',
+      fechaPedido: '2025-10-18',
+      horaPedido: '12:10',
+      mesa: 'Mesa 4'
+    },
+    {
+      idPedido: 'PED008',
+      numeroComanda: 'COM-008',
+      cliente: 'David Herrera',
+      productos: [
+        { nombre: 'Desayuno Completo', cantidad: 1, precio: 95.00, subtotal: 95.00 },
+        { nombre: 'Café con Leche', cantidad: 1, precio: 30.00, subtotal: 30.00 }
+      ],
+      total: 125.00,
+      formaPago: 'EFECTIVO',
+      estado: 'PENDIENTE',
+      fechaPedido: '2025-10-18',
+      horaPedido: '12:45',
+      mesa: 'Mesa 8'
+    },
+    {
+      idPedido: 'PED009',
+      numeroComanda: 'COM-009',
+      cliente: 'Patricia López',
+      productos: [
+        { nombre: 'Sándwich Club', cantidad: 1, precio: 85.00, subtotal: 85.00 },
+        { nombre: 'Papas Gajo', cantidad: 1, precio: 50.00, subtotal: 50.00 },
+        { nombre: 'Limonada', cantidad: 1, precio: 25.00, subtotal: 25.00 }
+      ],
+      total: 160.00,
+      formaPago: 'TARJETA',
+      estado: 'LISTO',
+      fechaPedido: '2025-10-18',
+      horaPedido: '13:20',
+      mesa: 'Mesa 9'
+    },
+    {
+      idPedido: 'PED010',
+      numeroComanda: 'COM-010',
+      cliente: 'Fernando Castillo',
+      productos: [
+        { nombre: 'Pollo a la Plancha', cantidad: 1, precio: 135.00, subtotal: 135.00 },
+        { nombre: 'Arroz Blanco', cantidad: 1, precio: 25.00, subtotal: 25.00 },
+        { nombre: 'Verduras al Vapor', cantidad: 1, precio: 40.00, subtotal: 40.00 }
+      ],
+      total: 200.00,
+      formaPago: 'TRANSFERENCIA',
+      estado: 'PREPARANDO',
+      fechaPedido: '2025-10-18',
+      horaPedido: '13:55',
+      mesa: 'Mesa 10'
+    }
+  ];
+
+  // Función para manejar click en pedido
+  const handleOrderClick = (pedido: Pedido): void => {
+    console.log('🍽️ Click en pedido:', pedido.numeroComanda); // Log de click
+    // Aquí se puede agregar lógica para mostrar detalles del pedido
+  };
+
+  // Función para obtener clase CSS según el estado
+  const getStatusClass = (estado: string): string => {
+    return estado.toLowerCase().replace(' ', '-');
+  };
+
+  // Función para formatear precio
+  const formatPrice = (price: number): string => {
+    return `$${price.toFixed(2)}`;
+  };
+
+  return (
+    <section className="orders-section">
+      <h2>📋 Pedidos POSdeClientes</h2>
+      <div className="orders-list">
+        {mockOrders.map((pedido) => (
+          <div 
+            key={pedido.idPedido} 
+            className="order-card"
+            onClick={() => handleOrderClick(pedido)}
+          >
+            {/* Header del pedido */}
+            <div className="order-header">
+              <span className="order-number">{pedido.numeroComanda}</span>
+              <span className={`order-status ${getStatusClass(pedido.estado)}`}>
+                {pedido.estado}
+              </span>
+            </div>
+
+            {/* Cliente y mesa */}
+            <div className="order-client">
+              <span>👤</span>
+              <span>{pedido.cliente}</span>
+              {pedido.mesa && <span>• {pedido.mesa}</span>}
+            </div>
+
+            {/* Lista de productos */}
+            <div className="order-products">
+              {pedido.productos.map((producto, index) => (
+                <div key={index} className="order-product">
+                  <div className="product-info">
+                    <span className="product-quantity">{producto.cantidad}x</span>
+                    {producto.nombre}
+                  </div>
+                  <div className="product-price">
+                    {formatPrice(producto.subtotal)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer con total y forma de pago */}
+            <div className="order-footer">
+              <div className="order-total">
+                Total: {formatPrice(pedido.total)}
+              </div>
+              <div className="order-payment">
+                {pedido.formaPago}
+              </div>
+            </div>
+
+            {/* Hora del pedido */}
+            <div className="order-time">
+              {pedido.horaPedido} - {pedido.fechaPedido}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 };
 
@@ -173,61 +410,13 @@ interface HomeScreenProps {
 
 // Componente de pantalla principal
 const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate }) => {
-  // Estado para los indicadores del dashboard
-  const [indicators, setIndicators] = useState<Indicator[]>([]);
-
   // Estado para mostrar/ocultar el menú móvil
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
 
-  // Efecto para cargar los indicadores al montar el componente
+  // Efecto para log al montar el componente
   useEffect(() => {
     console.log('🏠 Cargando pantalla principal para:', user.nombre); // Log de carga
-    loadIndicators(); // Carga los indicadores
   }, [user]);
-
-  // Función para cargar indicadores de ejemplo
-  const loadIndicators = (): void => {
-    console.log('📊 Cargando indicadores del dashboard'); // Log de carga
-    
-    // Datos de ejemplo para los indicadores
-    const exampleIndicators: Indicator[] = [
-      {
-        id: 'ventas',
-        title: 'Ventas del Día',
-        value: '$15,420.50',
-        description: 'Total de ventas registradas hoy',
-        icon: '💰',
-        color: '#10b981' // Verde
-      },
-      {
-        id: 'servicios',
-        title: 'Servicios',
-        value: '24',
-        description: 'Servicios completados hoy',
-        icon: '🛠️',
-        color: '#3b82f6' // Azul
-      },
-      {
-        id: 'compras_vs_ventas',
-        title: 'Compras vs Ventas',
-        value: '68%',
-        description: 'Margen de ganancia actual',
-        icon: '📈',
-        color: '#8b5cf6' // Morado
-      },
-      {
-        id: 'top_productos',
-        title: 'Top Productos',
-        value: 'Ver Lista',
-        description: 'Los 5 productos más vendidos',
-        icon: '🏆',
-        color: '#f59e0b' // Amarillo
-      }
-    ];
-
-    setIndicators(exampleIndicators); // Establece los indicadores
-    console.log('✅ Indicadores cargados exitosamente'); // Log de éxito
-  };
 
   // Función para manejar clicks en los indicadores
   const handleIndicatorClick = (indicatorId: string): void => {
@@ -237,12 +426,25 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate }) => {
     switch (indicatorId) {
       case 'ventas':
         console.log('💰 Mostrando detalles de ventas'); // Log específico
+        onNavigate('indicadores-ventas' as ScreenType);
         break;
       case 'servicios':
         console.log('🛠️ Mostrando servicios'); // Log específico
         break;
-      case 'top_productos':
+      case 'finanzas':
+        console.log('📊 Mostrando finanzas'); // Log específico
+        break;
+      case 'productos':
         console.log('🏆 Mostrando top productos'); // Log específico
+        onNavigate('config-productos' as ScreenType);
+        break;
+      case 'inventario':
+        console.log('📦 Mostrando inventario'); // Log específico
+        onNavigate('config-insumos' as ScreenType);
+        break;
+      case 'clientes':
+        console.log('👥 Mostrando clientes'); // Log específico
+        onNavigate('config-clientes' as ScreenType);
         break;
       default:
         console.log('📊 Indicador genérico'); // Log genérico
@@ -286,196 +488,138 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user, onNavigate }) => {
           </div>
         </header>
 
-        {/* Grid de indicadores mejorado */}
-        <section className="indicators-section">
-          <div className="main-indicators-grid">
-            
-            {/* Indicadores dinámicos agrupados */}
-            <div className="dynamic-indicators">
-              {indicators.map((ind) => (
-                <div
-                  key={ind.id}
-                  className="indicator-card dynamic-card"
-                  onClick={() => handleIndicatorClick(ind.id)}
-                >
-                  <div className="card-header">
-                    <div className="card-icon" style={{ color: ind.color }}>{ind.icon}</div>
-                    <div className="card-title">
-                      <h3>{ind.title}</h3>
-                      <span className="card-subtitle">{ind.description}</span>
-                    </div>
-                  </div>
-                  <div className="card-content">
-                    <div className="main-value">{ind.value}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Tarjeta 1: Ventas del Día */}
-            <div className="indicator-card main-card ventas-card">
-              <div className="card-header">
+        {/* Contenido principal del dashboard */}
+        <div className="dashboard-content">
+          
+          {/* Columna izquierda: Grid de indicadores */}
+          <section className="indicators-section">
+            <div className="indicators-grid">
+              
+              {/* Cards de indicadores minimalistas */}
+              <div className="indicator-card" onClick={() => handleIndicatorClick('ventas')}>
                 <div className="card-icon">💰</div>
-                <div className="card-title">
-                  <h3>Ventas del Día</h3>
-                  <span className="card-subtitle">Ingresos actuales</span>
+                <div className="card-content">
+                  <h3 className="card-title">Ventas del Día</h3>
+                  <div className="card-value">$25,480.00</div>
+                  <div className="card-change positive">+15.2% ↗️</div>
                 </div>
               </div>
-              <div className="card-content">
-                <div className="main-value">$25,480.00</div>
-                <div className="secondary-info">
-                  <span className="trend positive">+15.2% ↗️</span>
-                  <span className="comparison">vs ayer</span>
-                </div>
-                <div className="mini-stats">
-                  <div className="mini-stat">
-                    <span className="mini-label">Transacciones:</span>
-                    <span className="mini-value">47</span>
-                  </div>
-                  <div className="mini-stat">
-                    <span className="mini-label">Promedio:</span>
-                    <span className="mini-value">$541.70</span>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Tarjeta 2: Servicios Activos */}
-            <div className="indicator-card main-card servicios-card">
-              <div className="card-header">
+              <div className="indicator-card" onClick={() => handleIndicatorClick('servicios')}>
                 <div className="card-icon">🔧</div>
-                <div className="card-title">
-                  <h3>Servicios</h3>
-                  <span className="card-subtitle">Estado actual</span>
+                <div className="card-content">
+                  <h3 className="card-title">Servicios</h3>
+                  <div className="card-value">12</div>
+                  <div className="card-change neutral">Sin cambios</div>
                 </div>
               </div>
-              <div className="card-content">
-                <div className="main-value">12</div>
-                <div className="secondary-info">
-                  <span className="trend neutral">= Sin cambios</span>
-                  <span className="comparison">vs ayer</span>
-                </div>
-                <div className="mini-stats">
-                  <div className="mini-stat">
-                    <span className="mini-label">Completados:</span>
-                    <span className="mini-value">8</span>
-                  </div>
-                  <div className="mini-stat">
-                    <span className="mini-label">Pendientes:</span>
-                    <span className="mini-value">4</span>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Tarjeta 3: Compras vs Ventas Netas */}
-            <div className="indicator-card main-card finanzas-card">
-              <div className="card-header">
+              <div className="indicator-card" onClick={() => handleIndicatorClick('finanzas')}>
                 <div className="card-icon">📊</div>
-                <div className="card-title">
-                  <h3>Compras + Gastos vs Ventas</h3>
-                  <span className="card-subtitle">Balance mensual</span>
+                <div className="card-content">
+                  <h3 className="card-title">Balance</h3>
+                  <div className="card-value">$57,230</div>
+                  <div className="card-change positive">+8.5% ↗️</div>
                 </div>
               </div>
-              <div className="card-content">
-                <div className="balance-info">
-                  <div className="balance-item">
-                    <span className="balance-label">Ventas:</span>
-                    <span className="balance-value positive">$125,480</span>
-                  </div>
-                  <div className="balance-item">
-                    <span className="balance-label">Gastos:</span>
-                    <span className="balance-value negative">$68,250</span>
-                  </div>
-                  <div className="balance-item main">
-                    <span className="balance-label">Utilidad:</span>
-                    <span className="balance-value profit">$57,230</span>
-                  </div>
-                </div>
-                <div className="secondary-info">
-                  <span className="trend positive">+8.5% ↗️</span>
-                  <span className="comparison">vs mes anterior</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Tarjeta 4: Top 5 Productos */}
-            <div className="indicator-card main-card productos-card">
-              <div className="card-header">
+              <div className="indicator-card" onClick={() => handleIndicatorClick('productos')}>
                 <div className="card-icon">🏆</div>
-                <div className="card-title">
-                  <h3>Top 5 Productos</h3>
-                  <span className="card-subtitle">Más vendidos</span>
+                <div className="card-content">
+                  <h3 className="card-title">Top Productos</h3>
+                  <div className="card-value">5</div>
+                  <div className="card-change info">Ver detalles</div>
                 </div>
               </div>
-              <div className="card-content">
-                <div className="top-list">
-                  <div className="top-item">
-                    <span className="rank">1.</span>
-                    <span className="item-name">Combo Especial</span>
-                    <span className="item-value">$2,450</span>
-                  </div>
-                  <div className="top-item">
-                    <span className="rank">2.</span>
-                    <span className="item-name">Hamburguesa Premium</span>
-                    <span className="item-value">$1,890</span>
-                  </div>
-                  <div className="top-item">
-                    <span className="rank">3.</span>
-                    <span className="item-name">Pizza Familiar</span>
-                    <span className="item-value">$1,650</span>
-                  </div>
-                  <div className="top-item">
-                    <span className="rank">4.</span>
-                    <span className="item-name">Bebidas Premium</span>
-                    <span className="item-value">$980</span>
-                  </div>
-                  <div className="top-item">
-                    <span className="rank">5.</span>
-                    <span className="item-name">Postre del Chef</span>
-                    <span className="item-value">$750</span>
-                  </div>
+
+              <div className="indicator-card" onClick={() => handleIndicatorClick('inventario')}>
+                <div className="card-icon">📦</div>
+                <div className="card-content">
+                  <h3 className="card-title">Inventario</h3>
+                  <div className="card-value">284</div>
+                  <div className="card-change warning">Stock bajo</div>
                 </div>
               </div>
+
+              <div className="indicator-card" onClick={() => handleIndicatorClick('clientes')}>
+                <div className="card-icon">👥</div>
+                <div className="card-content">
+                  <h3 className="card-title">Clientes</h3>
+                  <div className="card-value">156</div>
+                  <div className="card-change positive">+3 nuevos</div>
+                </div>
+              </div>
+
             </div>
+          </section>
 
-          </div>
-        </section>
+          {/* Columna central: Acciones rápidas */}
+          <section className="quick-actions">
+            <h2>Acciones Rápidas</h2>
+            <div className="actions-grid">
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-usuarios' as ScreenType)}
+              >
+                <span className="action-icon">👥</span>
+                <span>Gestionar Usuarios</span>
+              </button>
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-negocios' as ScreenType)}
+              >
+                <span className="action-icon">🏢</span>
+                <span>Gestionar Negocios</span>
+              </button>
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-roles' as ScreenType)}
+              >
+                <span className="action-icon">🎭</span>
+                <span>Gestionar Roles</span>
+              </button>
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-clientes' as ScreenType)}
+              >
+                <span className="action-icon">👤</span>
+                <span>Gestionar Clientes</span>
+              </button>
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-categorias' as ScreenType)}
+              >
+                <span className="action-icon">🏷️</span>
+                <span>Gestionar Categorías</span>
+              </button>
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-insumos' as ScreenType)}
+              >
+                <span className="action-icon">🧪</span>
+                <span>Gestionar Insumos</span>
+              </button>
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-productos' as ScreenType)}
+              >
+                <span className="action-icon">📦</span>
+                <span>Gestionar Productos</span>
+              </button>
+              <button 
+                className="action-button"
+                onClick={() => onNavigate('config-recetas' as ScreenType)}
+              >
+                <span className="action-icon">📋</span>
+                <span>Gestionar Recetas</span>
+              </button>
+            </div>
+          </section>
 
-        {/* Sección de acciones rápidas */}
-        <section className="quick-actions">
-          <h2>Acciones Rápidas</h2>
-          <div className="actions-grid">
-            <button 
-              className="action-button"
-              onClick={() => onNavigate('config-usuarios' as ScreenType)}
-            >
-              <span className="action-icon">👥</span>
-              <span>Gestionar Usuarios</span>
-            </button>
-            <button 
-              className="action-button"
-              onClick={() => onNavigate('config-negocios' as ScreenType)}
-            >
-              <span className="action-icon">🏢</span>
-              <span>Gestionar Negocios</span>
-            </button>
-            <button 
-              className="action-button"
-              onClick={() => onNavigate('config-roles' as ScreenType)}
-            >
-              <span className="action-icon">🎭</span>
-              <span>Gestionar Roles</span>
-            </button>
-            <button 
-              className="action-button"
-              onClick={() => onNavigate('config-clientes' as ScreenType)}
-            >
-              <span className="action-icon">�</span>
-              <span>Gestionar Clientes</span>
-            </button>
-          </div>
-        </section>
+          {/* Columna derecha: Pedidos desde POSdeClientes */}
+          <OrdersComponent />
+
+        </div>
 
       </main>
 
