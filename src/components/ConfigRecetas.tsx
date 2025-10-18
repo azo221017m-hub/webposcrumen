@@ -111,7 +111,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
         console.log('✅ Recetas cargadas:', data.data.length);
         
         // Log detallado de cada receta para verificar tipos de datos
-        data.data.forEach((receta, index) => {
+        data.data.forEach((receta: any, index: number) => {
           console.log(`📋 Receta ${index + 1}:`, {
             nombreReceta: receta.nombreReceta,
             costoReceta: receta.costoReceta,
@@ -211,7 +211,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
         console.log(`🎯 Resultados procesados:`, resultados);
         
         // Log detallado de cada insumo encontrado
-        resultados.forEach((insumo, index) => {
+        resultados.forEach((insumo: any, index: number) => {
           console.log(`🔍 Insumo ${index + 1}:`, {
             nomInsumo: insumo.nomInsumo,
             umInsumo: insumo.umInsumo,
@@ -869,7 +869,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                             </td>
                             <td>
                               <span className="status-badge status-active">
-                                {typeof receta.totalInsumos === 'number' ? receta.totalInsumos : parseInt(receta.totalInsumos || 0)} insumos
+                                {typeof receta.totalInsumos === 'number' ? receta.totalInsumos : parseInt(String(receta.totalInsumos || 0))} insumos
                               </span>
                             </td>
                             <td>

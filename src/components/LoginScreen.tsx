@@ -204,12 +204,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
       </div>
 
       {/* Componente Toast para mensajes */}
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.isVisible}
-        onClose={closeToast}
-      />
+      {toast.isVisible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
+      )}
     </div>
   );
 };

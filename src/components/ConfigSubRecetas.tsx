@@ -250,7 +250,7 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
           umInsumoSubr: insumoEncontrado.umInsumo || '',
           cantidadUsoSubr: 0,
           costoInsumoSubr: typeof insumoEncontrado.costoPromPond === 'number' ? 
-            insumoEncontrado.costoPromPond : parseFloat(insumoEncontrado.costoPromPond?.toString() || '0'),
+            insumoEncontrado.costoPromPond : parseFloat(String(insumoEncontrado.costoPromPond || 0)),
           estatus: 1,
           usuario: user.usuario,
           idNegocio: 1
@@ -265,7 +265,7 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
           nombreInsumoSubr: insumoEncontrado.nomInsumo || '',
           umInsumoSubr: insumoEncontrado.umInsumo || '',
           costoInsumoSubr: typeof insumoEncontrado.costoPromPond === 'number' ? 
-            insumoEncontrado.costoPromPond : parseFloat(insumoEncontrado.costoPromPond?.toString() || '0')
+            insumoEncontrado.costoPromPond : parseFloat(String(insumoEncontrado.costoPromPond || 0))
         };
         setInsumos(nuevosInsumos);
       }
@@ -287,9 +287,9 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
   useEffect(() => {
     const costoTotal = insumos.reduce((total, insumo) => {
       const cantidad = typeof insumo.cantidadUsoSubr === 'number' ? 
-        insumo.cantidadUsoSubr : parseFloat(insumo.cantidadUsoSubr?.toString() || '0');
+        insumo.cantidadUsoSubr : parseFloat(String(insumo.cantidadUsoSubr || 0));
       const costo = typeof insumo.costoInsumoSubr === 'number' ? 
-        insumo.costoInsumoSubr : parseFloat(insumo.costoInsumoSubr?.toString() || '0');
+        insumo.costoInsumoSubr : parseFloat(String(insumo.costoInsumoSubr || 0));
       return total + (cantidad * costo);
     }, 0);
     setCostoSubReceta(costoTotal);
@@ -581,7 +581,7 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
                       <input
                         type="number"
                         className="form-input"
-                        value={(typeof costoSubReceta === 'number' ? costoSubReceta : parseFloat(costoSubReceta?.toString() || '0')).toFixed(2)}
+                        value={(typeof costoSubReceta === 'number' ? costoSubReceta : parseFloat(String(costoSubReceta || 0))).toFixed(2)}
                         readOnly
                         style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
                       />
@@ -641,7 +641,7 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
                                   <span className="result-price">
                                     💰 ${typeof insumo.costoPromPond === 'number' ? 
                                       insumo.costoPromPond.toFixed(2) : 
-                                      parseFloat(insumo.costoPromPond?.toString() || '0').toFixed(2)}
+                                      parseFloat(String(insumo.costoPromPond || 0)).toFixed(2)}
                                   </span>
                                   {insumo.existencia !== undefined && (
                                     <span className="result-stock">📦 Stock: {insumo.existencia}</span>
@@ -752,7 +752,7 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
                             <input
                               type="text"
                               className="form-input"
-                              value={`$${((typeof insumo.cantidadUsoSubr === 'number' ? insumo.cantidadUsoSubr : parseFloat(insumo.cantidadUsoSubr?.toString() || '0')) * (typeof insumo.costoInsumoSubr === 'number' ? insumo.costoInsumoSubr : parseFloat(insumo.costoInsumoSubr?.toString() || '0'))).toFixed(2)}`}
+                              value={`$${((typeof insumo.cantidadUsoSubr === 'number' ? insumo.cantidadUsoSubr : parseFloat(String(insumo.cantidadUsoSubr || 0))) * (typeof insumo.costoInsumoSubr === 'number' ? insumo.costoInsumoSubr : parseFloat(String(insumo.costoInsumoSubr || 0)))).toFixed(2)}`}
                               readOnly
                               style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
                             />
@@ -823,14 +823,14 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
                               <strong>
                                 ${typeof subReceta.costoSubReceta === 'number' ? 
                                   subReceta.costoSubReceta.toFixed(2) : 
-                                  parseFloat(subReceta.costoSubReceta?.toString() || '0').toFixed(2)}
+                                  parseFloat(String(subReceta.costoSubReceta || 0)).toFixed(2)}
                               </strong>
                             </td>
                             <td>
                               <span className="status-badge status-active">
                                 {typeof subReceta.totalInsumos === 'number' ? 
                                   subReceta.totalInsumos : 
-                                  parseInt(subReceta.totalInsumos?.toString() || '0')} insumos
+                                  parseInt(String(subReceta.totalInsumos || 0))} insumos
                               </span>
                             </td>
                             <td>
