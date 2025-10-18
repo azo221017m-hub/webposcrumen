@@ -88,6 +88,10 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, showMobile, onToggl
                 <span className="dropdown-icon">📋</span>
                 Recetas
               </button>
+              <button onClick={() => handleNavigate('config-sub-recetas' as ScreenType)}>
+                <span className="dropdown-icon">🍴</span>
+                Sub-Recetas
+              </button>
               <button onClick={() => handleNavigate('config-perfil' as ScreenType)}>
                 <span className="dropdown-icon">👤</span>
                 Perfil

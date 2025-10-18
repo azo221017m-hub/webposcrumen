@@ -173,6 +173,7 @@ export type ScreenType =
   | 'formulario-negocio' // Formulario completo de negocio
   | 'config-productos' // Configuración de productos
   | 'config-recetas' // Configuración de recetas
+  | 'config-sub-recetas' // Configuración de sub-recetas
   | 'config-perfil' // Configuración de perfil
   | 'config-recibos' // Configuración de recibos
   | 'iniciar-venta' // Iniciar nueva venta

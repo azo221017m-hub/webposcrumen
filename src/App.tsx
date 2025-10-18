@@ -18,6 +18,7 @@ import ConfigInsumos from './components/ConfigInsumos'; // Configuración de ins
 import FormularioNegocio from './components/FormularioNegocio'; // Formulario completo de negocio
 import ConfigProductos from './components/ConfigProductos'; // Configuración de productos
 import ConfigRecetas from './components/ConfigRecetas'; // Configuración de recetas
+import ConfigSubRecetas from './components/ConfigSubRecetas'; // Configuración de sub-recetas
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
@@ -200,6 +201,15 @@ function App() {
         }
         console.log('📋 Renderizando configuración de recetas'); // Log de renderizado
         return <ConfigRecetasAny user={user} onNavigate={handleNavigate} />;
+
+      case 'config-sub-recetas':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('🍴 Renderizando configuración de sub-recetas'); // Log de renderizado
+        return <ConfigSubRecetas user={user} onNavigate={handleNavigate} />;
 
       case 'formulario-negocio':
         if (!isAuthenticated || !user) {
