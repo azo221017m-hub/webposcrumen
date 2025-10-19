@@ -8,7 +8,7 @@ import type { CorsOptions } from 'cors'; // Importa tipos de cors
 const corsOptions: CorsOptions = {
   // Origen permitido - URL del frontend (más permisivo para desarrollo)
   origin: [
-    'http://localhost:5173'
+    'https://pos54nwebcrumen.onrender.com'
   ],
   
   // Métodos HTTP permitidos
