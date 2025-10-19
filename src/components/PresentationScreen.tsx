@@ -20,7 +20,7 @@ const PresentationScreen: React.FC<PresentationScreenProps> = ({ onComplete }) =
   // Frases que se mostrarán una tras otra
   const phrases: string[] = [
     'Bienvenido a POSWEBCrumen', // Frase 1: Bienvenida
-    'Tu solución completa de punto de venta', // Frase 2: Descripción
+    'Tu solución completa Digital', // Frase 2: Descripción
     'Gestiona tu negocio de manera eficiente', // Frase 3: Beneficio
     'Control total de ventas e inventari0', // Frase 4: Características
     'Iniciando tu experiencia...' // Frase 5: Transición
