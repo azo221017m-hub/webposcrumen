@@ -28,7 +28,7 @@ const corsOptions: CorsOptions = {
 const corsMiddleware = cors(corsOptions);
 
 console.log('🌐 Middleware CORS configurado para múltiples orígenes:'); // Log de configuración
-console.log('   - http://localhost:5173');
+console.log('   - Server Frontend URL');
 
 
 export default corsMiddleware;
