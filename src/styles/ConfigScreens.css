@@ -17,8 +17,8 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 30%, rgba(71, 85, 105, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(82, 82, 91, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: 1;
 }
@@ -812,6 +812,56 @@
   font-size: 0.875rem;
 }
 
+/* Botón de regreso */
+.btn-back {
+  background: linear-gradient(135deg, var(--gray-500), var(--gray-600));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, var(--gray-600), var(--gray-700));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-back:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer de configuración */
+.config-footer {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.config-footer .btn-back {
+  background: linear-gradient(135deg, var(--primary), var(--primary-600));
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.config-footer .btn-back:hover {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+}
+
 /* Estilos para buscador de insumos */
 .search-results {
   margin-top: 1.5rem;
@@ -1248,6 +1298,173 @@
 }
 
 /* Versión de texto para mayor claridad */
+
+/* Estilos específicos para ConfigMesas */
+.mesa-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mesa-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.mesa-id {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+}
+
+.mesa-number {
+  padding: 0.25rem 0;
+}
+
+.number-badge {
+  background: var(--primary);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.mesa-capacity {
+  padding: 0.25rem 0;
+}
+
+.capacity-badge {
+  background: var(--success-light);
+  color: var(--success);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.mesa-status {
+  padding: 0.25rem 0;
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-success {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.status-badge.status-error {
+  background: var(--error-light);
+  color: var(--error);
+}
+
+.status-badge.status-warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-badge.status-secondary {
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.mesa-date {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.mesa-actions {
+  padding: 0.25rem 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.btn-delete:hover {
+  background: var(--error-light);
+  color: var(--error);
+  transform: scale(1.1);
+}
+
+.btn-edit:active,
+.btn-delete:active {
+  transform: scale(0.95);
+}
+
+/* Responsividad para mesas */
+@media (max-width: 768px) {
+  .mesa-info {
+    gap: 0.2rem;
+  }
+  
+  .mesa-title {
+    font-size: 0.9rem;
+  }
+  
+  .mesa-id {
+    font-size: 0.75rem;
+  }
+  
+  .number-badge,
+  .capacity-badge,
+  .status-badge {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .action-buttons {
+    gap: 0.3rem;
+  }
+  
+  .btn-edit,
+  .btn-delete {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
 .status-airplane-wrapper {
   display: flex;
   align-items: center;
@@ -1327,4 +1544,254 @@
 .form-input.success {
   border-color: var(--success-500);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Estilos para calculadora de utilidad */
+.calculadora-utilidad {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.utilidad-calculator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.calc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calc-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 80px;
+  font-size: 0.875rem;
+}
+
+.calc-input {
+  flex: 1;
+  max-width: 120px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.calc-unit {
+  color: var(--text-secondary);
+  font-weight: 500;
+  min-width: 20px;
+}
+
+.calc-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--bg-primary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color-light);
+}
+
+.calc-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.calc-detail-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.calc-detail-value {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.calc-detail:last-child .calc-detail-value {
+  color: var(--success-600);
+}
+
+/* ================================
+   ESTILOS ESPECÍFICOS PARA MESAS
+   ================================ */
+
+/* Estilos específicos para ConfigMesas */
+.mesa-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mesa-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.mesa-id {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+}
+
+.mesa-number {
+  padding: 0.25rem 0;
+}
+
+.number-badge {
+  background: var(--primary-500);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.mesa-capacity {
+  padding: 0.25rem 0;
+}
+
+.capacity-badge {
+  background: var(--success-100);
+  color: var(--success-700);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: inline-block;
+  border: 1px solid var(--success-200);
+}
+
+.mesa-status {
+  padding: 0.25rem 0;
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-success {
+  background: var(--success-100);
+  color: var(--success-700);
+  border: 1px solid var(--success-200);
+}
+
+.status-badge.status-error {
+  background: var(--error-100);
+  color: var(--error-700);
+  border: 1px solid var(--error-200);
+}
+
+.status-badge.status-warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-badge.status-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.mesa-date {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.mesa-actions {
+  padding: 0.25rem 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit:hover {
+  background: var(--primary-100);
+  color: var(--primary-600);
+  transform: scale(1.1);
+}
+
+.btn-delete:hover {
+  background: var(--error-100);
+  color: var(--error-600);
+  transform: scale(1.1);
+}
+
+.btn-edit:active,
+.btn-delete:active {
+  transform: scale(0.95);
+}
+
+/* Responsividad para mesas */
+@media (max-width: 768px) {
+  .mesa-info {
+    gap: 0.2rem;
+  }
+  
+  .mesa-title {
+    font-size: 0.9rem;
+  }
+  
+  .mesa-id {
+    font-size: 0.75rem;
+  }
+  
+  .number-badge,
+  .capacity-badge,
+  .status-badge {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .action-buttons {
+    gap: 0.3rem;
+  }
+  
+  .btn-edit,
+  .btn-delete {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
 }

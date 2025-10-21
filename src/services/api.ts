@@ -391,6 +391,47 @@ class ApiService {
       method: 'GET', // Método GET
     });
   }
+
+  // Métodos para gestión de mesas
+  
+  // Método para obtener mesas
+  async getMesas(): Promise<ApiResponse<any[]>> {
+    console.log('🍽️ Obteniendo mesas'); // Log de consulta
+    
+    return this.request<any[]>('/api/mesas', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear una nueva mesa
+  async createMesa(mesaData: any): Promise<ApiResponse<any>> {
+    console.log('🍽️ Creando nueva mesa:', mesaData); // Log de creación
+    
+    return this.request<any>('/api/mesas', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(mesaData), // Datos de la mesa en JSON
+    });
+  }
+
+  // Método para actualizar una mesa
+  async updateMesa(id: number, mesaData: any): Promise<ApiResponse<any>> {
+    console.log(`🔄 Actualizando mesa ID: ${id}`, mesaData); // Log de actualización
+    
+    return this.request<any>(`/api/mesas/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(mesaData), // Datos actualizados en JSON
+    });
+  }
+
+  // Método para eliminar una mesa (cambiar a inactiva)
+  async deleteMesa(id: number, data: any): Promise<ApiResponse<any>> {
+    console.log(`🗑️ Eliminando mesa ID: ${id}`); // Log de eliminación
+    
+    return this.request<any>(`/api/mesas/${id}`, {
+      method: 'DELETE', // Método DELETE
+      body: JSON.stringify(data), // Datos de auditoría
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -434,3 +475,9 @@ export const deleteInsumo = (id: number, data: any) => apiService.deleteInsumo(i
 
 // Exportaciones para subrecetas
 export const getSubRecetas = () => apiService.getSubRecetas();
+
+// Exportaciones para mesas
+export const getMesas = () => apiService.getMesas();
+export const createMesa = (mesaData: any) => apiService.createMesa(mesaData);
+export const updateMesa = (id: number, mesaData: any) => apiService.updateMesa(id, mesaData);
+export const deleteMesa = (id: number, data: any) => apiService.deleteMesa(id, data);

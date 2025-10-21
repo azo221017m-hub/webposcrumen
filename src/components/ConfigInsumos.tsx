@@ -41,6 +41,9 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
   const [toastMessage, setToastMessage] = useState<string>('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('info');
 
+  // Estados para calculadora de precio (solo para PRODUCTO)
+  const [porcentajeUtilidad, setPorcentajeUtilidad] = useState<number>(0);
+
   // Función para mostrar notificaciones
   const mostrarToast = (message: string, type: 'success' | 'error' | 'info') => {
     setToastMessage(message);
@@ -48,6 +51,28 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
     setShowToast(true);
     // Auto-ocultar después de 3 segundos
     setTimeout(() => setShowToast(false), 3000);
+  };
+
+  // Funciones para calculadora de precio de venta
+  const calcularPrecioPorUtilidad = (costo: number, utilidad: number): number => {
+    if (costo <= 0 || utilidad < 0) return 0;
+    return costo + (costo * utilidad / 100);
+  };
+
+  const calcularUtilidadPorPrecio = (costo: number, precio: number): number => {
+    if (costo <= 0 || precio <= 0) return 0;
+    return ((precio - costo) / costo) * 100;
+  };
+
+  const handleUtilidadChange = (utilidad: number): void => {
+    setPorcentajeUtilidad(utilidad);
+    const nuevoPrecio = calcularPrecioPorUtilidad(formData.costoPromPond, utilidad);
+    setFormData(prev => ({ ...prev, precioVta: Number(nuevoPrecio.toFixed(2)) }));
+  };
+
+  const handlePrecioChange = (precio: number): void => {
+    const nuevaUtilidad = calcularUtilidadPorPrecio(formData.costoPromPond, precio);
+    setPorcentajeUtilidad(Number(nuevaUtilidad.toFixed(2)));
   };
 
   // Función para cargar insumos desde la API
@@ -122,6 +147,18 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
         // Si es INSUMO, ocultar precio (rellenar con 0) y resetear categoría
         newFormData.precioVta = 0;
         newFormData.idCategoria = 0;
+        setPorcentajeUtilidad(0); // Resetear utilidad
+      }
+    }
+
+    // Actualizar cálculos de utilidad cuando cambia el precio o costo (solo para PRODUCTO)
+    if (formData.tipoInsumo === 'PRODUCTO') {
+      if (name === 'precioVta') {
+        handlePrecioChange(Number(value));
+      } else if (name === 'costoPromPond') {
+        // Recalcular precio manteniendo el mismo porcentaje de utilidad
+        const nuevoPrecio = calcularPrecioPorUtilidad(Number(value), porcentajeUtilidad);
+        newFormData.precioVta = Number(nuevoPrecio.toFixed(2));
       }
     }
 
@@ -471,22 +508,59 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
 
               {/* Campo precio de venta - Solo visible para PRODUCTO */}
               {formData.tipoInsumo === 'PRODUCTO' && (
-                <div className="form-group">
-                  <label htmlFor="precioVta" className="form-label">
-                    Precio de Venta
-                  </label>
-                  <input
-                    type="number"
-                    id="precioVta"
-                    name="precioVta"
-                    value={formData.precioVta}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="0.00"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
+                <>
+                  <div className="form-group">
+                    <label htmlFor="precioVta" className="form-label">
+                      Precio de Venta
+                    </label>
+                    <input
+                      type="number"
+                      id="precioVta"
+                      name="precioVta"
+                      value={formData.precioVta}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+
+                  {/* Calculadora de utilidad */}
+                  <div className="form-group calculadora-utilidad">
+                    <label className="form-label">💰 Calculadora de Utilidad</label>
+                    <div className="utilidad-calculator">
+                      <div className="calc-row">
+                        <label htmlFor="porcentajeUtilidad" className="calc-label">% Utilidad:</label>
+                        <input
+                          type="number"
+                          id="porcentajeUtilidad"
+                          value={porcentajeUtilidad}
+                          onChange={(e) => handleUtilidadChange(Number(e.target.value))}
+                          className="calc-input"
+                          placeholder="0"
+                          min="0"
+                          step="0.1"
+                        />
+                        <span className="calc-unit">%</span>
+                      </div>
+                      <div className="calc-info">
+                        <div className="calc-detail">
+                          <span className="calc-detail-label">Costo:</span>
+                          <span className="calc-detail-value">${formData.costoPromPond.toFixed(2)}</span>
+                        </div>
+                        <div className="calc-detail">
+                          <span className="calc-detail-label">Precio:</span>
+                          <span className="calc-detail-value">${formData.precioVta.toFixed(2)}</span>
+                        </div>
+                        <div className="calc-detail">
+                          <span className="calc-detail-label">Ganancia:</span>
+                          <span className="calc-detail-value">${(formData.precioVta - formData.costoPromPond).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Campo usuario - oculto porque se llena automáticamente */}
