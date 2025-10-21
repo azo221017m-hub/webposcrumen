@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Usuario } from '../types';
 import InsumosSelector from './InsumosSelector';
+import SubRecetasSelector from './SubRecetasSelector';
 import Toast from './Toast';
 import '../styles/ConfigScreens.css';
 
@@ -87,6 +88,9 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('info');
+
+  // Estados para selector de subrecetas
+  const [showSubRecetasSelector, setShowSubRecetasSelector] = useState(false);
 
   // Función para mostrar Toast
   const mostrarToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
@@ -183,6 +187,46 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     const nuevosInsumos = [...insumos];
     (nuevosInsumos[index] as any)[field] = value;
     setInsumos(nuevosInsumos);
+  };
+
+  // Función para manejar selección de subreceta
+  const handleSubRecetaSelect = (subreceta: any): void => {
+    console.log('📋 SubReceta seleccionada:', subreceta.nombreSubReceta, 'Costo:', subreceta.costoSubReceta);
+    
+    // Agregar la subreceta como un "insumo" especial
+    const nuevaSubReceta: DetalleReceta = {
+      nombreInsumo: `[SubReceta] ${subreceta.nombreSubReceta}`,
+      umInsumo: 'pza',
+      cantidadUso: 1,
+      costoInsumo: subreceta.costoSubReceta,
+      estatus: 1,
+      usuario: user.usuario,
+      idNegocio: 1
+    };
+
+    // Buscar si hay un insumo vacío para reemplazar, sino agregar al final
+    const indexVacio = insumos.findIndex(insumo => !insumo.nombreInsumo.trim());
+    
+    if (indexVacio !== -1) {
+      // Reemplazar insumo vacío
+      const nuevosInsumos = [...insumos];
+      nuevosInsumos[indexVacio] = nuevaSubReceta;
+      setInsumos(nuevosInsumos);
+    } else {
+      // Agregar al final
+      setInsumos([...insumos, nuevaSubReceta]);
+    }
+
+    // Recalcular costo total
+    const nuevoCosto = [...insumos].reduce((total, insumo) => {
+      if (insumo.nombreInsumo.trim()) {
+        return total + (insumo.cantidadUso * insumo.costoInsumo);
+      }
+      return total;
+    }, 0) + nuevaSubReceta.costoInsumo;
+
+    setCostoReceta(Number(nuevoCosto.toFixed(2)));
+    mostrarToast(`SubReceta "${subreceta.nombreSubReceta}" agregada exitosamente`, 'success');
   };
 
 
@@ -567,15 +611,25 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                 {/* Insumos */}
                 <div className="form-section">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3>Insumos ({insumos.length}/40)</h3>
-                    <button 
-                      type="button"
-                      className="btn btn-success btn-sm"
-                      onClick={agregarInsumo}
-                      disabled={insumos.length >= 40}
-                    >
-                      ➕ Agregar Insumo
-                    </button>
+                    <h3>Insumos y SubRecetas ({insumos.length}/40)</h3>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button 
+                        type="button"
+                        className="btn btn-info btn-sm"
+                        onClick={() => setShowSubRecetasSelector(true)}
+                        disabled={insumos.length >= 40}
+                      >
+                        📋 Agregar SubReceta
+                      </button>
+                      <button 
+                        type="button"
+                        className="btn btn-success btn-sm"
+                        onClick={agregarInsumo}
+                        disabled={insumos.length >= 40}
+                      >
+                        ➕ Agregar Insumo
+                      </button>
+                    </div>
                   </div>
 
                   <div className="insumos-list">
@@ -765,6 +819,13 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
           </div>
         </div>
       </div>
+
+      {/* Selector de SubRecetas */}
+      <SubRecetasSelector
+        isOpen={showSubRecetasSelector}
+        onSubRecetaSelect={handleSubRecetaSelect}
+        onClose={() => setShowSubRecetasSelector(false)}
+      />
 
       {/* Toast para notificaciones */}
       {showToast && (

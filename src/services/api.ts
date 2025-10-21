@@ -6,7 +6,7 @@ import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, Creat
 // URL base de la API - se obtiene de variables de entorno o usa localhost por defecto
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
-// Clase para manejar todas las llamadas a la API
+// Clase principal del servicio API que maneja todas las llamadas a la API
 class ApiService {
   private baseURL: string; // URL base de la API
 
@@ -148,6 +148,16 @@ class ApiService {
     
     return this.request<{ idRol: number; nombreRol: string }>('/api/roles', {
       method: 'POST', // Método POST
+      body: JSON.stringify(rolData), // Datos del rol en JSON
+    });
+  }
+
+  // Método para actualizar un rol existente
+  async updateRol(idRol: number, rolData: any): Promise<ApiResponse<{ idRol: number; nombreRol: string }>> {
+    console.log('👥 Actualizando rol:', idRol, rolData.nombreRol); // Log de actualización
+    
+    return this.request<{ idRol: number; nombreRol: string }>(`/api/roles/${idRol}`, {
+      method: 'PUT', // Método PUT
       body: JSON.stringify(rolData), // Datos del rol en JSON
     });
   }
@@ -372,6 +382,15 @@ class ApiService {
       body: JSON.stringify(data), // Datos adicionales
     });
   }
+
+  // Método para obtener subrecetas
+  async getSubRecetas(): Promise<ApiResponse<any[]>> {
+    console.log('📋 Obteniendo subrecetas'); // Log de consulta
+    
+    return this.request<any[]>('/api/sub-recetas', {
+      method: 'GET', // Método GET
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -412,3 +431,6 @@ export const getInsumos = () => apiService.getInsumos();
 export const createInsumo = (insumoData: any) => apiService.createInsumo(insumoData);
 export const updateInsumo = (id: number, insumoData: any) => apiService.updateInsumo(id, insumoData);
 export const deleteInsumo = (id: number, data: any) => apiService.deleteInsumo(id, data);
+
+// Exportaciones para subrecetas
+export const getSubRecetas = () => apiService.getSubRecetas();

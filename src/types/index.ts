@@ -246,7 +246,7 @@ export interface Insumo {
   nomInsumo: string; // Nombre del insumo
   costoPromPond: string | number; // Costo promedio ponderado (decimal de MySQL)
   umInsumo: string; // Unidad de medida del insumo
-  tipoInsumo: 'PIEZA' | 'CONSUMO'; // Tipo de insumo
+  tipoInsumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo
   existencia: string | number; // Existencia disponible (decimal de MySQL)
   stockMinimo: string | number; // Stock mínimo (decimal de MySQL)
   precioVta: string | number; // Precio de venta (decimal de MySQL)
@@ -261,7 +261,7 @@ export interface CreateInsumoData {
   nomInsumo: string; // Nombre del insumo
   costoPromPond: number; // Costo promedio ponderado
   umInsumo: string; // Unidad de medida del insumo
-  tipoInsumo: 'PIEZA' | 'CONSUMO'; // Tipo de insumo (según requerimiento)
+  tipoInsumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo (según requerimiento)
   existencia: number; // Existencia inicial
   stockMinimo: number; // Stock mínimo
   precioVta: number; // Precio de venta
