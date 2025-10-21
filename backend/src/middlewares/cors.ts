@@ -4,12 +4,13 @@
 import cors from 'cors'; // Importa cors
 import type { CorsOptions } from 'cors'; // Importa tipos de cors
 
+
+
+
 // Configuración de CORS para permitir conexiones desde el frontend
 const corsOptions: CorsOptions = {
   // Origen permitido - URL del frontend (más permisivo para desarrollo)
-  origin: [
-    'https://pos54nwebcrumen.onrender.com'
-  ],
+ origin: ['http://localhost:5173'],
   
   // Métodos HTTP permitidos
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
