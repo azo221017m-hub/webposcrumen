@@ -104,6 +104,11 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     }, 2000);
   };
 
+  // Función para abrir el selector de subrecetas
+  const openSubRecetasSelector = (): void => {
+    setShowSubRecetasSelector(true);
+  };
+
   // Cargar recetas al montar el componente
   useEffect(() => {
     cargarRecetas();
@@ -220,10 +225,10 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
     // Recalcular costo total
     const nuevoCosto = [...insumos].reduce((total, insumo) => {
       if (insumo.nombreInsumo.trim()) {
-        return total + (insumo.cantidadUso * insumo.costoInsumo);
+        return total + (Number(insumo.cantidadUso || 0) * Number(insumo.costoInsumo || 0));
       }
       return total;
-    }, 0) + nuevaSubReceta.costoInsumo;
+    }, 0) + Number(nuevaSubReceta.costoInsumo || 0);
 
     setCostoReceta(Number(nuevoCosto.toFixed(2)));
     mostrarToast(`SubReceta "${subreceta.nombreSubReceta}" agregada exitosamente`, 'success');
@@ -601,7 +606,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                   <h3>🔍 Agregar Insumos a la Receta</h3>
                   <InsumosSelector
                     onInsumoSelect={handleInsumoSelect}
-                    filtroTipo="CONSUMO"
+                    filtroTipo="INSUMO"
                     placeholder="Buscar insumos por nombre..."
                     label="Buscar y Seleccionar Insumo"
                     selectedInsumos={insumos.map((_, index) => index)}
@@ -616,7 +621,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
                       <button 
                         type="button"
                         className="btn btn-info btn-sm"
-                        onClick={() => setShowSubRecetasSelector(true)}
+                        onClick={openSubRecetasSelector}
                         disabled={insumos.length >= 40}
                       >
                         📋 Agregar SubReceta

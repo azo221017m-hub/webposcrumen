@@ -20,9 +20,8 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
   const [categorias, setCategorias] = useState<Categoria[]>([]); // Lista de categorías para dropdown
   const [loading, setLoading] = useState<boolean>(true); // Estado de carga
   const [submitting, setSubmitting] = useState<boolean>(false); // Estado de envío de formulario
-  const [isEditing, setIsEditing] = useState<boolean>(false); // Control del modo edición
-  const [editingId, setEditingId] = useState<number | null>(null); // ID del insumo siendo editado
-  const [showForm, setShowForm] = useState<boolean>(false); // Control del formulario
+  const [, setIsEditing] = useState<boolean>(false); // Control del modo edición
+  const [, setEditingId] = useState<number | null>(null); // ID del insumo siendo editado
 
   // Estados para el formulario de nuevo insumo
   const [formData, setFormData] = useState<CreateInsumoData>({
@@ -120,8 +119,8 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
         // Si es PRODUCTO, rellenar unidad de medida con 'pza'
         newFormData.umInsumo = 'pza';
       } else if (value === 'INSUMO') {
-        // Si es INSUMO, ocultar categorías (enviar valor "INSUMO")
-        // Resetear categoria a 0 para manejo posterior
+        // Si es INSUMO, ocultar precio (rellenar con 0) y resetear categoría
+        newFormData.precioVta = 0;
         newFormData.idCategoria = 0;
       }
     }
@@ -271,57 +270,8 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
   };
 
   // Función para editar insumo
-  const handleEditInsumo = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault();
-    
-    if (!editingId) return;
-    
-    try {
-      setSubmitting(true);
-      
-      const insumoData = {
-        ...formData,
-        nomInsumo: formData.nomInsumo.trim(),
-        umInsumo: formData.umInsumo.trim(),
-        idCategoria: formData.tipoInsumo === 'INSUMO' ? 0 : formData.idCategoria,
-        usuario: currentUser.usuario
-      };
-      
-      const response = await import('../services/api').then(api => api.default.updateInsumo(editingId, insumoData));
-      
-      if (response.success) {
-        mostrarToast('Insumo actualizado exitosamente', 'success');
-        setShowForm(false);
-        resetForm();
-        await cargarInsumos();
-      } else {
-        mostrarToast(response.message || 'Error actualizando insumo', 'error');
-      }
-    } catch (error) {
-      console.error('❌ Error editando insumo:', error);
-      mostrarToast('Error de conexión', 'error');
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   // Función para iniciar edición
-  const startEdit = (insumo: Insumo): void => {
-    setFormData({
-      nomInsumo: insumo.nomInsumo,
-      costoPromPond: Number(insumo.costoPromPond),
-      umInsumo: insumo.umInsumo,
-      tipoInsumo: insumo.tipoInsumo,
-      existencia: Number(insumo.existencia),
-      stockMinimo: Number(insumo.stockMinimo),
-      precioVta: Number(insumo.precioVta),
-      idCategoria: insumo.idCategoria,
-      usuario: currentUser.usuario
-    });
-    setEditingId(insumo.idInsumo);
-    setIsEditing(true);
-    setShowForm(true);
-  };
 
   // Función para resetear formulario
   const resetForm = (): void => {
@@ -341,10 +291,6 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
   };
 
   // Función para cancelar edición/creación
-  const handleCancel = (): void => {
-    setShowForm(false);
-    resetForm();
-  };
 
   // Función para obtener nombre de categoría
   const obtenerNombreCategoria = (idCategoria: number): string => {
@@ -411,26 +357,38 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
                 </select>
               </div>
 
-              {/* Campo unidad de medida - ahora dropdown */}
+              {/* Campo unidad de medida - dropdown o readonly según tipo */}
               <div className="form-group">
                 <label htmlFor="umInsumo" className="form-label">
                   Unidad de Medida *
                 </label>
-                <select
-                  id="umInsumo"
-                  name="umInsumo"
-                  value={formData.umInsumo}
-                  onChange={handleInputChange}
-                  className="form-select"
-                  required
-                >
-                  <option value="">Seleccione unidad</option>
-                  <option value="Kg">Kg</option>
-                  <option value="Lt">Lt</option>
-                  <option value="ml">ml</option>
-                  <option value="gr">gr</option>
-                  <option value="pza">pza</option>
-                </select>
+                {formData.tipoInsumo === 'PRODUCTO' ? (
+                  <input
+                    type="text"
+                    id="umInsumo"
+                    name="umInsumo"
+                    value={formData.umInsumo}
+                    className="form-input"
+                    readOnly
+                    style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                  />
+                ) : (
+                  <select
+                    id="umInsumo"
+                    name="umInsumo"
+                    value={formData.umInsumo}
+                    onChange={handleInputChange}
+                    className="form-select"
+                    required
+                  >
+                    <option value="">Seleccione unidad</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Lt">Lt</option>
+                    <option value="ml">ml</option>
+                    <option value="gr">gr</option>
+                    <option value="pza">pza</option>
+                  </select>
+                )}
               </div>
 
               {/* Campo categoría - solo visible para PRODUCTO */}
@@ -511,23 +469,25 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
                 />
               </div>
 
-              {/* Campo precio de venta */}
-              <div className="form-group">
-                <label htmlFor="precioVta" className="form-label">
-                  Precio de Venta
-                </label>
-                <input
-                  type="number"
-                  id="precioVta"
-                  name="precioVta"
-                  value={formData.precioVta}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
+              {/* Campo precio de venta - Solo visible para PRODUCTO */}
+              {formData.tipoInsumo === 'PRODUCTO' && (
+                <div className="form-group">
+                  <label htmlFor="precioVta" className="form-label">
+                    Precio de Venta
+                  </label>
+                  <input
+                    type="number"
+                    id="precioVta"
+                    name="precioVta"
+                    value={formData.precioVta}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              )}
 
               {/* Campo usuario - oculto porque se llena automáticamente */}
             </div>
@@ -540,6 +500,14 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ onNavigate, currentUser }
                 disabled={submitting}
               >
                 {submitting ? 'Guardando...' : 'Guardar Insumo'}
+              </button>
+              <button
+                type="button"
+                className="btn-secondary btn-cancel"
+                onClick={resetForm}
+                disabled={submitting}
+              >
+                Cancelar
               </button>
             </div>
           </form>

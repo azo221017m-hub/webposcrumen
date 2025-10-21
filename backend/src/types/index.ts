@@ -163,7 +163,7 @@ export interface Insumo {
   nomInsumo: string; // Nombre del insumo
   costoPromPond: number; // Costo promedio ponderado
   umInsumo: string; // Unidad de medida del insumo
-  tipoInsumo: 'PIEZA' | 'CONSUMO'; // Tipo de insumo
+  tipoInsumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo
   existencia: number; // Existencia disponible
   stockMinimo: number; // Stock mínimo
   precioVta: number; // Precio de venta
@@ -178,7 +178,7 @@ export interface CreateInsumoData {
   nomInsumo: string; // Nombre del insumo
   costoPromPond: number; // Costo promedio ponderado
   umInsumo: string; // Unidad de medida del insumo
-  tipoInsumo: 'PIEZA' | 'CONSUMO'; // Tipo de insumo (según requerimiento)
+  tipoInsumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo (según requerimiento)
   existencia: number; // Existencia inicial
   stockMinimo: number; // Stock mínimo
   precioVta: number; // Precio de venta

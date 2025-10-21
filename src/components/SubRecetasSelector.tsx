@@ -10,8 +10,8 @@ import '../styles/ConfigScreens.css';
 interface SubReceta {
   idSubReceta: number;
   nombreSubReceta: string;
-  costoSubReceta: number;
-  totalInsumos: number;
+  costoSubReceta: number | string;
+  totalInsumos: number | string;
   instruccionesSubr: string;
 }
 
@@ -89,8 +89,35 @@ const SubRecetasSelector: React.FC<SubRecetasSelectorProps> = ({
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content subrecetas-selector">
+    <div 
+      className="modal-overlay"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999
+      }}
+    >
+      <div 
+        className="modal-content subrecetas-selector"
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '1.5rem',
+          width: '90vw',
+          maxWidth: '800px',
+          maxHeight: '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        }}
+      >
         <div className="modal-header">
           <h2>Seleccionar SubReceta</h2>
           <button 
@@ -154,12 +181,12 @@ const SubRecetasSelector: React.FC<SubRecetasSelectorProps> = ({
                     <div className="subreceta-header">
                       <h4>{subreceta.nombreSubReceta}</h4>
                       <span className="subreceta-cost">
-                        ${subreceta.costoSubReceta.toFixed(2)}
+                        ${Number(subreceta.costoSubReceta || 0).toFixed(2)}
                       </span>
                     </div>
                     <div className="subreceta-details">
                       <p className="subreceta-ingredients">
-                        {subreceta.totalInsumos} insumo(s)
+                        {Number(subreceta.totalInsumos || 0)} insumo(s)
                       </p>
                       {subreceta.instruccionesSubr && (
                         <p className="subreceta-instructions">
