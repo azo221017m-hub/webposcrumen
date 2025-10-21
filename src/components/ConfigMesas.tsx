@@ -38,11 +38,15 @@ const ConfigMesas: React.FC<ConfigMesasProps> = ({ onNavigate, currentUser }) =>
 
   // Función para mostrar notificaciones
   const mostrarToast = (message: string, type: 'success' | 'error' | 'info') => {
+    console.log('🎯 [ConfigMesas] Mostrando toast:', { message, type });
     setToastMessage(message);
     setToastType(type);
     setShowToast(true);
     // Auto-ocultar después de 3 segundos
-    setTimeout(() => setShowToast(false), 3000);
+    setTimeout(() => {
+      console.log('⏰ [ConfigMesas] Ocultando toast automáticamente');
+      setShowToast(false);
+    }, 3000);
   };
 
   // Función para cargar mesas
