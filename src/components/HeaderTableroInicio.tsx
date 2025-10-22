@@ -21,12 +21,27 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
 }) => {
   // Estado para controlar el dropdown del usuario
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+  
+  // Estado para controlar el modal de soporte
+  const [showSupportModal, setShowSupportModal] = useState<boolean>(false);
 
   // Función para manejar logout
   const handleLogout = (): void => {
     console.log('🚪 Usuario cerrando sesión:', user.usuario);
     onLogout();
     setShowUserMenu(false);
+  };
+
+  // Función para mostrar modal de soporte
+  const handleSupportClick = (): void => {
+    setShowSupportModal(true);
+    setShowUserMenu(false);
+    console.log('📞 Mostrando modal de soporte');
+  };
+
+  // Función para cerrar modal de soporte
+  const closeSupportModal = (): void => {
+    setShowSupportModal(false);
   };
 
   return (
@@ -90,6 +105,13 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
                 </div>
                 <div className="dropdown-divider"></div>
                 <button 
+                  className="dropdown-item support-btn"
+                  onClick={handleSupportClick}
+                >
+                  <span className="support-icon">📞</span>
+                  Soporte
+                </button>
+                <button 
                   className="dropdown-item logout-btn"
                   onClick={handleLogout}
                 >
@@ -102,6 +124,65 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
         </div>
 
       </div>
+
+      {/* Modal de Soporte */}
+      {showSupportModal && (
+        <div className="support-modal-overlay" onClick={closeSupportModal}>
+          <div className="support-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📞 Crumen Soporte 24/7</h3>
+              <button 
+                className="modal-close"
+                onClick={closeSupportModal}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="support-info">
+                <div className="support-item">
+                  <span className="support-icon">📱</span>
+                  <div className="support-details">
+                    <h4>Teléfono de Soporte</h4>
+                    <p className="phone-number">5527618631</p>
+                    <p className="support-hours">Disponible 24 horas, 7 días</p>
+                  </div>
+                </div>
+                <div className="support-item">
+                  <span className="support-icon">⚡</span>
+                  <div className="support-details">
+                    <h4>Soporte Técnico</h4>
+                    <p>Resolución inmediata de problemas</p>
+                    <p>Asistencia con configuración</p>
+                  </div>
+                </div>
+                <div className="support-item">
+                  <span className="support-icon">🛠️</span>
+                  <div className="support-details">
+                    <h4>Mantenimiento</h4>
+                    <p>Actualizaciones del sistema</p>
+                    <p>Respaldo y seguridad</p>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button 
+                  className="btn-call"
+                  onClick={() => window.open('tel:5527618631')}
+                >
+                  📞 Llamar Ahora
+                </button>
+                <button 
+                  className="btn-whatsapp"
+                  onClick={() => window.open('https://wa.me/525527618631')}
+                >
+                  💬 WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
