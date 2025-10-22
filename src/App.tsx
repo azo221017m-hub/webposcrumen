@@ -20,6 +20,7 @@ import ConfigProductos from './components/ConfigProductos'; // Configuración de
 import ConfigRecetas from './components/ConfigRecetas'; // Configuración de recetas
 import ConfigSubRecetas from './components/ConfigSubRecetas'; // Configuración de sub-recetas
 import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
+import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
@@ -39,7 +40,7 @@ import './App.css'; // Estilos específicos de App
 // Componente principal de la aplicación
 function App() {
   // Estado para la pantalla actual - siempre inicia con presentation
-  const [currentScreen, setCurrentScreen] = useState<ScreenType>('presentation');
+  const [currentScreen, setCurrentScreen] = useState<ScreenType>('login');
   
   // Hook de autenticación
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
@@ -119,7 +120,61 @@ function App() {
 
       case 'login':
         console.log('🔐 Renderizando pantalla de login'); // Log de renderizado
-        return <LoginScreen onLogin={login} isLoading={isLoading} />;
+        // Mock temporal para testing del TableroInicial
+        const mockUser = {
+          idUsuario: 1,
+          idNegocio: 1,
+          idRol: 1,
+          nombre: 'Usuario Demo',
+          usuario: 'demo',
+          email: 'demo@test.com',
+          estatus: 1,
+          fechaRegistro: '2024-01-01',
+          fechaActualizacion: '2024-01-01',
+          usuarioAuditoria: 'admin'
+        };
+        
+        return (
+          <div style={{padding: '20px', textAlign: 'center'}}>
+            <h2>🧪 Modo de Demostración</h2>
+            <p>Haz clic para probar el nuevo TableroInicial:</p>
+            <button 
+              onClick={() => {
+                // Simular login exitoso
+                console.log('🎯 Iniciando demo del TableroInicial');
+                setCurrentScreen('tablero-inicial');
+              }}
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                padding: '15px 30px',
+                borderRadius: '8px',
+                fontSize: '1.1rem',
+                cursor: 'pointer',
+                margin: '10px'
+              }}
+            >
+              🚀 Probar TableroInicial
+            </button>
+            <br />
+            <button 
+              onClick={() => setCurrentScreen('home')}
+              style={{
+                background: '#6c757d',
+                color: 'white',
+                border: 'none',
+                padding: '15px 30px',
+                borderRadius: '8px',
+                fontSize: '1.1rem',
+                cursor: 'pointer',
+                margin: '10px'
+              }}
+            >
+              🏠 HomeScreen Original
+            </button>
+          </div>
+        );
 
       case 'home':
         if (!isAuthenticated || !user) {
@@ -132,7 +187,30 @@ function App() {
           <HomeScreen 
             user={user} 
             onNavigate={handleNavigate}
-            onLogout={handleLogout}
+          />
+        );
+
+      case 'tablero-inicial':
+        console.log('📊 Renderizando tablero inicial'); // Log de renderizado
+        // Usar mockUser para demostración
+        const demoUser = {
+          idUsuario: 1,
+          idNegocio: 1,
+          idRol: 1,
+          nombre: 'Usuario Demo',
+          usuario: 'demo',
+          email: 'demo@test.com',
+          estatus: 1,
+          fechaRegistro: '2024-01-01',
+          fechaActualizacion: '2024-01-01',
+          usuarioAuditoria: 'admin'
+        };
+        
+        return (
+          <TableroInicial 
+            user={demoUser} 
+            onNavigate={handleNavigate}
+            onLogout={() => setCurrentScreen('login')}
           />
         );
 
