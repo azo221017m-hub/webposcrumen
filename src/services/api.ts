@@ -4,7 +4,7 @@
 import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, CreateNegocioData } from '../types';
 
 // URL base de la API - se obtiene de variables de entorno o usa localhost por defecto
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4001';
 
 // Clase principal del servicio API que maneja todas las llamadas a la API
 class ApiService {

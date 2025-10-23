@@ -12,6 +12,7 @@ const corsOptions: CorsOptions = {
   // Origen permitido - URL del frontend (desarrollo y producción)
  origin: [
     'http://localhost:5173', 
+    'http://localhost:5174',
     'https://pos54nwebcrumen.onrender.com',
     'https://pos54nwebcrumenbackend.onrender.com'
   ],

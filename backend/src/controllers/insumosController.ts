@@ -86,7 +86,7 @@ export const createInsumoController = async (req: Request, res: Response): Promi
       return;
     }
 
-    if (!insumoData.id_categoria || isNaN(Number(insumoData.id_categoria))) {
+    if (insumoData.id_categoria === undefined || insumoData.id_categoria === null || isNaN(Number(insumoData.id_categoria))) {
       res.status(400).json({
         success: false,
         message: 'La categoría es obligatoria y debe ser un número válido'
@@ -126,18 +126,51 @@ export const createInsumoController = async (req: Request, res: Response): Promi
       return;
     }
 
-    // Verificar que la categoría existe
-    const categoriaExists = await executeQuery(
-      'SELECT idCategoria FROM tblposcrumenwebcategorias WHERE idCategoria = ? AND estatus = 1',
-      [insumoData.id_categoria]
-    );
+    // Verificar o crear categoría para insumos
+    if (insumoData.tipo_insumo === 'INSUMO') {
+      console.log('🔍 Procesando insumo tipo INSUMO, buscando categoría...');
+      
+      // Buscar la categoría "INSUMO"
+      let categoriaInsumo = await executeQuery(
+        'SELECT idCategoria FROM tblposcrumenwebcategorias WHERE nombre = ? AND estatus = 1',
+        ['INSUMO']
+      );
 
-    if (categoriaExists.length === 0) {
-      res.status(400).json({
-        success: false,
-        message: 'La categoría especificada no existe o está inactiva'
-      });
-      return;
+      console.log('📝 Resultado búsqueda categoría INSUMO:', categoriaInsumo);
+
+      if (categoriaInsumo.length === 0) {
+        console.log('➕ Categoría INSUMO no existe, creándola...');
+        
+        // Si no existe, crearla
+        const result = await executeQuery(
+          'INSERT INTO tblposcrumenwebcategorias (nombre, descripcion, estatus, fechaRegistro, fechaActualizacion, usuario) VALUES (?, ?, ?, ?, ?, ?)',
+          ['INSUMO', 'Categoría automática para insumos', 1, 
+           new Date().toISOString().slice(0, 19).replace('T', ' '),
+           new Date().toISOString().slice(0, 19).replace('T', ' '),
+           insumoData.usuario || 'sistema']
+        );
+        insumoData.id_categoria = result.insertId;
+        console.log('✅ Categoría INSUMO creada automáticamente con ID:', result.insertId);
+      } else {
+        insumoData.id_categoria = categoriaInsumo[0].idCategoria;
+        console.log('✅ Usando categoría INSUMO existente con ID:', categoriaInsumo[0].idCategoria);
+      }
+    } else {
+      // Para productos, verificar que la categoría especificada existe
+      if (insumoData.id_categoria !== 0) {
+        const categoriaExists = await executeQuery(
+          'SELECT idCategoria FROM tblposcrumenwebcategorias WHERE idCategoria = ? AND estatus = 1',
+          [insumoData.id_categoria]
+        );
+
+        if (categoriaExists.length === 0) {
+          res.status(400).json({
+            success: false,
+            message: 'La categoría especificada no existe o está inactiva'
+          });
+          return;
+        }
+      }
     }
 
     // Verificar que no existe un insumo con el mismo nombre

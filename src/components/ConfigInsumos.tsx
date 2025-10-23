@@ -130,6 +130,9 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ currentUser, onBack }) =>
     cargarCategorias();
   }, []);
 
+  // Para insumos tipo "INSUMO", la categoría se maneja automáticamente en el backend
+  // No se requiere lógica adicional en el frontend
+
   // Función para manejar cambios en el formulario
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -147,9 +150,9 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ currentUser, onBack }) =>
         // Si es PRODUCTO, rellenar unidad de medida con 'pza'
         newFormData.unidad_medida = 'pza';
       } else if (value === 'INSUMO') {
-        // Si es INSUMO, ocultar precio (rellenar con 0) y resetear categoría
+        // Si es INSUMO, ocultar precio y usar categoría automática (el backend la manejará)
         newFormData.precio_venta = 0;
-        newFormData.id_categoria = 0;
+        newFormData.id_categoria = 0; // El backend creará/usará la categoría INSUMO automáticamente
         setPorcentajeUtilidad(0); // Resetear utilidad
       }
     }
@@ -189,6 +192,9 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ currentUser, onBack }) =>
       return;
     }
 
+    // Para INSUMO, no se requiere validación de categoría ya que el backend la creará automáticamente
+    // La categoría "INSUMO" se manejará automáticamente en el backend
+
     if (formData.costo_promedio_ponderado < 0) {
       mostrarToast('El costo promedio ponderado no puede ser negativo', 'error');
       return;
@@ -218,7 +224,8 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ currentUser, onBack }) =>
         ...formData,
         nombre: formData.nombre.trim(),
         unidad_medida: formData.unidad_medida.trim(),
-        // Si es INSUMO, usar una categoría especial o 0
+        // Para INSUMO, el backend manejará la categoría automáticamente
+        // Para PRODUCTO, usar la categoría seleccionada
         id_categoria: formData.tipo_insumo === 'INSUMO' ? 0 : formData.id_categoria,
         usuario: currentUser.usuario
       };
@@ -327,7 +334,7 @@ const ConfigInsumos: React.FC<ConfigInsumosProps> = ({ currentUser, onBack }) =>
       stock_minimo: 0,
       precio_venta: 0,
       precio_referencia: 0,
-      id_categoria: 0,
+      id_categoria: 0, // Para INSUMO, el backend manejará la categoría automáticamente
       id_proveedor: undefined,
       activo: true,
       usuario: currentUser.usuario
