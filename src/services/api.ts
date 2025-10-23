@@ -1,10 +1,10 @@
 // src/services/api.ts
 // Servicio para comunicación con la API del backend POSWEBCrumen
 
-import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, CreateNegocioData } from '../types';
+import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, CreateNegocioData, UMCompra, CreateUMCompraData, UpdateUMCompraData, TipoMovimiento, CreateTipoMovimientoData, UpdateTipoMovimientoData } from '../types';
 
 // URL base de la API - se obtiene de variables de entorno o usa localhost por defecto
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 // Clase principal del servicio API que maneja todas las llamadas a la API
 class ApiService {
@@ -472,6 +472,118 @@ class ApiService {
       method: 'DELETE', // Método DELETE
     });
   }
+
+  // === MÉTODOS PARA UNIDADES DE MEDIDA DE COMPRA === //
+
+  /**
+   * Obtiene todas las unidades de medida de compra
+   * @returns Promise con la respuesta de la API conteniendo las UMCompras
+   */
+  async getUMCompras(): Promise<ApiResponse<UMCompra[]>> {
+    console.log('📋 Obteniendo unidades de medida de compra...'); // Log de solicitud
+    
+    return this.request<UMCompra[]>('/api/um-compras', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  /**
+   * Crea una nueva unidad de medida de compra
+   * @param umCompraData - Datos de la nueva UMCompra
+   * @returns Promise con la respuesta de la API
+   */
+  async createUMCompra(umCompraData: CreateUMCompraData): Promise<ApiResponse<UMCompra>> {
+    console.log('📦 Creando nueva unidad de medida de compra:', umCompraData); // Log de creación
+    
+    return this.request<UMCompra>('/api/um-compras', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(umCompraData), // Envía los datos como JSON
+    });
+  }
+
+  /**
+   * Actualiza una unidad de medida de compra existente
+   * @param id - ID de la UMCompra a actualizar
+   * @param umCompraData - Nuevos datos de la UMCompra
+   * @returns Promise con la respuesta de la API
+   */
+  async updateUMCompra(id: number, umCompraData: UpdateUMCompraData): Promise<ApiResponse<UMCompra>> {
+    console.log(`🔄 Actualizando unidad de medida de compra ID: ${id}`, umCompraData); // Log de actualización
+    
+    return this.request<UMCompra>(`/api/um-compras/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(umCompraData), // Envía los datos como JSON
+    });
+  }
+
+  /**
+   * Elimina una unidad de medida de compra
+   * @param id - ID de la UMCompra a eliminar
+   * @returns Promise con la respuesta de la API
+   */
+  async deleteUMCompra(id: number): Promise<ApiResponse<any>> {
+    console.log(`🗑️ Eliminando unidad de medida de compra ID: ${id}`); // Log de eliminación
+    
+    return this.request<any>(`/api/um-compras/${id}`, {
+      method: 'DELETE', // Método DELETE
+    });
+  }
+
+  // === MÉTODOS PARA TIPOS DE MOVIMIENTO === //
+
+  /**
+   * Obtiene todos los tipos de movimiento
+   * @returns Promise con la respuesta de la API conteniendo los tipos de movimiento
+   */
+  async getTipoMovimientos(): Promise<ApiResponse<TipoMovimiento[]>> {
+    console.log('📋 Obteniendo tipos de movimiento...'); // Log de solicitud
+    
+    return this.request<TipoMovimiento[]>('/api/tipo-movimiento', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  /**
+   * Crea un nuevo tipo de movimiento
+   * @param tipoMovimientoData - Datos del nuevo tipo de movimiento
+   * @returns Promise con la respuesta de la API
+   */
+  async createTipoMovimiento(tipoMovimientoData: CreateTipoMovimientoData): Promise<ApiResponse<TipoMovimiento>> {
+    console.log('📦 Creando nuevo tipo de movimiento:', tipoMovimientoData); // Log de creación
+    
+    return this.request<TipoMovimiento>('/api/tipo-movimiento', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(tipoMovimientoData), // Envía los datos como JSON
+    });
+  }
+
+  /**
+   * Actualiza un tipo de movimiento existente
+   * @param id - ID del tipo de movimiento a actualizar
+   * @param tipoMovimientoData - Nuevos datos del tipo de movimiento
+   * @returns Promise con la respuesta de la API
+   */
+  async updateTipoMovimiento(id: number, tipoMovimientoData: UpdateTipoMovimientoData): Promise<ApiResponse<TipoMovimiento>> {
+    console.log(`🔄 Actualizando tipo de movimiento ID: ${id}`, tipoMovimientoData); // Log de actualización
+    
+    return this.request<TipoMovimiento>(`/api/tipo-movimiento/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(tipoMovimientoData), // Envía los datos como JSON
+    });
+  }
+
+  /**
+   * Elimina un tipo de movimiento
+   * @param id - ID del tipo de movimiento a eliminar
+   * @returns Promise con la respuesta de la API
+   */
+  async deleteTipoMovimiento(id: number): Promise<ApiResponse<any>> {
+    console.log(`🗑️ Eliminando tipo de movimiento ID: ${id}`); // Log de eliminación
+    
+    return this.request<any>(`/api/tipo-movimiento/${id}`, {
+      method: 'DELETE', // Método DELETE
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -527,3 +639,15 @@ export const getProveedores = () => apiService.getProveedores();
 export const createProveedor = (proveedorData: any) => apiService.createProveedor(proveedorData);
 export const updateProveedor = (id: number, proveedorData: any) => apiService.updateProveedor(id, proveedorData);
 export const deleteProveedor = (id: number) => apiService.deleteProveedor(id);
+
+// Exportaciones para unidades de medida de compra
+export const getUMCompras = () => apiService.getUMCompras();
+export const createUMCompra = (umCompraData: CreateUMCompraData) => apiService.createUMCompra(umCompraData);
+export const updateUMCompra = (id: number, umCompraData: UpdateUMCompraData) => apiService.updateUMCompra(id, umCompraData);
+export const deleteUMCompra = (id: number) => apiService.deleteUMCompra(id);
+
+// Exportaciones para tipos de movimiento
+export const getTipoMovimientos = () => apiService.getTipoMovimientos();
+export const createTipoMovimiento = (tipoMovimientoData: CreateTipoMovimientoData) => apiService.createTipoMovimiento(tipoMovimientoData);
+export const updateTipoMovimiento = (id: number, tipoMovimientoData: UpdateTipoMovimientoData) => apiService.updateTipoMovimiento(id, tipoMovimientoData);
+export const deleteTipoMovimiento = (id: number) => apiService.deleteTipoMovimiento(id);

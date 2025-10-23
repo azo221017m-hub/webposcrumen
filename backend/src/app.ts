@@ -20,6 +20,9 @@ import recetasRoutes from './routes/recetasRoutes'; // Rutas de recetas
 import subRecetasRoutes from './routes/subRecetasRoutes'; // Rutas de sub-recetas
 import mesasRoutes from './routes/mesasRoutes'; // Rutas de mesas
 import proveedoresRoutes from './routes/proveedoresRoutes'; // Rutas de proveedores
+import umComprasRoutes from './routes/umComprasRoutes'; // Rutas de unidades de medida de compra
+import tipoMovimientoRoutes from './routes/tipoMovimientoRoutes'; // Rutas de tipos de movimiento
+import subtipoMovimientoRoutes from './routes/subtipoMovimientoRoutes'; // Rutas de subtipos de movimiento
 
 // Carga las variables de entorno
 dotenv.config();
@@ -70,6 +73,9 @@ app.use('/api/recetas', recetasRoutes); // Rutas de recetas
 app.use('/api/sub-recetas', subRecetasRoutes); // Rutas de sub-recetas
 app.use('/api/mesas', mesasRoutes); // Rutas de mesas
 app.use('/api/proveedores', proveedoresRoutes); // Rutas de proveedores
+app.use('/api/um-compras', umComprasRoutes); // Rutas de unidades de medida de compra
+app.use('/api/tipo-movimiento', tipoMovimientoRoutes); // Rutas de tipos de movimiento
+app.use('/api/subtipo-movimiento', subtipoMovimientoRoutes); // Rutas de subtipos de movimiento
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {
@@ -144,6 +150,14 @@ const startServer = async (): Promise<void> => {
       console.log('   - GET  /api/insumos'); // Obtener insumos
       console.log('   - GET  /api/insumos/buscar/:filtro'); // Buscar insumos
       console.log('   - POST /api/insumos'); // Crear insumo
+      console.log('   - GET  /api/um-compras'); // Obtener UMCompras
+      console.log('   - POST /api/um-compras'); // Crear UMCompra
+      console.log('   - PUT  /api/um-compras/:id'); // Actualizar UMCompra
+      console.log('   - DELETE /api/um-compras/:id'); // Eliminar UMCompra
+      console.log('   - GET  /api/tipo-movimiento'); // Obtener tipos de movimiento
+      console.log('   - POST /api/tipo-movimiento'); // Crear tipo de movimiento
+      console.log('   - PUT  /api/tipo-movimiento/:id'); // Actualizar tipo de movimiento
+      console.log('   - DELETE /api/tipo-movimiento/:id'); // Eliminar tipo de movimiento
     });
     
   } catch (error) {
