@@ -2,19 +2,19 @@
 // Componente para gestión de mesas
 
 import React, { useState, useEffect } from 'react';
-import type { Mesa, CreateMesaData, ApiResponse, Usuario, ScreenType } from '../types/index';
+import type { Mesa, CreateMesaData, ApiResponse, Usuario } from '../types/index';
 import { getMesas, createMesa, updateMesa, deleteMesa } from '../services/api';
 import Toast from './Toast';
 import '../styles/ConfigScreens.css';
 
 // Interfaz para props del componente
 interface ConfigMesasProps {
-  onNavigate: (screen: ScreenType) => void; // Función para navegar entre pantallas
   currentUser: Usuario; // Usuario autenticado actual
+  onBack?: () => void; // Función para regresar al TableroInicial
 }
 
 // Componente principal de configuración de mesas
-const ConfigMesas: React.FC<ConfigMesasProps> = ({ onNavigate, currentUser }) => {
+const ConfigMesas: React.FC<ConfigMesasProps> = ({ currentUser, onBack }) => {
   // Estados para el manejo de datos y UI
   const [mesas, setMesas] = useState<Mesa[]>([]); // Lista de mesas
   const [loading, setLoading] = useState<boolean>(true); // Estado de carga
@@ -256,13 +256,6 @@ const ConfigMesas: React.FC<ConfigMesasProps> = ({ onNavigate, currentUser }) =>
                 Gestiona las mesas de tu restaurante
               </p>
             </div>
-            <button 
-              className="btn-back"
-              onClick={() => onNavigate('home')}
-              title="Volver al inicio"
-            >
-              ← Volver
-            </button>
           </div>
         </div>
 
@@ -478,15 +471,17 @@ const ConfigMesas: React.FC<ConfigMesasProps> = ({ onNavigate, currentUser }) =>
           </div>
 
           {/* Botón de regreso inferior */}
-          <div className="config-footer">
-            <button 
-              className="btn-back"
-              onClick={() => onNavigate('home')}
-              title="Regresar al menú principal"
-            >
-              🏠 Regresar al Menú Principal
-            </button>
-          </div>
+          {onBack && (
+            <div className="config-footer">
+              <button 
+                className="btn-back"
+                onClick={onBack}
+                title="Regresar al TableroInicial"
+              >
+                ← Regresar
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -19,6 +19,7 @@ import insumosRoutes from './routes/insumosRoutes'; // Rutas de insumos
 import recetasRoutes from './routes/recetasRoutes'; // Rutas de recetas
 import subRecetasRoutes from './routes/subRecetasRoutes'; // Rutas de sub-recetas
 import mesasRoutes from './routes/mesasRoutes'; // Rutas de mesas
+import proveedoresRoutes from './routes/proveedoresRoutes'; // Rutas de proveedores
 
 // Carga las variables de entorno
 dotenv.config();
@@ -68,6 +69,7 @@ app.use('/api/insumos', insumosRoutes); // Rutas de insumos
 app.use('/api/recetas', recetasRoutes); // Rutas de recetas
 app.use('/api/sub-recetas', subRecetasRoutes); // Rutas de sub-recetas
 app.use('/api/mesas', mesasRoutes); // Rutas de mesas
+app.use('/api/proveedores', proveedoresRoutes); // Rutas de proveedores
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {
@@ -81,6 +83,7 @@ app.get('/', (req, res) => {
       usuarios: '/api/usuarios', 
       negocios: '/api/negocios',
       mesas: '/api/mesas',
+      proveedores: '/api/proveedores',
       health: '/health'
     }
   });

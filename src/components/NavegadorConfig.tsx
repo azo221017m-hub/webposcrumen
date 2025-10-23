@@ -22,15 +22,14 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
       
       {/* Título del navegador */}
       <header className="navegador-header">
-        <h2>🧭 NAVEGADOR</h2>
-        <p>Configuraciones del Sistema</p>
+        <h2>⚡ ACCIONES RAPIDAS</h2>
       </header>
 
-      {/* Sección de Configuraciones Principales */}
+      {/* Sección MI NEGOCIO */}
       <div className="config-section">
         <h3 className="section-title">
-          <span className="section-icon">⚙️</span>
-          CONFIGURACIÓN
+          <span className="section-icon">🏢</span>
+          MI NEGOCIO
         </h3>
         
         <div className="config-grid">
@@ -108,62 +107,18 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
 
           <button 
             className="config-btn"
-            onClick={() => handleNavigate('config-subrecetas' as ScreenType)}
+            onClick={() => handleNavigate('config-sub-recetas' as ScreenType)}
           >
             <span className="btn-icon">📋</span>
             <span className="btn-text">Sub-recetas</span>
           </button>
-        </div>
-      </div>
-
-      {/* Sección de Ventas */}
-      <div className="config-section">
-        <h3 className="section-title">
-          <span className="section-icon">💰</span>
-          VENTAS
-        </h3>
-        
-        <div className="config-grid">
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('iniciar-venta' as ScreenType)}
-          >
-            <span className="btn-icon">🛒</span>
-            <span className="btn-text">Iniciar Venta</span>
-          </button>
 
           <button 
             className="config-btn"
-            onClick={() => handleNavigate('indicadores-ventas' as ScreenType)}
+            onClick={() => handleNavigate('config-proveedores' as ScreenType)}
           >
-            <span className="btn-icon">📊</span>
-            <span className="btn-text">Indicadores</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Sección de Sistema */}
-      <div className="config-section">
-        <h3 className="section-title">
-          <span className="section-icon">🔧</span>
-          SISTEMA
-        </h3>
-        
-        <div className="config-grid">
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('formulario-negocio' as ScreenType)}
-          >
-            <span className="btn-icon">🏢</span>
-            <span className="btn-text">Registro Negocio</span>
-          </button>
-
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-parametros' as ScreenType)}
-          >
-            <span className="btn-icon">⚙️</span>
-            <span className="btn-text">Parámetros</span>
+            <span className="btn-icon">🏪</span>
+            <span className="btn-text">Proveedores</span>
           </button>
         </div>
       </div>

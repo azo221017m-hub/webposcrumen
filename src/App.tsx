@@ -9,7 +9,7 @@ import { useAuth } from './hooks/useAuth'; // Importa hook de autenticación
 import PresentationScreen from './components/PresentationScreen'; // Pantalla de presentación
 import LoginScreen from './components/LoginScreen'; // Pantalla de login
 import HomeScreen from './components/HomeScreen'; // Pantalla principal
-import ConfigNegocios from './components/ConfigNegocios'; // Configuración de negocios
+// ConfigNegocios removido - ahora se usa FormularioNegocio
 import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de usuarios
 import ConfigRoles from './components/ConfigRoles'; // Configuración de roles
 import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
@@ -20,6 +20,7 @@ import ConfigProductos from './components/ConfigProductos'; // Configuración de
 import ConfigRecetas from './components/ConfigRecetas'; // Configuración de recetas
 import ConfigSubRecetas from './components/ConfigSubRecetas'; // Configuración de sub-recetas
 import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
+import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
 import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
@@ -40,7 +41,7 @@ import './App.css'; // Estilos específicos de App
 // Componente principal de la aplicación
 function App() {
   // Estado para la pantalla actual - siempre inicia con presentation
-  const [currentScreen, setCurrentScreen] = useState<ScreenType>('login');
+  const [currentScreen, setCurrentScreen] = useState<ScreenType>('presentation');
   
   // Hook de autenticación
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
@@ -54,11 +55,11 @@ function App() {
       isLoading 
     }); // Log de cambio
     
-    // Si está autenticado y no está en una pantalla válida, va al home
-    if (isAuthenticated && currentScreen !== 'home' && currentScreen !== 'config-usuarios' && currentScreen !== 'config-negocios') {
-      console.log('🏠 [App] Redirigiendo a home - usuario autenticado'); // Log de redirección
-      console.log('📱 [App] Cambiando currentScreen de', currentScreen, 'a home'); // Log de cambio de pantalla
-      setCurrentScreen('home');
+    // Si está autenticado y viene de login o presentation, va al tablero-inicial
+    if (isAuthenticated && user && (currentScreen === 'login' || currentScreen === 'presentation')) {
+      console.log('📊 [App] Redirigiendo a tablero-inicial - usuario autenticado'); // Log de redirección
+      console.log('📱 [App] Cambiando currentScreen de', currentScreen, 'a tablero-inicial'); // Log de cambio de pantalla
+      setCurrentScreen('tablero-inicial');
     }
     
     // Si no está autenticado y no está en login o presentación, va a login
@@ -68,10 +69,10 @@ function App() {
     }
   }, [isAuthenticated, isLoading, user]); // Removido currentScreen de las dependencias para evitar loops
 
-  // Función para manejar el completado de la presentación
+  // Función para manejar el completado de la presentación (solo presentación, no login)
   const handlePresentationComplete = (): void => {
-    console.log('🎬 Presentación completada'); // Log de completado
-    setCurrentScreen('login'); // Cambia a la pantalla de login
+    console.log('🎬 [handlePresentationComplete] Presentación completada, ir a login');
+    setCurrentScreen('login'); // Ir al login real
   };
 
   // Función para manejar la navegación entre pantallas
@@ -80,18 +81,13 @@ function App() {
     setCurrentScreen(screen); // Cambia la pantalla actual
   };
 
-  // Función para regresar al home desde pantallas de configuración
-  const handleBackToHome = (): void => {
-    console.log('🏠 Regresando al home'); // Log de regreso
-    setCurrentScreen('home'); // Cambia al home
+  // Función para regresar al TableroInicial desde pantallas de configuración
+  const handleBackToTableroInicial = (): void => {
+    console.log('📊 Regresando al TableroInicial'); // Log de regreso
+    setCurrentScreen('tablero-inicial'); // Cambia al TableroInicial
   };
 
-  // Función para manejar logout
-  const handleLogout = (): void => {
-    console.log('🚪 Cerrando sesión desde App'); // Log de logout
-    logout(); // Ejecuta logout
-    setCurrentScreen('login'); // Cambia a login
-  };
+  // Función para manejar logout integrada inline donde se usa
 
   // Renderiza la pantalla actual según el estado
   const renderCurrentScreen = (): React.ReactElement => {
@@ -119,61 +115,28 @@ function App() {
         return <PresentationScreen onComplete={handlePresentationComplete} />;
 
       case 'login':
-        console.log('🔐 Renderizando pantalla de login'); // Log de renderizado
-        // Mock temporal para testing del TableroInicial
-        const mockUser = {
-          idUsuario: 1,
-          idNegocio: 1,
-          idRol: 1,
-          nombre: 'Usuario Demo',
-          usuario: 'demo',
-          email: 'demo@test.com',
-          estatus: 1,
-          fechaRegistro: '2024-01-01',
-          fechaActualizacion: '2024-01-01',
-          usuarioAuditoria: 'admin'
-        };
-        
+        console.log('🔐 Renderizando pantalla de login directa'); // Log de renderizado
         return (
-          <div style={{padding: '20px', textAlign: 'center'}}>
-            <h2>🧪 Modo de Demostración</h2>
-            <p>Haz clic para probar el nuevo TableroInicial:</p>
-            <button 
-              onClick={() => {
-                // Simular login exitoso
-                console.log('🎯 Iniciando demo del TableroInicial');
-                setCurrentScreen('tablero-inicial');
-              }}
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '15px 30px',
-                borderRadius: '8px',
-                fontSize: '1.1rem',
-                cursor: 'pointer',
-                margin: '10px'
-              }}
-            >
-              🚀 Probar TableroInicial
-            </button>
-            <br />
-            <button 
-              onClick={() => setCurrentScreen('home')}
-              style={{
-                background: '#6c757d',
-                color: 'white',
-                border: 'none',
-                padding: '15px 30px',
-                borderRadius: '8px',
-                fontSize: '1.1rem',
-                cursor: 'pointer',
-                margin: '10px'
-              }}
-            >
-              🏠 HomeScreen Original
-            </button>
-          </div>
+          <LoginScreen
+            onLogin={async (loginData) => {
+              console.log('🔐 [App] Manejando login directamente:', loginData.usuario);
+              try {
+                const success = await login(loginData);
+                if (success) {
+                  console.log('✅ [App] Login exitoso, navegando a tablero-inicial');
+                  setCurrentScreen('tablero-inicial');
+                  return true;
+                } else {
+                  console.log('❌ [App] Login falló');
+                  return false;
+                }
+              } catch (error) {
+                console.error('💥 [App] Error en login:', error);
+                return false;
+              }
+            }}
+            isLoading={isLoading}
+          />
         );
 
       case 'home':
@@ -191,26 +154,20 @@ function App() {
         );
 
       case 'tablero-inicial':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
         console.log('📊 Renderizando tablero inicial'); // Log de renderizado
-        // Usar mockUser para demostración
-        const demoUser = {
-          idUsuario: 1,
-          idNegocio: 1,
-          idRol: 1,
-          nombre: 'Usuario Demo',
-          usuario: 'demo',
-          email: 'demo@test.com',
-          estatus: 1,
-          fechaRegistro: '2024-01-01',
-          fechaActualizacion: '2024-01-01',
-          usuarioAuditoria: 'admin'
-        };
-        
         return (
           <TableroInicial 
-            user={demoUser} 
+            user={user} 
             onNavigate={handleNavigate}
-            onLogout={() => setCurrentScreen('login')}
+            onLogout={() => {
+              logout();
+              setCurrentScreen('presentation');
+            }}
           />
         );
 
@@ -221,7 +178,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('👥 Renderizando configuración de usuarios'); // Log de renderizado
-        return <ConfigUsuariosAny currentUser={user} onBack={handleBackToHome} />;
+        return <ConfigUsuariosAny currentUser={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-negocios':
         if (!isAuthenticated || !user) {
@@ -229,8 +186,8 @@ function App() {
           setCurrentScreen('login');
           return <div></div>; // Componente vacío temporal
         }
-        console.log('🏢 Renderizando configuración de negocios'); // Log de renderizado
-        return <ConfigNegocios onBack={handleBackToHome} />;
+        console.log('🏢 Renderizando formulario de negocios'); // Log de renderizado
+        return <FormularioNegocioAny onBack={handleBackToTableroInicial} />;
 
       case 'config-roles':
         if (!isAuthenticated || !user) {
@@ -239,7 +196,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('👥 Renderizando configuración de roles'); // Log de renderizado
-        return <ConfigRolesAny currentUser={user} onBack={handleBackToHome} />;
+        return <ConfigRolesAny currentUser={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-clientes':
         if (!isAuthenticated || !user) {
@@ -248,7 +205,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('👥 Renderizando configuración de clientes'); // Log de renderizado
-        return <ConfigClientesAny currentUser={user} onBack={handleBackToHome} />;
+        return <ConfigClientesAny currentUser={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-categorias':
         if (!isAuthenticated || !user) {
@@ -257,7 +214,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('🏷️ Renderizando configuración de categorías'); // Log de renderizado
-        return <ConfigCategoriasAny onNavigate={handleNavigate} currentUser={user} />;
+        return <ConfigCategoriasAny currentUser={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-insumos':
         if (!isAuthenticated || !user) {
@@ -266,7 +223,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('📦 Renderizando configuración de insumos'); // Log de renderizado
-        return <ConfigInsumosAny onNavigate={handleNavigate} currentUser={user} />;
+        return <ConfigInsumosAny currentUser={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-productos':
         if (!isAuthenticated || !user) {
@@ -275,7 +232,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('📦 Renderizando configuración de productos'); // Log de renderizado
-        return <ConfigProductosAny user={user} onNavigate={handleNavigate} />;
+        return <ConfigProductosAny user={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-recetas':
         if (!isAuthenticated || !user) {
@@ -284,7 +241,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('📋 Renderizando configuración de recetas'); // Log de renderizado
-        return <ConfigRecetasAny user={user} onNavigate={handleNavigate} />;
+        return <ConfigRecetasAny user={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-sub-recetas':
         if (!isAuthenticated || !user) {
@@ -293,7 +250,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('🍴 Renderizando configuración de sub-recetas'); // Log de renderizado
-        return <ConfigSubRecetas user={user} onNavigate={handleNavigate} />;
+        return <ConfigSubRecetas user={user} onBack={handleBackToTableroInicial} />;
 
       case 'config-mesas':
         if (!isAuthenticated || !user) {
@@ -302,7 +259,16 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('🍽️ Renderizando configuración de mesas'); // Log de renderizado
-        return <ConfigMesas onNavigate={handleNavigate} currentUser={user} />;
+        return <ConfigMesas currentUser={user} onBack={handleBackToTableroInicial} />;
+
+      case 'config-proveedores':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('🏪 Renderizando configuración de proveedores'); // Log de renderizado
+        return <ConfigProveedores currentUser={user} onBack={handleBackToTableroInicial} />;
 
       case 'formulario-negocio':
         if (!isAuthenticated || !user) {
@@ -311,7 +277,7 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('🏢 Renderizando formulario de negocio completo'); // Log de renderizado
-        return <FormularioNegocioAny currentUser={user} onBack={handleBackToHome} />;
+        return <FormularioNegocioAny currentUser={user} onBack={handleBackToTableroInicial} />;
 
       default:
         console.log('❓ Pantalla desconocida, redirigiendo a presentación'); // Log de error

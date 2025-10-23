@@ -2,7 +2,7 @@
 // Componente para gestión de sub-recetas
 
 import React, { useState, useEffect } from 'react';
-import type { Usuario, ScreenType } from '../types';
+import type { Usuario } from '../types';
 import Toast from './Toast';
 import InsumosSelector from './InsumosSelector';
 import '../styles/ConfigScreens.css';
@@ -40,12 +40,12 @@ interface SubRecetaCompleta {
 
 interface ConfigSubRecetasProps {
   user: Usuario;
-  onNavigate: (screen: ScreenType) => void;
+  onBack?: () => void; // Función para regresar al TableroInicial
 }
 
 
 
-const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate }) => {
+const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onBack }) => {
   // Estados principales
   const [subRecetas, setSubRecetas] = useState<SubReceta[]>([]);
   const [loading, setLoading] = useState(false);
@@ -165,7 +165,7 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
   const handleInsumoSelect = (insumo: any): void => {
     try {
       // Validar que el insumo tenga los datos necesarios
-      if (!insumo || !insumo.nomInsumo) {
+      if (!insumo || !insumo.nombre) {
         mostrarToast('Error: Datos del insumo incompletos', 'error');
         return;
       }
@@ -181,11 +181,11 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
         }
         
         const nuevoInsumo: DetalleSubReceta = {
-          nombreInsumoSubr: insumo.nomInsumo || '',
-          umInsumoSubr: insumo.umInsumo || '',
+          nombreInsumoSubr: insumo.nombre || '',
+          umInsumoSubr: insumo.unidad_medida || '',
           cantidadUsoSubr: 0,
-          costoInsumoSubr: typeof insumo.costoPromPond === 'number' ? 
-            insumo.costoPromPond : parseFloat(String(insumo.costoPromPond || 0)),
+          costoInsumoSubr: typeof insumo.costo_promedio_ponderado === 'number' ? 
+            insumo.costo_promedio_ponderado : parseFloat(String(insumo.costo_promedio_ponderado || 0)),
           estatus: 1,
           usuario: user.usuario,
           idNegocio: 1
@@ -197,16 +197,16 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
         const nuevosInsumos = [...insumos];
         nuevosInsumos[indexVacio] = {
           ...nuevosInsumos[indexVacio],
-          nombreInsumoSubr: insumo.nomInsumo || '',
-          umInsumoSubr: insumo.umInsumo || '',
-          costoInsumoSubr: typeof insumo.costoPromPond === 'number' ? 
-            insumo.costoPromPond : parseFloat(String(insumo.costoPromPond || 0))
+          nombreInsumoSubr: insumo.nombre || '',
+          umInsumoSubr: insumo.unidad_medida || '',
+          costoInsumoSubr: typeof insumo.costo_promedio_ponderado === 'number' ? 
+            insumo.costo_promedio_ponderado : parseFloat(String(insumo.costo_promedio_ponderado || 0))
         };
         setInsumos(nuevosInsumos);
       }
       
-      console.log('✅ Insumo agregado a la sub-receta:', insumo.nomInsumo);
-      mostrarToast(`Insumo "${insumo.nomInsumo}" agregado`, 'success');
+      console.log('✅ Insumo agregado a la sub-receta:', insumo.nombre);
+      mostrarToast(`Insumo "${insumo.nombre}" agregado`, 'success');
     } catch (error) {
       console.error('❌ Error al agregar insumo a la sub-receta:', error);
       mostrarToast('Error al agregar el insumo', 'error');
@@ -407,9 +407,11 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
         {/* Header */}
         <div className="config-header">
           <div className="config-breadcrumb">
-            <span className="breadcrumb-item">
-              <button onClick={() => onNavigate('home')}>🏠 Inicio</button>
-            </span>
+            {onBack && (
+              <span className="breadcrumb-item">
+                <button onClick={onBack}>← Regresar</button>
+              </span>
+            )}
             <span className="breadcrumb-separator">→</span>
             <span className="breadcrumb-item">🍴 Sub-Recetas</span>
           </div>
@@ -737,15 +739,17 @@ const ConfigSubRecetas: React.FC<ConfigSubRecetasProps> = ({ user, onNavigate })
           </div>
         </div>
 
-        {/* Botón de regresar */}
-        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-          <button 
-            className="btn btn-secondary btn-lg"
-            onClick={() => onNavigate('home')}
-          >
-            🏠 Regresar al Dashboard
-          </button>
-        </div>
+        {/* Botón de regresar estandarizado */}
+        {onBack && (
+          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+            <button 
+              className="btn btn-secondary btn-lg"
+              onClick={onBack}
+            >
+              ← Regresar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

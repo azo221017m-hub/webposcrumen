@@ -2,19 +2,19 @@
 // Componente para gestión de categorías con tabla de datos y formulario de inserción
 
 import React, { useState, useEffect } from 'react';
-import type { Categoria, CreateCategoriaData, ApiResponse, Usuario, ScreenType } from '../types/index';
+import type { Categoria, CreateCategoriaData, ApiResponse, Usuario } from '../types/index';
 import { getCategorias, createCategoria } from '../services/api';
 import Toast from './Toast';
 import '../styles/ConfigScreens.css';
 
 // Interfaz para props del componente
 interface ConfigCategoriasProps {
-  onNavigate: (screen: ScreenType) => void; // Función para navegar entre pantallas
   currentUser: Usuario; // Usuario autenticado actual
+  onBack?: () => void; // Función para regresar al TableroInicial
 }
 
 // Componente principal de configuración de categorías
-const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate, currentUser }) => {
+const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ currentUser, onBack }) => {
   // Estados para el manejo de datos y UI
   const [categorias, setCategorias] = useState<Categoria[]>([]); // Lista de categorías
   const [loading, setLoading] = useState<boolean>(true); // Estado de carga
@@ -165,9 +165,11 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate, current
       {/* Header con título y navegación */}
       <div className="config-header">
         <div className="config-breadcrumb">
-          <span className="breadcrumb-item">
-            <button onClick={() => onNavigate('home')}>🏠 Inicio</button>
-          </span>
+          {onBack && (
+            <span className="breadcrumb-item">
+              <button onClick={onBack}>← Regresar</button>
+            </span>
+          )}
           <span className="breadcrumb-separator">→</span>
           <span className="breadcrumb-item">🏷️ Categorías</span>
         </div>
@@ -325,15 +327,17 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate, current
           </div>
         </div>
 
-        {/* Botón de regresar */}
-        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-          <button 
-            className="btn btn-secondary btn-lg"
-            onClick={() => onNavigate('home')}
-          >
-            🏠 Regresar al Dashboard
-          </button>
-        </div>
+        {/* Botón de regresar estandarizado */}
+        {onBack && (
+          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+            <button 
+              className="btn btn-secondary btn-lg"
+              onClick={onBack}
+            >
+              ← Regresar
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

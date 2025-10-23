@@ -22,8 +22,8 @@ const ContenedorIndicadores: React.FC<ContenedorIndicadoresProps> = ({
       
       {/* Título de la sección */}
       <header className="indicadores-header">
-        <h1>📊 Panel de Control</h1>
-        <p>Resumen de actividades del negocio</p>
+        <h1>📊 Tablero Principal</h1>
+      
       </header>
 
       {/* Grid de indicadores */}
@@ -108,22 +108,11 @@ const ContenedorIndicadores: React.FC<ContenedorIndicadoresProps> = ({
           </div>
         </div>
 
-        {/* Indicador de Clientes */}
-        <div 
-          className="indicador-card clientes"
-          onClick={() => handleClick('clientes')}
-        >
-          <div className="card-icon">👥</div>
-          <div className="card-content">
-            <h3 className="card-title">Clientes</h3>
-            <div className="card-value">156</div>
-            <div className="card-change positive">+3 nuevos</div>
-            <div className="card-subtitle">Total registrados</div>
-          </div>
-        </div>
 
         {/* Área de Productos - Dividida en 4 mini-cards */}
+        
         <div className="productos-area">
+        
           <div 
             className="mini-card productos-disponibles"
             onClick={() => handleClick('productos-disponibles')}
@@ -173,6 +162,19 @@ const ContenedorIndicadores: React.FC<ContenedorIndicadoresProps> = ({
           </div>
         </div>
 
+        {/* Indicador de Clientes */}
+        <div 
+          className="indicador-card clientes"
+          onClick={() => handleClick('clientes')}
+        >
+          <div className="card-icon">👥</div>
+          <div className="card-content">
+            <h3 className="card-title">Clientes</h3>
+            <div className="card-value">156</div>
+            <div className="card-change positive">+3 nuevos</div>
+            <div className="card-subtitle">Total registrados</div>
+          </div>
+        </div>
         {/* Indicador de Pedidos */}
         <div 
           className="indicador-card pedidos"

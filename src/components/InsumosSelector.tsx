@@ -6,8 +6,8 @@ import type { Insumo } from '../types';
 import '../styles/InsumosSelector.css';
 
 // Tipos específicos para el selector
-interface InsumoSelectorItem extends Omit<Insumo, 'existencia'> {
-  existencia?: number;
+interface InsumoSelectorItem extends Omit<Insumo, 'stock_actual'> {
+  stock_actual?: number;
 }
 
 interface InsumosSelectorProps {
@@ -96,7 +96,7 @@ const InsumosSelector: React.FC<InsumosSelectorProps> = ({
 
   // Función para manejar selección de insumo
   const handleInsumoSelect = (insumo: InsumoSelectorItem): void => {
-    console.log('🎯 Insumo seleccionado:', insumo.nomInsumo);
+    console.log('🎯 Insumo seleccionado:', insumo.nombre);
     onInsumoSelect(insumo);
     setBusquedaTexto('');
     setResultadosBusqueda([]);
@@ -140,26 +140,26 @@ const InsumosSelector: React.FC<InsumosSelectorProps> = ({
           <div className="results-list">
             {resultadosBusqueda.map((insumo) => (
               <div
-                key={insumo.idInsumo}
-                className={`result-item ${isInsumoSelected(insumo.idInsumo) ? 'selected' : ''}`}
+                key={insumo.id_insumo}
+                className={`result-item ${isInsumoSelected(insumo.id_insumo) ? 'selected' : ''}`}
                 onClick={() => handleInsumoSelect(insumo)}
               >
                 <div className="result-info">
                   <div className="result-name">
-                    <span className="name-text">{insumo.nomInsumo}</span>
-                    {isInsumoSelected(insumo.idInsumo) && (
+                    <span className="name-text">{insumo.nombre}</span>
+                    {isInsumoSelected(insumo.id_insumo) && (
                       <span className="selected-badge">✓</span>
                     )}
                   </div>
                   <div className="result-details">
-                    <span className="result-um">📏 {insumo.umInsumo || 'N/A'}</span>
+                    <span className="result-um">📏 {insumo.unidad_medida || 'N/A'}</span>
                     <span className="result-price">
-                      💰 ${typeof insumo.costoPromPond === 'number' ? 
-                        insumo.costoPromPond.toFixed(2) : 
-                        parseFloat(String(insumo.costoPromPond || 0)).toFixed(2)}
+                      💰 ${typeof insumo.costo_promedio_ponderado === 'number' ?
+                        insumo.costo_promedio_ponderado.toFixed(2) :
+                        parseFloat(String(insumo.costo_promedio_ponderado || 0)).toFixed(2)}
                     </span>
-                    {insumo.existencia !== undefined && (
-                      <span className="result-stock">📦 Stock: {insumo.existencia}</span>
+                    {insumo.stock_actual !== undefined && (
+                      <span className="result-stock">📦 Stock: {insumo.stock_actual}</span>
                     )}
                   </div>
                 </div>

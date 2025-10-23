@@ -432,6 +432,46 @@ class ApiService {
       body: JSON.stringify(data), // Datos de auditoría
     });
   }
+
+  // Métodos para gestión de proveedores
+  
+  // Método para obtener proveedores
+  async getProveedores(): Promise<ApiResponse<any[]>> {
+    console.log('🏪 Obteniendo proveedores'); // Log de consulta
+    
+    return this.request<any[]>('/api/proveedores', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear un nuevo proveedor
+  async createProveedor(proveedorData: any): Promise<ApiResponse<any>> {
+    console.log('🏪 Creando nuevo proveedor:', proveedorData); // Log de creación
+    
+    return this.request<any>('/api/proveedores', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(proveedorData), // Datos del proveedor en JSON
+    });
+  }
+
+  // Método para actualizar un proveedor
+  async updateProveedor(id: number, proveedorData: any): Promise<ApiResponse<any>> {
+    console.log(`🔄 Actualizando proveedor ID: ${id}`, proveedorData); // Log de actualización
+    
+    return this.request<any>(`/api/proveedores/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(proveedorData), // Datos actualizados en JSON
+    });
+  }
+
+  // Método para eliminar un proveedor
+  async deleteProveedor(id: number): Promise<ApiResponse<any>> {
+    console.log(`🗑️ Eliminando proveedor ID: ${id}`); // Log de eliminación
+    
+    return this.request<any>(`/api/proveedores/${id}`, {
+      method: 'DELETE', // Método DELETE
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -481,3 +521,9 @@ export const getMesas = () => apiService.getMesas();
 export const createMesa = (mesaData: any) => apiService.createMesa(mesaData);
 export const updateMesa = (id: number, mesaData: any) => apiService.updateMesa(id, mesaData);
 export const deleteMesa = (id: number, data: any) => apiService.deleteMesa(id, data);
+
+// Exportaciones para proveedores
+export const getProveedores = () => apiService.getProveedores();
+export const createProveedor = (proveedorData: any) => apiService.createProveedor(proveedorData);
+export const updateProveedor = (id: number, proveedorData: any) => apiService.updateProveedor(id, proveedorData);
+export const deleteProveedor = (id: number) => apiService.deleteProveedor(id);

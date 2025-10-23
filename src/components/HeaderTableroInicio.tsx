@@ -143,8 +143,8 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
                 <div className="support-item">
                   <span className="support-icon">📱</span>
                   <div className="support-details">
-                    <h4>Teléfono de Soporte</h4>
-                    <p className="phone-number">5527618631</p>
+                    <h4>Soporte en sitio o remoto</h4>
+                    <p className="phone-number">Contacto por llamada o whatsApp</p>
                     <p className="support-hours">Disponible 24 horas, 7 días</p>
                   </div>
                 </div>
@@ -152,16 +152,16 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
                   <span className="support-icon">⚡</span>
                   <div className="support-details">
                     <h4>Soporte Técnico</h4>
-                    <p>Resolución inmediata de problemas</p>
-                    <p>Asistencia con configuración</p>
+                    <p className="support-hours">Resolución inmediata de problemas</p>
+                    <p className="support-hours">Asistencia con configuración</p>
                   </div>
                 </div>
                 <div className="support-item">
                   <span className="support-icon">🛠️</span>
                   <div className="support-details">
                     <h4>Mantenimiento</h4>
-                    <p>Actualizaciones del sistema</p>
-                    <p>Respaldo y seguridad</p>
+                    <p className="support-hours">Actualizaciones del sistema</p>
+                    <p className="support-hours">Respaldo y seguridad</p>
                   </div>
                 </div>
               </div>

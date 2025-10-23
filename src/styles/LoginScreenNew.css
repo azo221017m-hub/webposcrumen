@@ -305,6 +305,35 @@
   line-height: 1.4;
 }
 
+.help-text {
+  font-size: 0.85rem;
+  color: var(--vscode-text-muted);
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+/* Información de versión */
+.version-info {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(15, 118, 110, 0.3);
+}
+
+.version {
+  font-size: 0.75rem;
+  color: var(--vscode-accent-light);
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.copyright {
+  font-size: 0.7rem;
+  color: var(--vscode-text-muted);
+  font-family: 'Segoe UI', sans-serif;
+  opacity: 0.8;
+}
+
 .login-version {
   margin-top: 0.5rem;
   font-size: 0.75rem;

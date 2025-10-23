@@ -17,7 +17,7 @@ interface ConfigRolesProps {
  * Componente ConfigRoles
  * Gestiona la configuración de roles con formularios y lista
  * @param currentUser Usuario actualmente logueado
- * @param onBack Función para regresar al HomeScreen
+ * @param onBack Función para regresar al TableroInicial
  */
 const ConfigRoles: React.FC<ConfigRolesProps> = ({ currentUser, onBack }) => {
   // Estados del componente

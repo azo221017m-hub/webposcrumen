@@ -5,9 +5,11 @@ import { useState } from 'react';
 import type { Usuario, ScreenType } from '../types';
 import HeaderTableroInicio from './HeaderTableroInicio';
 import NavegadorConfig from './NavegadorConfig';
-import ContenedorIndicadores from './ContenedorIndicadores';
+import ContenedorIndicadores from './ContenedorIndicadores.js';
 import PanelAlertasRapidas from './PanelAlertasRapidas';
 import '../styles/TableroInicial.css';
+
+// Componentes importados desde archivos separados
 
 // Props del componente TableroInicial
 interface TableroInicialProps {

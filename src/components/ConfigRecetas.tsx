@@ -41,7 +41,7 @@ interface RecetaCompleta {
 
 interface ConfigRecetasProps {
   user: Usuario;
-  onNavigate: (screen: string) => void;
+  onBack?: () => void; // Función para regresar al TableroInicial
 }
 
 // Unidades de medida comunes
@@ -50,7 +50,7 @@ const UNIDADES_MEDIDA = [
   'pizca', 'rebanada', 'diente', 'rama', 'hoja', 'sobre'
 ];
 
-const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
+const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onBack }) => {
   // Estados principales
   const [recetas, setRecetas] = useState<Receta[]>([]);
   const [loading, setLoading] = useState(false);
@@ -246,7 +246,7 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
   const agregarInsumoAReceta = (insumoEncontrado: any): void => {
     try {
       // Validar que el insumo tenga los datos necesarios
-      if (!insumoEncontrado || !insumoEncontrado.nomInsumo) {
+      if (!insumoEncontrado || !insumoEncontrado.nombre) {
         mostrarToast('Error: Datos del insumo incompletos', 'error');
         return;
       }
@@ -262,10 +262,10 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
         }
         
         const nuevoInsumo: DetalleReceta = {
-          nombreInsumo: insumoEncontrado.nomInsumo || '',
-          umInsumo: insumoEncontrado.umInsumo || 'pza',
+          nombreInsumo: insumoEncontrado.nombre || '',
+          umInsumo: insumoEncontrado.unidad_medida || 'pza',
           cantidadUso: 0,
-          costoInsumo: typeof insumoEncontrado.costoPromPond === 'number' ? insumoEncontrado.costoPromPond : parseFloat(insumoEncontrado.costoPromPond || 0),
+          costoInsumo: typeof insumoEncontrado.costo_promedio_ponderado === 'number' ? insumoEncontrado.costo_promedio_ponderado : parseFloat(insumoEncontrado.costo_promedio_ponderado || 0),
           estatus: 1,
           usuario: user.usuario,
           idNegocio: 1
@@ -277,17 +277,17 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
         const nuevosInsumos = [...insumos];
         nuevosInsumos[indexVacio] = {
           ...nuevosInsumos[indexVacio],
-          nombreInsumo: insumoEncontrado.nomInsumo || '',
-          umInsumo: insumoEncontrado.umInsumo || 'pza',
-          costoInsumo: typeof insumoEncontrado.costoPromPond === 'number' ? insumoEncontrado.costoPromPond : parseFloat(insumoEncontrado.costoPromPond || 0)
+          nombreInsumo: insumoEncontrado.nombre || '',
+          umInsumo: insumoEncontrado.unidad_medida || 'pza',
+          costoInsumo: typeof insumoEncontrado.costo_promedio_ponderado === 'number' ? insumoEncontrado.costo_promedio_ponderado : parseFloat(insumoEncontrado.costo_promedio_ponderado || 0)
         };
         setInsumos(nuevosInsumos);
       }
       
 
       
-      console.log('✅ Insumo agregado a la receta:', insumoEncontrado.nomInsumo);
-      mostrarToast(`Insumo "${insumoEncontrado.nomInsumo}" agregado`, 'success');
+      console.log('✅ Insumo agregado a la receta:', insumoEncontrado.nombre);
+      mostrarToast(`Insumo "${insumoEncontrado.nombre}" agregado`, 'success');
     } catch (error) {
       console.error('❌ Error al agregar insumo a la receta:', error);
       mostrarToast('Error al agregar el insumo', 'error');
@@ -490,9 +490,11 @@ const ConfigRecetas: React.FC<ConfigRecetasProps> = ({ user, onNavigate }) => {
         {/* Header */}
         <div className="config-header">
           <div className="config-breadcrumb">
-            <span className="breadcrumb-item">
-              <button onClick={() => onNavigate('home')}>🏠 Inicio</button>
-            </span>
+            {onBack && (
+              <span className="breadcrumb-item">
+                <button onClick={onBack}>← Regresar</button>
+              </span>
+            )}
             <span className="breadcrumb-separator">→</span>
             <span className="breadcrumb-item">📋 Recetas</span>
           </div>

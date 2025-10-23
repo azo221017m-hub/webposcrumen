@@ -6,8 +6,7 @@ import type {
   Producto, 
   CreateProductoData, 
   Categoria, 
-  Usuario, 
-  ScreenType 
+  Usuario
 } from '../types'; // Importa tipos
 import { 
   getProductosByNegocio, 
@@ -22,14 +21,14 @@ import Toast from './Toast'; // Importa componente de notificaciones
 // Interfaz para las props del componente
 interface ConfigProductosProps {
   user: Usuario; // Usuario autenticado
-  onNavigate: (screen: ScreenType) => void; // Función de navegación
+  onBack?: () => void; // Función para regresar al TableroInicial
 }
 
 // Tipos para el formulario de productos
 type TipoProducto = 'Producto' | 'Platillo';
 
 // Componente principal de configuración de productos
-const ConfigProductos: React.FC<ConfigProductosProps> = ({ user, onNavigate }) => {
+const ConfigProductos: React.FC<ConfigProductosProps> = ({ user, onBack }) => {
   // Estados para el manejo de datos
   const [productos, setProductos] = useState<Producto[]>([]); // Lista de productos
   const [categorias, setCategorias] = useState<Categoria[]>([]); // Lista de categorías
@@ -296,13 +295,15 @@ const ConfigProductos: React.FC<ConfigProductosProps> = ({ user, onNavigate }) =
       {/* Header de la pantalla */}
       <div className="config-header">
         <div className="header-left">
-          <button 
-            className="back-button"
-            onClick={() => onNavigate('home')}
-            title="Regresar al inicio"
-          >
-            ←
-          </button>
+          {onBack && (
+            <button 
+              className="back-button"
+              onClick={onBack}
+              title="Regresar al TableroInicial"
+            >
+              ← Regresar
+            </button>
+          )}
           <div>
             <h1>📦 Configuración de Productos</h1>
             <p>Gestiona los productos de tu negocio</p>

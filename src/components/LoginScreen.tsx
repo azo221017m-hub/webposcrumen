@@ -202,6 +202,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
             <p className="help-text">
               ¿Problemas para acceder? Contacta al administrador
             </p>
+            <div className="version-info">
+              <p className="version">v.B1010</p>
+              <p className="copyright">© 2025 - PosWebCrumen</p>
+            </div>
           </div>
 
         </div>

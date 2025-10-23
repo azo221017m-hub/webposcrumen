@@ -171,6 +171,7 @@ export type ScreenType =
   | 'config-clientes' // Configuración de clientes
   | 'config-categorias' // Configuración de categorías
   | 'config-insumos' // Configuración de insumos
+  | 'config-proveedores' // Configuración de proveedores
   | 'formulario-negocio' // Formulario completo de negocio
   | 'config-productos' // Configuración de productos
   | 'config-recetas' // Configuración de recetas
@@ -244,30 +245,36 @@ export interface CreateProductoData {
 
 // Tipo para datos de insumo (como viene del backend)
 export interface Insumo {
-  idInsumo: number; // ID único del insumo
-  nomInsumo: string; // Nombre del insumo
-  costoPromPond: string | number; // Costo promedio ponderado (decimal de MySQL)
-  umInsumo: string; // Unidad de medida del insumo
-  tipoInsumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo
-  existencia: string | number; // Existencia disponible (decimal de MySQL)
-  stockMinimo: string | number; // Stock mínimo (decimal de MySQL)
-  precioVta: string | number; // Precio de venta (decimal de MySQL)
-  idCategoria: number; // ID de la categoría
-  fechaRegistro: string; // Fecha de registro
-  fechaActualizacion: string; // Fecha de última actualización
+  id_insumo: number; // ID único del insumo
+  nombre: string; // Nombre del insumo
+  costo_promedio_ponderado: string | number; // Costo promedio ponderado (decimal de MySQL)
+  unidad_medida: string; // Unidad de medida del insumo
+  tipo_insumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo
+  stock_actual: string | number; // Stock actual disponible (decimal de MySQL)
+  stock_minimo: string | number; // Stock mínimo (decimal de MySQL)
+  precio_venta: string | number; // Precio de venta (decimal de MySQL)
+  precio_referencia?: string | number; // Precio de referencia opcional (decimal de MySQL)
+  id_categoria: number; // ID de la categoría
+  id_proveedor?: number; // ID del proveedor opcional
+  activo: boolean; // Estado activo/inactivo
+  fecha_registro: string; // Fecha de registro
+  fecha_actualizacion: string; // Fecha de última actualización
   usuario: string; // Usuario que registró el insumo
 }
 
 // Tipo para datos de registro de insumo
 export interface CreateInsumoData {
-  nomInsumo: string; // Nombre del insumo
-  costoPromPond: number; // Costo promedio ponderado
-  umInsumo: string; // Unidad de medida del insumo
-  tipoInsumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo (según requerimiento)
-  existencia: number; // Existencia inicial
-  stockMinimo: number; // Stock mínimo
-  precioVta: number; // Precio de venta
-  idCategoria: number; // ID de la categoría
+  nombre: string; // Nombre del insumo
+  costo_promedio_ponderado: number; // Costo promedio ponderado
+  unidad_medida: string; // Unidad de medida del insumo
+  tipo_insumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo (según requerimiento)
+  stock_actual: number; // Stock inicial/actual
+  stock_minimo: number; // Stock mínimo
+  precio_venta: number; // Precio de venta
+  precio_referencia?: number; // Precio de referencia opcional
+  id_categoria: number; // ID de la categoría
+  id_proveedor?: number; // ID del proveedor opcional
+  activo?: boolean; // Estado activo/inactivo (por defecto true)
   usuario?: string; // Usuario que crea el registro (opcional, se llenará automáticamente)
 }
 
@@ -326,4 +333,43 @@ export interface UpdateMesaData {
   cantcomensales?: number; // Cantidad de comensales (opcional)
   estatusmesa?: 'DISPONIBLE' | 'OCUPADA' | 'RESERVADA' | 'INACTIVA'; // Estado de la mesa (opcional)
   actualizado_por: string; // Usuario que actualiza la mesa
+}
+
+// Tipo para datos de proveedor
+export interface Proveedor {
+  id: number; // ID único del proveedor
+  nombre: string; // Nombre del proveedor
+  rfc?: string; // RFC del proveedor (opcional)
+  telefono?: string; // Teléfono del proveedor (opcional)
+  correo?: string; // Correo electrónico del proveedor (opcional)
+  direccion?: string; // Dirección del proveedor (opcional)
+  banco?: string; // Banco del proveedor (opcional)
+  cuenta?: string; // Número de cuenta del proveedor (opcional)
+  activo: number; // Estado activo (1=activo, 0=inactivo)
+  created_at: string; // Fecha de registro del proveedor
+  updated_at: string; // Fecha de última actualización del proveedor
+}
+
+// Tipo para crear un proveedor
+export interface CreateProveedorData {
+  nombre: string; // Nombre del proveedor (requerido)
+  rfc?: string; // RFC del proveedor (opcional)
+  telefono?: string; // Teléfono del proveedor (opcional)
+  correo?: string; // Correo electrónico del proveedor (opcional)
+  direccion?: string; // Dirección del proveedor (opcional)
+  banco?: string; // Banco del proveedor (opcional)
+  cuenta?: string; // Número de cuenta del proveedor (opcional)
+  activo?: number; // Estado activo (1=activo, 0=inactivo, por defecto 1)
+}
+
+// Tipo para actualizar un proveedor
+export interface UpdateProveedorData {
+  nombre: string; // Nombre del proveedor (requerido)
+  rfc?: string; // RFC del proveedor (opcional)
+  telefono?: string; // Teléfono del proveedor (opcional)
+  correo?: string; // Correo electrónico del proveedor (opcional)
+  direccion?: string; // Dirección del proveedor (opcional)
+  banco?: string; // Banco del proveedor (opcional)
+  cuenta?: string; // Número de cuenta del proveedor (opcional)
+  activo?: number; // Estado activo del proveedor (opcional)
 }
