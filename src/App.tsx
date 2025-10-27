@@ -29,8 +29,14 @@ import ConfigRecetas from './components/ConfigRecetas'; // Configuración de rec
 import ConfigSubRecetas from './components/ConfigSubRecetas'; // Configuración de sub-recetas
 import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
 import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
+<<<<<<< HEAD
 import ConfigUMMovimiento from './components/ConfigUMMovimiento'; // Configuración de unidades de medida
 import ConfigCuentas from './components/ConfigCuentas'; // Configuración de cuentas contables
+=======
+import ConfigUnidaddeMedidaCompra from './components/ConfigUnidaddeMedidaCompra'; // Configuración de unidades de medida de compra
+import ConfigTipoMovimiento from './components/ConfigTipoMovimiento'; // Configuración de tipos de movimiento
+import ConfigSubtipoMovimiento from './components/ConfigSubtipoMovimiento'; // Configuración de subtipos de movimiento
+>>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
 import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
@@ -80,6 +86,22 @@ function App() {
       setCurrentScreen('login');
     }
   }, [isAuthenticated, isLoading, user]); // Removido currentScreen de las dependencias para evitar loops
+
+  // Efecto para manejar eventos personalizados de navegación
+  useEffect(() => {
+    const handleNavigateToHome = (): void => {
+      console.log('🏠 Evento navigateToHome recibido'); // Log del evento
+      setCurrentScreen('tablero-inicial'); // Regresar al tablero inicial
+    };
+
+    // Agregar event listener
+    window.addEventListener('navigateToHome', handleNavigateToHome);
+
+    // Cleanup: remover event listener
+    return () => {
+      window.removeEventListener('navigateToHome', handleNavigateToHome);
+    };
+  }, []); // Sin dependencias porque solo se configura una vez
 
   // Función para manejar el completado de la presentación (solo presentación, no login)
   const handlePresentationComplete = (): void => {
@@ -281,6 +303,33 @@ function App() {
         }
         console.log('🏪 Renderizando configuración de proveedores'); // Log de renderizado
         return <ConfigProveedores currentUser={user} onBack={handleBackToTableroInicial} />;
+
+      case 'config-umcompras':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📏 Renderizando configuración de unidades de medida de compra'); // Log de renderizado
+        return <ConfigUnidaddeMedidaCompra />;
+
+      case 'config-tipo-movimiento':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📊 Renderizando configuración de tipos de movimiento'); // Log de renderizado
+        return <ConfigTipoMovimiento />;
+
+      case 'config-subtipo-movimiento':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📈 Renderizando configuración de subtipos de movimiento'); // Log de renderizado
+        return <ConfigSubtipoMovimiento />;
 
       case 'formulario-negocio':
         if (!isAuthenticated || !user) {

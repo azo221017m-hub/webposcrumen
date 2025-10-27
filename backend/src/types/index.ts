@@ -285,3 +285,75 @@ export interface UpdateProveedorData {
   cuenta?: string; // Cuenta bancaria del proveedor (opcional)
   activo?: number; // Estado del proveedor (opcional)
 }
+
+// Tipo para unidad de medida de compra en la base de datos
+export interface UMCompra {
+  idUmCompra: number; // ID único de la unidad de medida de compra
+  nombreUmCompra: string; // Nombre de la unidad de medida de compra
+  valor: number; // Valor de conversión
+  umMatPrima: string; // Unidad de materia prima (Lt, ml, Kl, gr, pza)
+  valorConvertido: number; // Valor convertido
+  fechaRegistro: Date; // Fecha de registro
+  fechaActualizacion: Date; // Fecha de última actualización
+  usuario: string; // Usuario que realizó el registro/actualización
+}
+
+// Tipo para crear una nueva unidad de medida de compra
+export interface CreateUMCompraData {
+  nombreUmCompra: string; // Nombre de la unidad de medida de compra (requerido)
+  valor: number; // Valor de conversión (requerido)
+  umMatPrima: string; // Unidad de materia prima (requerido: Lt, ml, Kl, gr, pza)
+  valorConvertido: number; // Valor convertido (requerido)
+  usuario: string; // Usuario que realiza el registro (requerido)
+}
+
+// Tipo para actualizar una unidad de medida de compra
+export interface UpdateUMCompraData {
+  nombreUmCompra: string; // Nombre de la unidad de medida de compra (requerido)
+  valor: number; // Valor de conversión (requerido)
+  umMatPrima: string; // Unidad de materia prima (requerido: Lt, ml, Kl, gr, pza)
+  valorConvertido: number; // Valor convertido (requerido)
+}
+
+// Tipo para tipo de movimiento en la base de datos
+export interface TipoMovimiento {
+  idtipomovimiento: number; // ID único del tipo de movimiento
+  nombretipomovimiento: string; // Nombre del tipo de movimiento
+  categoriatipomovimiento: string; // Categoría del tipo de movimiento
+}
+
+// Tipo para crear un nuevo tipo de movimiento
+export interface CreateTipoMovimientoData {
+  nombretipomovimiento: string; // Nombre del tipo de movimiento (requerido)
+  categoriatipomovimiento: string; // Categoría del tipo de movimiento (requerido)
+}
+
+// Tipo para actualizar un tipo de movimiento
+export interface UpdateTipoMovimientoData {
+  nombretipomovimiento: string; // Nombre del tipo de movimiento (requerido)
+  categoriatipomovimiento: string; // Categoría del tipo de movimiento (requerido)
+}
+
+// Tipo para subtipo de movimiento en la base de datos
+export interface SubtipoMovimiento {
+  idsubtipomovimiento: number; // ID único del subtipo de movimiento
+  nombretiposubmovimiento: string; // Nombre del subtipo de movimiento
+  idtipomovimiento: number; // ID del tipo de movimiento (FK)
+  preciosubtipomovimiento: number; // Precio del subtipo de movimiento
+  // Campos adicionales para joins
+  nombretipomovimiento?: string; // Nombre del tipo de movimiento (para mostrar)
+}
+
+// Tipo para crear un nuevo subtipo de movimiento
+export interface CreateSubtipoMovimientoData {
+  nombretiposubmovimiento: string; // Nombre del subtipo de movimiento (requerido)
+  idtipomovimiento: number; // ID del tipo de movimiento (requerido)
+  preciosubtipomovimiento: number; // Precio del subtipo de movimiento (requerido)
+}
+
+// Tipo para actualizar un subtipo de movimiento
+export interface UpdateSubtipoMovimientoData {
+  nombretiposubmovimiento: string; // Nombre del subtipo de movimiento (requerido)
+  idtipomovimiento: number; // ID del tipo de movimiento (requerido)
+  preciosubtipomovimiento: number; // Precio del subtipo de movimiento (requerido)
+}
