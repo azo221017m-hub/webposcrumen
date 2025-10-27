@@ -1795,3 +1795,139 @@
     font-size: 0.9rem;
   }
 }
+
+/* ===== ESTILOS PARA SWITCH BUTTON ===== */
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.switch-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.switch-button:hover {
+  border-color: var(--primary-300);
+  box-shadow: var(--shadow-md);
+  background: rgba(240, 253, 250, 0.5);
+}
+
+.switch-button.active {
+  border-color: var(--primary-500);
+  background: rgba(20, 184, 166, 0.05);
+}
+
+.switch-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.switch-toggle {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background: var(--gray-300);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.switch-toggle.on {
+  background: var(--primary-500);
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.switch-toggle.on .switch-thumb {
+  transform: translateX(24px);
+}
+
+/* ===== ESTILOS PARA RADIO BUTTONS ===== */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.radio-option:hover {
+  background: rgba(240, 253, 250, 0.5);
+  border-color: var(--primary-200);
+}
+
+.radio-option input[type='radio'] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--gray-300);
+  border-radius: 50%;
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.radio-option input[type='radio']:checked {
+  border-color: var(--primary-500);
+  background: var(--primary-500);
+}
+
+.radio-option input[type='radio']:checked::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+.radio-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.radio-option input[type='radio']:checked + .radio-label {
+  color: var(--primary-600);
+  font-weight: 600;
+}

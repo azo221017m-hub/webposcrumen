@@ -14,13 +14,23 @@ import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de u
 import ConfigRoles from './components/ConfigRoles'; // Configuración de roles
 import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
 import ConfigCategorias from './components/ConfigCategorias'; // Configuración de categorías
-import ConfigInsumos from './components/ConfigInsumos'; // Configuración de insumos
+// Configuración de insumos - placeholder component para evitar error de compilación
+// Si más adelante existe ./components/ConfigInsumos, reemplazar este placeholder por la importación real.
+const ConfigInsumos: any = () => {
+  return (
+    <div style={{ padding: 16 }}>
+      <strong>ConfigInsumos</strong> (componente no disponible - placeholder)
+    </div>
+  );
+};
 import FormularioNegocio from './components/FormularioNegocio'; // Formulario completo de negocio
 import ConfigProductos from './components/ConfigProductos'; // Configuración de productos
 import ConfigRecetas from './components/ConfigRecetas'; // Configuración de recetas
 import ConfigSubRecetas from './components/ConfigSubRecetas'; // Configuración de sub-recetas
 import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
 import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
+import ConfigUMMovimiento from './components/ConfigUMMovimiento'; // Configuración de unidades de medida
+import ConfigCuentas from './components/ConfigCuentas'; // Configuración de cuentas contables
 import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
@@ -33,6 +43,8 @@ const ConfigInsumosAny = ConfigInsumos as any;
 const FormularioNegocioAny = FormularioNegocio as any;
 const ConfigProductosAny = ConfigProductos as any;
 const ConfigRecetasAny = ConfigRecetas as any;
+const ConfigUMMovimientoAny = ConfigUMMovimiento as any;
+const ConfigCuentasAny = ConfigCuentas as any;
 
 // Importa estilos
 import './styles/global.css'; // Estilos globales
@@ -278,6 +290,24 @@ function App() {
         }
         console.log('🏢 Renderizando formulario de negocio completo'); // Log de renderizado
         return <FormularioNegocioAny currentUser={user} onBack={handleBackToTableroInicial} />;
+
+      case 'config-um-movimiento':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📏 Renderizando configuración de unidades de medida'); // Log de renderizado
+        return <ConfigUMMovimientoAny currentUser={user} onBack={handleBackToTableroInicial} />;
+
+      case 'config-cuentas':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('💳 Renderizando configuración de cuentas contables'); // Log de renderizado
+        return <ConfigCuentasAny currentUser={user} onBack={handleBackToTableroInicial} />;
 
       default:
         console.log('❓ Pantalla desconocida, redirigiendo a presentación'); // Log de error

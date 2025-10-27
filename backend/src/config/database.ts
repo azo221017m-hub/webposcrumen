@@ -17,9 +17,7 @@ const dbConfig = {
   ssl: {
     rejectUnauthorized: false // Permite conexiones SSL no verificadas (para Azure)
   },
-  connectTimeout: 30000, // Timeout de conexión en milisegundos
-  acquireTimeout: 30000, // Timeout para adquirir conexión
-  timeout: 30000 // Timeout general
+  connectTimeout: 30000 // Timeout de conexión en milisegundos
 };
 
 // Pool de conexiones para optimizar el rendimiento

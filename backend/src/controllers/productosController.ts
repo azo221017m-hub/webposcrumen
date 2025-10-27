@@ -135,6 +135,10 @@ export const getProductoImagenController = async (req: Request, res: Response): 
 export const createProductoController = async (req: MulterRequest, res: Response): Promise<void> => {
   try {
     console.log('📦 Creando nuevo producto'); // Log de inicio
+    console.log('🔍 req.file:', req.file); // Debug file
+    console.log('🔍 req.body:', req.body); // Debug body
+    console.log('🔍 Content-Type:', req.headers['content-type']); // Debug content type
+    
     const { 
       idCategoria, 
       idReceta, 

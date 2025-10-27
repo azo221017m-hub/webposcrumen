@@ -4,7 +4,7 @@
 import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, CreateNegocioData } from '../types';
 
 // URL base de la API - se obtiene de variables de entorno o usa localhost por defecto
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 // Clase principal del servicio API que maneja todas las llamadas a la API
 class ApiService {
@@ -332,6 +332,26 @@ class ApiService {
     });
   }
 
+  // Método para obtener imagen de un producto
+  async getProductoImagen(id: number): Promise<Blob> {
+    console.log('🖼️ Obteniendo imagen del producto ID:', id); // Log de obtención
+    
+    const response = await fetch(`${this.baseURL}/api/productos/${id}/imagen`, {
+      method: 'GET'
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al obtener imagen del producto');
+    }
+
+    return response.blob();
+  }
+
+  // Método para obtener URL de imagen de un producto  
+  getProductoImagenUrl(id: number): string {
+    return `${this.baseURL}/api/productos/${id}/imagen`;
+  }
+
   // Método para eliminar un producto
   async deleteProducto(id: number, data: any): Promise<ApiResponse<{ idProducto: number }>> {
     console.log('🗑️ Eliminando producto ID:', id); // Log de eliminación
@@ -342,46 +362,7 @@ class ApiService {
     });
   }
 
-  // ===== MÉTODOS PARA INSUMOS =====
 
-  // Método para obtener todos los insumos
-  async getInsumos(): Promise<ApiResponse<any[]>> {
-    console.log('📦 Obteniendo lista de insumos'); // Log de operación
-    
-    return this.request<any[]>('/api/insumos', {
-      method: 'GET', // Método GET
-    });
-  }
-
-  // Método para crear un nuevo insumo
-  async createInsumo(insumoData: any): Promise<ApiResponse<{ idInsumo: number }>> {
-    console.log('📦 Creando nuevo insumo:', insumoData); // Log de creación
-    
-    return this.request<{ idInsumo: number }>('/api/insumos', {
-      method: 'POST', // Método POST
-      body: JSON.stringify(insumoData), // Datos del insumo en JSON
-    });
-  }
-
-  // Método para actualizar un insumo existente
-  async updateInsumo(id: number, insumoData: any): Promise<ApiResponse<{ idInsumo: number }>> {
-    console.log('📦 Actualizando insumo ID:', id, 'Datos:', insumoData); // Log de actualización
-    
-    return this.request<{ idInsumo: number }>(`/api/insumos/${id}`, {
-      method: 'PUT', // Método PUT
-      body: JSON.stringify(insumoData), // Datos actualizados en JSON
-    });
-  }
-
-  // Método para eliminar un insumo
-  async deleteInsumo(id: number, data: any): Promise<ApiResponse<{ idInsumo: number }>> {
-    console.log('🗑️ Eliminando insumo ID:', id); // Log de eliminación
-    
-    return this.request<{ idInsumo: number }>(`/api/insumos/${id}`, {
-      method: 'DELETE', // Método DELETE
-      body: JSON.stringify(data), // Datos adicionales
-    });
-  }
 
   // Método para obtener subrecetas
   async getSubRecetas(): Promise<ApiResponse<any[]>> {
@@ -472,6 +453,144 @@ class ApiService {
       method: 'DELETE', // Método DELETE
     });
   }
+
+  // Métodos para UMMovimiento (Unidades de Medida de Compra)
+  
+  // Método para obtener todas las unidades de medida de compra
+  async getUMMovimientos(): Promise<ApiResponse<any[]>> {
+    console.log('📏 Obteniendo lista de unidades de medida de compra'); // Log de consulta
+    
+    return this.request<any[]>('/api/ummovimientos', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para obtener una unidad de medida específica por ID
+  async getUMMovimientoById(id: number): Promise<ApiResponse<any>> {
+    console.log(`📏 Obteniendo unidad de medida ID: ${id}`); // Log de consulta
+    
+    return this.request<any>(`/api/ummovimientos/${id}`, {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear una nueva unidad de medida de compra
+  async createUMMovimiento(umData: any): Promise<ApiResponse<any>> {
+    console.log('📏 Creando nueva unidad de medida de compra:', umData.nombreUmCompra); // Log de creación
+    
+    return this.request<any>('/api/ummovimientos', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(umData), // Datos de la unidad de medida en JSON
+    });
+  }
+
+  // Método para actualizar una unidad de medida de compra
+  async updateUMMovimiento(id: number, umData: any): Promise<ApiResponse<any>> {
+    console.log(`📏 Actualizando unidad de medida ID: ${id}`, umData); // Log de actualización
+    
+    return this.request<any>(`/api/ummovimientos/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(umData), // Datos actualizados en JSON
+    });
+  }
+
+  // Métodos para Cuentas Contables
+  
+  // Método para obtener todas las cuentas contables
+  async getCuentas(): Promise<ApiResponse<any[]>> {
+    console.log('💳 Obteniendo lista de cuentas contables'); // Log de consulta
+    
+    return this.request<any[]>('/api/cuentas', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para obtener una cuenta contable específica por ID
+  async getCuentaById(id: number): Promise<ApiResponse<any>> {
+    console.log(`💳 Obteniendo cuenta contable ID: ${id}`); // Log de consulta
+    
+    return this.request<any>(`/api/cuentas/${id}`, {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear una nueva cuenta contable
+  async createCuenta(cuentaData: any): Promise<ApiResponse<any>> {
+    console.log('💳 Creando nueva cuenta contable:', cuentaData.nombrecuentacontable); // Log de creación
+    
+    return this.request<any>('/api/cuentas', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(cuentaData), // Datos de la cuenta contable en JSON
+    });
+  }
+
+  // Método para actualizar una cuenta contable
+  async updateCuenta(id: number, cuentaData: any): Promise<ApiResponse<any>> {
+    console.log(`💳 Actualizando cuenta contable ID: ${id}`, cuentaData); // Log de actualización
+    
+    return this.request<any>(`/api/cuentas/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(cuentaData), // Datos actualizados en JSON
+    });
+  }
+
+  // Métodos para Insumos
+  
+  // Método para obtener todos los insumos
+  async getInsumos(): Promise<ApiResponse<any[]>> {
+    console.log('📦 Obteniendo lista de insumos'); // Log de consulta
+    
+    return this.request<any[]>('/api/insumos', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para obtener un insumo específico por ID
+  async getInsumoById(id: number): Promise<ApiResponse<any>> {
+    console.log(`📦 Obteniendo insumo ID: ${id}`); // Log de consulta
+    
+    return this.request<any>(`/api/insumos/${id}`, {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear un nuevo insumo
+  async createInsumo(insumoData: any): Promise<ApiResponse<any>> {
+    console.log('📦 Creando nuevo insumo:', insumoData.nombre); // Log de creación
+    
+    return this.request<any>('/api/insumos', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(insumoData), // Datos del insumo en JSON
+    });
+  }
+
+  // Método para actualizar un insumo
+  async updateInsumo(id: number, insumoData: any): Promise<ApiResponse<any>> {
+    console.log(`📦 Actualizando insumo ID: ${id}`, insumoData); // Log de actualización
+    
+    return this.request<any>(`/api/insumos/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(insumoData), // Datos actualizados en JSON
+    });
+  }
+
+  // Método para desactivar un insumo
+  async deleteInsumo(id: number): Promise<ApiResponse<any>> {
+    console.log(`📦 Desactivando insumo ID: ${id}`); // Log de eliminación
+    
+    return this.request<any>(`/api/insumos/${id}`, {
+      method: 'DELETE', // Método DELETE
+    });
+  }
+
+  // Método para obtener cuentas contables para dropdown
+  async getCuentasContablesDropdown(): Promise<ApiResponse<any[]>> {
+    console.log('💳 Obteniendo cuentas contables para dropdown'); // Log de consulta
+    
+    return this.request<any[]>('/api/insumos/cuentas-dropdown', {
+      method: 'GET', // Método GET
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -503,15 +622,19 @@ export const deleteCategoria = (id: number, data: any) => apiService.deleteCateg
 // Exportaciones para productos
 export const getProductos = () => apiService.getProductos();
 export const getProductosByNegocio = (idNegocio: number) => apiService.getProductosByNegocio(idNegocio);
+export const getProductoImagen = (id: number) => apiService.getProductoImagen(id);
+export const getProductoImagenUrl = (id: number) => apiService.getProductoImagenUrl(id);
 export const createProducto = (productoData: FormData) => apiService.createProducto(productoData);
 export const updateProducto = (id: number, productoData: FormData) => apiService.updateProducto(id, productoData);
 export const deleteProducto = (id: number, data: any) => apiService.deleteProducto(id, data);
 
 // Exportaciones para insumos
 export const getInsumos = () => apiService.getInsumos();
+export const getInsumoById = (id: number) => apiService.getInsumoById(id);
 export const createInsumo = (insumoData: any) => apiService.createInsumo(insumoData);
 export const updateInsumo = (id: number, insumoData: any) => apiService.updateInsumo(id, insumoData);
-export const deleteInsumo = (id: number, data: any) => apiService.deleteInsumo(id, data);
+export const deleteInsumo = (id: number) => apiService.deleteInsumo(id);
+export const getCuentasContablesDropdown = () => apiService.getCuentasContablesDropdown();
 
 // Exportaciones para subrecetas
 export const getSubRecetas = () => apiService.getSubRecetas();
@@ -527,3 +650,15 @@ export const getProveedores = () => apiService.getProveedores();
 export const createProveedor = (proveedorData: any) => apiService.createProveedor(proveedorData);
 export const updateProveedor = (id: number, proveedorData: any) => apiService.updateProveedor(id, proveedorData);
 export const deleteProveedor = (id: number) => apiService.deleteProveedor(id);
+
+// Exportaciones para unidades de medida de compra
+export const getUMMovimientos = () => apiService.getUMMovimientos();
+export const getUMMovimientoById = (id: number) => apiService.getUMMovimientoById(id);
+export const createUMMovimiento = (umData: any) => apiService.createUMMovimiento(umData);
+export const updateUMMovimiento = (id: number, umData: any) => apiService.updateUMMovimiento(id, umData);
+
+// Exportaciones para cuentas contables (tipos de movimiento)
+export const getCuentas = () => apiService.getCuentas();
+export const getCuentaById = (id: number) => apiService.getCuentaById(id);
+export const createCuenta = (cuentaData: any) => apiService.createCuenta(cuentaData);
+export const updateCuenta = (id: number, cuentaData: any) => apiService.updateCuenta(id, cuentaData);

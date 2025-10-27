@@ -1,25 +1,47 @@
 // backend/src/routes/insumosRoutes.ts
-// Rutas para la gestión de insumos
+// Rutas para gestión de insumos con tabla tblposcrumenwebinsumos
 
-import { Router } from 'express';
-import {
-  getInsumosController,
-  createInsumoController,
-  updateInsumoController,
-  deleteInsumoController,
-  buscarInsumosController
-} from '../controllers/insumosController';
+import { Router } from 'express'; // Importa Router de Express
+import { 
+  getAllInsumos, 
+  getInsumoById,
+  createInsumo, 
+  updateInsumo, 
+  deleteInsumo,
+  getCuentasContablesForDropdown 
+} from '../controllers/insumosController'; // Importa controladores
 
-// Crear router de Express
+// Crea una instancia del router
 const router = Router();
 
-// Rutas para insumos
-router.get('/', getInsumosController); // GET /api/insumos - Obtener todos los insumos
-router.get('/buscar/:filtro', buscarInsumosController); // GET /api/insumos/buscar/:filtro - Buscar insumos por filtro
-router.get('/buscar', buscarInsumosController); // GET /api/insumos/buscar?busqueda=texto&tipo=CONSUMO - Buscar insumos con query params
-router.post('/', createInsumoController); // POST /api/insumos - Crear nuevo insumo
-router.put('/:id', updateInsumoController); // PUT /api/insumos/:id - Actualizar insumo
-router.delete('/:id', deleteInsumoController); // DELETE /api/insumos/:id - Eliminar insumo
+// Ruta GET para obtener cuentas contables para dropdown (debe ir antes que /:id)
+// Endpoint: GET /api/insumos/cuentas-dropdown
+router.get('/cuentas-dropdown', getCuentasContablesForDropdown);
 
-// Exportar el router
+// Ruta GET para obtener todos los insumos
+// Endpoint: GET /api/insumos
+router.get('/', getAllInsumos);
+
+// Ruta GET para obtener un insumo específico por ID
+// Endpoint: GET /api/insumos/:id
+// Params: id (id_insumo)
+router.get('/:id', getInsumoById);
+
+// Ruta POST para crear un nuevo insumo
+// Endpoint: POST /api/insumos
+// Body: CreateInsumoData
+router.post('/', createInsumo);
+
+// Ruta PUT para actualizar un insumo existente
+// Endpoint: PUT /api/insumos/:id
+// Params: id (id_insumo)
+// Body: CreateInsumoData
+router.put('/:id', updateInsumo);
+
+// Ruta DELETE para desactivar un insumo (soft delete)
+// Endpoint: DELETE /api/insumos/:id
+// Params: id (id_insumo)
+router.delete('/:id', deleteInsumo);
+
+// Exporta el router para uso en app principal
 export default router;

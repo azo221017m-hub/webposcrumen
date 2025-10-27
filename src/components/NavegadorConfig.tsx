@@ -123,6 +123,32 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Sección SYSTEMA */}
+      <div className="config-section">
+        <h3 className="section-title">
+          <span className="section-icon">⚙️</span>
+          SYSTEMA
+        </h3>
+        
+        <div className="config-grid">
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-um-movimiento' as ScreenType)}
+          >
+            <span className="btn-icon">📏</span>
+            <span className="btn-text">Unidades de Medida</span>
+          </button>
+
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-cuentas' as ScreenType)}
+          >
+            <span className="btn-icon">💳</span>
+            <span className="btn-text">Cuentas Contables</span>
+          </button>
+        </div>
+      </div>
+
     </nav>
   );
 };

@@ -177,6 +177,8 @@ export type ScreenType =
   | 'config-recetas' // Configuración de recetas
   | 'config-sub-recetas' // Configuración de sub-recetas
   | 'config-mesas' // Configuración de mesas
+  | 'config-um-movimiento' // Configuración de unidades de medida de compra
+  | 'config-cuentas' // Configuración de cuentas contables
   | 'config-perfil' // Configuración de perfil
   | 'config-recibos' // Configuración de recibos
   | 'iniciar-venta' // Iniciar nueva venta
@@ -243,39 +245,39 @@ export interface CreateProductoData {
   imagenProducto?: File; // Archivo de imagen del producto
 }
 
-// Tipo para datos de insumo (como viene del backend)
+// Tipo para datos de insumo (según tabla tblposcrumenwebinsumos)
 export interface Insumo {
-  id_insumo: number; // ID único del insumo
-  nombre: string; // Nombre del insumo
-  costo_promedio_ponderado: string | number; // Costo promedio ponderado (decimal de MySQL)
-  unidad_medida: string; // Unidad de medida del insumo
-  tipo_insumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo
-  stock_actual: string | number; // Stock actual disponible (decimal de MySQL)
-  stock_minimo: string | number; // Stock mínimo (decimal de MySQL)
-  precio_venta: string | number; // Precio de venta (decimal de MySQL)
-  precio_referencia?: string | number; // Precio de referencia opcional (decimal de MySQL)
-  id_categoria: number; // ID de la categoría
-  id_proveedor?: number; // ID del proveedor opcional
-  activo: boolean; // Estado activo/inactivo
-  fecha_registro: string; // Fecha de registro
-  fecha_actualizacion: string; // Fecha de última actualización
+  id_insumo: number; // ID único del insumo (AI PK)
+  nombre: string; // Nombre del insumo (varchar 100)
+  unidad_medida: 'Kg' | 'Lt' | 'Pza'; // Unidad de medida del insumo (varchar 20)
+  tipo_insumo: 'PRODUCTO' | 'INSUMO'; // Tipo de insumo (enum)
+  stock_actual: number; // Stock actual disponible (decimal 10,2)
+  stock_minimo: number; // Stock mínimo (decimal 10,2)
+  costo_promedio_ponderado: number; // Costo promedio ponderado (decimal 12,4)
+  precio_venta: number; // Precio de venta (decimal 12,2)
+  id_cuentacontable: number; // ID de cuenta contable (int 11)
+  activo: boolean; // Estado activo/inactivo (tinyint 1)
+  fecha_registro: string; // Fecha de registro (datetime)
+  fecha_actualizacion: string; // Fecha de última actualización (datetime)
   usuario: string; // Usuario que registró el insumo
 }
 
-// Tipo para datos de registro de insumo
+// Tipo para crear/actualizar insumo
 export interface CreateInsumoData {
-  nombre: string; // Nombre del insumo
-  costo_promedio_ponderado: number; // Costo promedio ponderado
-  unidad_medida: string; // Unidad de medida del insumo
-  tipo_insumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo (según requerimiento)
-  stock_actual: number; // Stock inicial/actual
-  stock_minimo: number; // Stock mínimo
-  precio_venta: number; // Precio de venta
-  precio_referencia?: number; // Precio de referencia opcional
-  id_categoria: number; // ID de la categoría
-  id_proveedor?: number; // ID del proveedor opcional
-  activo?: boolean; // Estado activo/inactivo (por defecto true)
-  usuario?: string; // Usuario que crea el registro (opcional, se llenará automáticamente)
+  nombre: string; // Nombre del insumo (requerido)
+  unidad_medida: 'Kg' | 'Lt' | 'Pza'; // Unidad de medida (requerido)
+  tipo_insumo: 'PRODUCTO' | 'INSUMO'; // Tipo de insumo (requerido)
+  stock_actual: number; // Stock inicial/actual (requerido)
+  stock_minimo: number; // Stock mínimo (requerido)
+  costo_promedio_ponderado: number; // Costo promedio ponderado (requerido)
+  precio_venta: number; // Precio de venta (requerido)
+  id_cuentacontable: number; // ID de cuenta contable (requerido)
+}
+
+// Tipo para datos de cuenta contable (para dropdown)
+export interface CuentaContableOption {
+  idcuentacontable: number;
+  nombrecuentacontable: string;
 }
 
 // Tipo para producto en un pedido
@@ -372,4 +374,63 @@ export interface UpdateProveedorData {
   banco?: string; // Banco del proveedor (opcional)
   cuenta?: string; // Número de cuenta del proveedor (opcional)
   activo?: number; // Estado activo del proveedor (opcional)
+}
+
+// Tipo para unidades de medida de compra
+export interface UMMovimiento {
+  idUmCompra: number; // ID único de la unidad de medida
+  nombreUmCompra: string; // Nombre de la unidad de medida (máx 100 caracteres)
+  valor: number; // Valor decimal de la unidad de medida
+  umMatPrima: 'Kl' | 'Lt' | 'gr' | 'ml' | 'pza'; // Unidad de materia prima (valores permitidos)
+  valorConvertido: number; // Valor convertido decimal
+  fechaRegistro: string; // Fecha de registro
+  fechaActualizacion: string; // Fecha de última actualización
+  usuario: string; // Usuario que realizó la operación
+}
+
+// Tipo para crear una unidad de medida de compra
+export interface CreateUMMovimientoData {
+  nombreUmCompra: string; // Nombre de la unidad de medida (requerido)
+  valor: number; // Valor decimal de la unidad de medida (requerido)
+  umMatPrima: 'Kl' | 'Lt' | 'gr' | 'ml' | 'pza'; // Unidad de materia prima (requerido)
+  valorConvertido: number; // Valor convertido decimal (requerido)
+  usuario?: string; // Usuario que crea el registro (opcional)
+}
+
+// Tipo para actualizar una unidad de medida de compra
+export interface UpdateUMMovimientoData {
+  nombreUmCompra: string; // Nombre de la unidad de medida (requerido)
+  valor: number; // Valor decimal de la unidad de medida (requerido)
+  umMatPrima: 'Kl' | 'Lt' | 'gr' | 'ml' | 'pza'; // Unidad de materia prima (requerido)
+  valorConvertido: number; // Valor convertido decimal (requerido)
+  usuario?: string; // Usuario que actualiza el registro (opcional)
+}
+
+// Tipos para naturaleza de movimiento contable
+export type NaturalezaMovimiento = 'COMPRA' | 'GASTO';
+
+// Tipos para categorías de movimiento según naturaleza
+export type CategoriaCompra = 'Inventario' | 'activo fijo' | 'servicios' | 'administrativas' | 'extraodinarias' | 'inversión';
+export type CategoriaGasto = 'operación' | 'financiero' | 'extraorinario';
+
+// Tipo para cuentas contables
+export interface TipoMovimiento {
+  idcuentacontable: number; // ID único de la cuenta contable
+  nombrecuentacontable: string; // Nombre de la cuenta contable (máx 100 caracteres)
+  categoriacuentacontable: CategoriaCompra | CategoriaGasto; // Categoría según naturaleza
+  naturalezacuentacontable: NaturalezaMovimiento; // Naturaleza del movimiento (COMPRA|GASTO)
+}
+
+// Tipo para crear una cuenta contable
+export interface CreateTipoMovimientoData {
+  nombrecuentacontable: string; // Nombre de la cuenta contable (requerido)
+  categoriacuentacontable: CategoriaCompra | CategoriaGasto; // Categoría según naturaleza (requerido)
+  naturalezacuentacontable: NaturalezaMovimiento; // Naturaleza del movimiento (requerido)
+}
+
+// Tipo para actualizar una cuenta contable
+export interface UpdateTipoMovimientoData {
+  nombrecuentacontable: string; // Nombre de la cuenta contable (requerido)
+  categoriacuentacontable: CategoriaCompra | CategoriaGasto; // Categoría según naturaleza (requerido)
+  naturalezacuentacontable: NaturalezaMovimiento; // Naturaleza del movimiento (requerido)
 }

@@ -48,6 +48,33 @@ export interface AccessAttempt {
   bloqueado_until: Date | null; // Fecha hasta cuando está bloqueado
 }
 
+// Tipo para unidades de medida de compra
+export interface UMMovimiento {
+  idUmCompra: number; // ID único de la unidad de medida
+  nombreUmCompra: string; // Nombre de la unidad de medida (máx 100 caracteres)
+  valor: number; // Valor decimal de la unidad de medida
+  umMatPrima: 'Kl' | 'Lt' | 'gr' | 'ml' | 'pza'; // Unidad de materia prima (valores permitidos)
+  valorConvertido: number; // Valor convertido decimal
+  fechaRegistro: Date; // Fecha de registro
+  fechaActualizacion: Date; // Fecha de última actualización
+  usuario: string; // Usuario que realizó la operación
+}
+
+// Tipos para naturaleza de movimiento contable
+export type NaturalezaMovimiento = 'COMPRA' | 'GASTO';
+
+// Tipos para categorías de movimiento según naturaleza
+export type CategoriaCompra = 'Inventario' | 'activo fijo' | 'servicios' | 'administrativas' | 'extraodinarias' | 'inversión';
+export type CategoriaGasto = 'operación' | 'financiero' | 'extraorinario';
+
+// Tipo para tipos de movimiento contable
+export interface TipoMovimiento {
+  idtipomovimiento: number; // ID único del tipo de movimiento
+  nombretipomovimiento: string; // Nombre del tipo de movimiento (máx 100 caracteres)
+  categoriatipomovimiento: CategoriaCompra | CategoriaGasto; // Categoría según naturaleza
+  naturalezatipomovimiento: NaturalezaMovimiento; // Naturaleza del movimiento (COMPRA|GASTO)
+}
+
 // Tipo para datos de login
 export interface LoginData {
   usuario: string; // Nombre de usuario
@@ -157,39 +184,33 @@ export interface CreateProductoData {
   imagenProducto?: Buffer; // Imagen del producto
 }
 
-// Tipo para datos de insumo en la base de datos (actualizado según nueva estructura)
+// Tipo para datos de insumo según tabla tblposcrumenwebinsumos
 export interface Insumo {
-  id_insumo: number; // ID único del insumo (renombrado)
-  nombre: string; // Nombre del insumo (renombrado)
-  unidad_medida: string; // Unidad de medida del insumo (renombrado)
-  tipo_insumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo (renombrado)
-  stock_actual: number; // Stock actual (renombrado de existencia)
-  stock_minimo: number; // Stock mínimo
-  costo_promedio_ponderado: number; // Costo promedio ponderado (renombrado)
-  precio_venta: number; // Precio de venta (renombrado)
-  precio_referencia: number; // Precio de referencia (nuevo campo)
-  id_categoria: number; // ID de la categoría (renombrado)
-  id_proveedor: number; // ID del proveedor (nuevo campo)
-  activo: number; // Estado activo (nuevo campo)
-  fecha_registro: Date; // Fecha de registro (renombrado)
-  fecha_actualizacion: Date; // Fecha de actualización (renombrado)
+  id_insumo: number; // ID único del insumo (AI PK)
+  nombre: string; // Nombre del insumo (varchar 100)
+  unidad_medida: 'Kg' | 'Lt' | 'Pza'; // Unidad de medida del insumo (varchar 20)
+  tipo_insumo: 'PRODUCTO' | 'INSUMO'; // Tipo de insumo (enum)
+  stock_actual: number; // Stock actual disponible (decimal 10,2)
+  stock_minimo: number; // Stock mínimo (decimal 10,2)
+  costo_promedio_ponderado: number; // Costo promedio ponderado (decimal 12,4)
+  precio_venta: number; // Precio de venta (decimal 12,2)
+  id_cuentacontable: number; // ID de cuenta contable (int 11)
+  activo: boolean; // Estado activo/inactivo (tinyint 1)
+  fecha_registro: string; // Fecha de registro (datetime)
+  fecha_actualizacion: string; // Fecha de última actualización (datetime)
   usuario: string; // Usuario que registró el insumo
 }
 
-// Tipo para datos de registro de insumo (actualizado según nueva estructura)
+// Tipo para crear/actualizar insumo
 export interface CreateInsumoData {
-  nombre: string; // Nombre del insumo (renombrado)
-  unidad_medida: string; // Unidad de medida del insumo (renombrado)
-  tipo_insumo: 'INSUMO' | 'PRODUCTO'; // Tipo de insumo (renombrado)
-  stock_actual: number; // Stock actual (renombrado de existencia)
-  stock_minimo: number; // Stock mínimo (renombrado)
-  costo_promedio_ponderado: number; // Costo promedio ponderado (renombrado)
-  precio_venta: number; // Precio de venta (renombrado)
-  precio_referencia?: number; // Precio de referencia (nuevo campo opcional)
-  id_categoria: number; // ID de la categoría (renombrado)
-  id_proveedor?: number; // ID del proveedor (nuevo campo opcional)
-  activo?: number; // Estado activo (nuevo campo opcional, por defecto 1)
-  usuario?: string; // Usuario que crea el registro (opcional, se llenará automáticamente)
+  nombre: string; // Nombre del insumo (requerido)
+  unidad_medida: 'Kg' | 'Lt' | 'Pza'; // Unidad de medida (requerido)
+  tipo_insumo: 'PRODUCTO' | 'INSUMO'; // Tipo de insumo (requerido)
+  stock_actual: number; // Stock inicial/actual (requerido)
+  stock_minimo: number; // Stock mínimo (requerido)
+  costo_promedio_ponderado: number; // Costo promedio ponderado (requerido)
+  precio_venta: number; // Precio de venta (requerido)
+  id_cuentacontable: number; // ID de cuenta contable (requerido)
 }
 
 // Tipo para datos de mesa en la base de datos

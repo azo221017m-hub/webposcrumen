@@ -20,6 +20,8 @@ import recetasRoutes from './routes/recetasRoutes'; // Rutas de recetas
 import subRecetasRoutes from './routes/subRecetasRoutes'; // Rutas de sub-recetas
 import mesasRoutes from './routes/mesasRoutes'; // Rutas de mesas
 import proveedoresRoutes from './routes/proveedoresRoutes'; // Rutas de proveedores
+import umMovimientoRoutes from './routes/umMovimientoRoutes'; // Rutas de unidades de medida
+import cuentasRoutes from './routes/cuentasRoutes'; // Rutas de cuentas contables
 
 // Carga las variables de entorno
 dotenv.config();
@@ -70,6 +72,8 @@ app.use('/api/recetas', recetasRoutes); // Rutas de recetas
 app.use('/api/sub-recetas', subRecetasRoutes); // Rutas de sub-recetas
 app.use('/api/mesas', mesasRoutes); // Rutas de mesas
 app.use('/api/proveedores', proveedoresRoutes); // Rutas de proveedores
+app.use('/api/ummovimientos', umMovimientoRoutes); // Rutas de unidades de medida
+app.use('/api/cuentas', cuentasRoutes); // Rutas de cuentas contables
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {

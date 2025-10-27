@@ -10,12 +10,14 @@ import type {
 } from '../types'; // Importa tipos
 import { 
   getProductosByNegocio, 
+  getProductoImagenUrl,
   createProducto, 
   updateProducto, 
   deleteProducto,
   getCategorias
 } from '../services/api'; // Importa servicios API
 import '../styles/ConfigScreens.css'; // Importa estilos
+import '../styles/ImageUpload.css'; // Importa estilos para imágenes
 import Toast from './Toast'; // Importa componente de notificaciones
 
 // Interfaz para las props del componente
@@ -208,8 +210,28 @@ const ConfigProductos: React.FC<ConfigProductosProps> = ({ user, onBack }) => {
       submitData.append('usuario', formData.usuario || user.usuario);
       submitData.append('idNegocio', formData.idNegocio.toString());
       
+      // Debug logs para la imagen
+      console.log('🔍 formData.imagenProducto:', formData.imagenProducto);
+      console.log('🔍 formData.imagenProducto type:', typeof formData.imagenProducto);
+      if (formData.imagenProducto instanceof File) {
+        console.log('🔍 File details:', {
+          name: formData.imagenProducto.name,
+          size: formData.imagenProducto.size,
+          type: formData.imagenProducto.type
+        });
+      }
+      
       if (formData.imagenProducto) {
         submitData.append('imagenProducto', formData.imagenProducto);
+        console.log('✅ Archivo agregado al FormData');
+      } else {
+        console.log('❌ No hay archivo para agregar');
+      }
+      
+      // Log del FormData completo
+      console.log('🔍 FormData contents:');
+      for (let [key, value] of submitData.entries()) {
+        console.log(`  ${key}:`, value);
       }
 
       let response;
@@ -254,7 +276,16 @@ const ConfigProductos: React.FC<ConfigProductosProps> = ({ user, onBack }) => {
       idNegocio: producto.idNegocio,
       imagenProducto: undefined
     });
-    setImagePreview(null); // No mostrar preview de imagen existente por ahora
+    
+    // Cargar imagen existente si la tiene
+    if (producto.idProducto) {
+      const imageUrl = getProductoImagenUrl(producto.idProducto);
+      setImagePreview(imageUrl);
+      console.log('🖼️ Cargando imagen para edición:', imageUrl); // Log de carga
+    } else {
+      setImagePreview(null);
+    }
+    
     setShowForm(true);
   };
 
@@ -448,7 +479,13 @@ const ConfigProductos: React.FC<ConfigProductosProps> = ({ user, onBack }) => {
                   />
                   <label htmlFor="imagen-producto" className="image-upload-label">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Vista previa" className="image-preview" />
+                      <div className="image-preview-container">
+                        <div className="image-preview-info">
+                          <img src={imagePreview} alt="Vista previa" className="image-preview" />
+                          <span className="preview-text">Vista previa (35px)</span>
+                          <span className="change-text">Haz clic para cambiar imagen</span>
+                        </div>
+                      </div>
                     ) : (
                       <div className="upload-placeholder">
                         <span className="upload-icon">📷</span>
