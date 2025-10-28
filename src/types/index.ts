@@ -379,7 +379,6 @@ export interface UpdateProveedorData {
   activo?: number; // Estado activo del proveedor (opcional)
 }
 
-<<<<<<< HEAD
 // Tipo para unidades de medida de compra
 export interface UMMovimiento {
   idUmCompra: number; // ID único de la unidad de medida
@@ -437,75 +436,4 @@ export interface UpdateTipoMovimientoData {
   nombrecuentacontable: string; // Nombre de la cuenta contable (requerido)
   categoriacuentacontable: CategoriaCompra | CategoriaGasto; // Categoría según naturaleza (requerido)
   naturalezacuentacontable: NaturalezaMovimiento; // Naturaleza del movimiento (requerido)
-=======
-// Tipo para unidad de medida de compra
-export interface UMCompra {
-  idUmCompra: number; // ID único de la unidad de medida de compra
-  nombreUmCompra: string; // Nombre de la unidad de medida de compra
-  valor: number | string; // Valor de conversión (puede venir como string desde MySQL)
-  umMatPrima: string; // Unidad de materia prima (Lt, ml, Kl, gr, pza)
-  valorConvertido: number | string; // Valor convertido (puede venir como string desde MySQL)
-  fechaRegistro: string; // Fecha de registro
-  fechaActualizacion: string; // Fecha de última actualización
-  usuario: string; // Usuario que realizó el registro/actualización
-}
-
-// Tipo para crear una nueva unidad de medida de compra
-export interface CreateUMCompraData {
-  nombreUmCompra: string; // Nombre de la unidad de medida de compra (requerido)
-  valor: number; // Valor de conversión (requerido)
-  umMatPrima: string; // Unidad de materia prima (requerido: Lt, ml, Kl, gr, pza)
-  valorConvertido: number; // Valor convertido (requerido)
-  usuario: string; // Usuario que realiza el registro (requerido)
-}
-
-// Tipo para actualizar una unidad de medida de compra
-export interface UpdateUMCompraData {
-  nombreUmCompra: string; // Nombre de la unidad de medida de compra (requerido)
-  valor: number; // Valor de conversión (requerido)
-  umMatPrima: string; // Unidad de materia prima (requerido: Lt, ml, Kl, gr, pza)
-  valorConvertido: number; // Valor convertido (requerido)
-}
-
-// Tipo para tipo de movimiento
-export interface TipoMovimiento {
-  idtipomovimiento: number; // ID único del tipo de movimiento
-  nombretipomovimiento: string; // Nombre del tipo de movimiento
-  categoriatipomovimiento: string; // Categoría del tipo de movimiento
-}
-
-// Tipo para crear un nuevo tipo de movimiento
-export interface CreateTipoMovimientoData {
-  nombretipomovimiento: string; // Nombre del tipo de movimiento (requerido)
-  categoriatipomovimiento: string; // Categoría del tipo de movimiento (requerido)
-}
-
-// Tipo para actualizar un tipo de movimiento
-export interface UpdateTipoMovimientoData {
-  nombretipomovimiento: string; // Nombre del tipo de movimiento (requerido)
-  categoriatipomovimiento: string; // Categoría del tipo de movimiento (requerido)
-}
-
-// Tipo para subtipo de movimiento
-export interface SubtipoMovimiento {
-  idsubtipomovimiento: number; // ID único del subtipo de movimiento
-  nombretiposubmovimiento: string; // Nombre del subtipo de movimiento
-  idtipomovimiento: number; // ID del tipo de movimiento asociado
-  preciosubtipomovimiento: number; // Precio del subtipo de movimiento
-  nombretipomovimiento?: string; // Nombre del tipo de movimiento (para JOINs)
-}
-
-// Tipo para crear un nuevo subtipo de movimiento
-export interface CreateSubtipoMovimientoData {
-  nombretiposubmovimiento: string; // Nombre del subtipo de movimiento (requerido)
-  idtipomovimiento: number; // ID del tipo de movimiento (requerido)
-  preciosubtipomovimiento: number; // Precio del subtipo de movimiento (requerido)
-}
-
-// Tipo para actualizar un subtipo de movimiento
-export interface UpdateSubtipoMovimientoData {
-  nombretiposubmovimiento: string; // Nombre del subtipo de movimiento (requerido)
-  idtipomovimiento: number; // ID del tipo de movimiento (requerido)
-  preciosubtipomovimiento: number; // Precio del subtipo de movimiento (requerido)
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
 }

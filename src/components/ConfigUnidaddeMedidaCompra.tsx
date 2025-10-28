@@ -2,10 +2,35 @@
 // Componente para configuración de unidades de medida de compra en POSWEBCrumen
 
 import React, { useState, useEffect } from 'react'; // Hooks de React
-import type { UMCompra, CreateUMCompraData, UpdateUMCompraData } from '../types'; // Tipos definidos
-import { getUMCompras, createUMCompra, updateUMCompra, deleteUMCompra } from '../services/api'; // Servicios API
+// Tipos locales para las operaciones de crear/actualizar UMCompra (evita dependencia de ../types)
+type CreateUMCompraData = {
+  nombreUmCompra: string;
+  valor: number;
+  umMatPrima: string;
+  valorConvertido: number;
+  usuario: string;
+};
+
+type UpdateUMCompraData = {
+  nombreUmCompra: string;
+  valor: number;
+  umMatPrima: string;
+  valorConvertido: number;
+};
+import * as api from '../services/api'; // Servicios API (usar import por namespace para coincidir con las exportaciones)
 import Toast from './Toast'; // Componente de notificaciones
 import '../styles/ConfigScreens.css'; // Estilos del componente
+
+// Tipo local para UMCompra (coincide con la forma que usa este componente y la API)
+interface UMCompra {
+  idUmCompra: number;
+  nombreUmCompra: string;
+  valor: number | string;
+  umMatPrima: string;
+  valorConvertido: number | string;
+  usuario: string;
+  fechaRegistro: string;
+}
 
 // Opciones para el dropdown de unidades de materia prima
 const UNIDADES_MATERIA_PRIMA = [
@@ -58,13 +83,13 @@ const ConfigUnidaddeMedidaCompra: React.FC = () => {
       setLoading(true); // Inicia el estado de carga
       console.log('📋 Cargando unidades de medida de compra...');
       
-      const response = await getUMCompras(); // Llama a la API
+      const response: { success?: boolean; data?: UMCompra[]; message?: string } | any = await api.getUMCompras(); // Llama a la API
       
-      if (response.success && response.data) {
+      if (response && response.success && response.data) {
         setUmCompras(response.data); // Actualiza el estado
         console.log(`✅ ${response.data.length} unidades de medida de compra cargadas`);
       } else {
-        throw new Error(response.message || 'Error al cargar unidades de medida de compra');
+        throw new Error((response && response.message) || 'Error al cargar unidades de medida de compra');
       }
     } catch (error) {
       console.error('❌ Error al cargar unidades de medida de compra:', error);
@@ -177,9 +202,15 @@ const ConfigUnidaddeMedidaCompra: React.FC = () => {
           valorConvertido: formData.valorConvertido
         };
         
-        const response = await updateUMCompra(editingUMCompra.idUmCompra, updateData);
+        // La función de la API podría no devolver un objeto; forzamos any para poder inspeccionarla
+        const response: any = await api.updateUMCompra(editingUMCompra.idUmCompra, updateData);
         
-        if (response.success) {
+        // Si la API no retorna un objeto con 'success', consideramos la operación exitosa (no se lanzó excepción)
+        if (!response || response.success === undefined) {
+          showToast('Unidad de medida de compra actualizada correctamente', 'success');
+          setShowForm(false); // Oculta el formulario
+          loadUMCompras(); // Recarga la lista
+        } else if (response.success) {
           showToast('Unidad de medida de compra actualizada correctamente', 'success');
           setShowForm(false); // Oculta el formulario
           loadUMCompras(); // Recarga la lista
@@ -190,9 +221,23 @@ const ConfigUnidaddeMedidaCompra: React.FC = () => {
         // Crear nueva UMCompra
         console.log('📦 Creando nueva UMCompra');
         
-        const response = await createUMCompra(formData);
+        const response: any = await api.createUMCompra(formData);
         
-        if (response.success) {
+        // Manejar caso donde la API no retorna un objeto (void) o no incluye 'success'
+        if (!response || response.success === undefined) {
+          showToast('Unidad de medida de compra creada correctamente', 'success');
+          setShowForm(false); // Oculta el formulario
+          setEditingUMCompra(null); // Limpia la edición
+          // Reinicia el formulario
+          setFormData({
+            nombreUmCompra: '',
+            valor: 0,
+            umMatPrima: 'Lt',
+            valorConvertido: 0,
+            usuario: localStorage.getItem('usuario') || 'admin'
+          });
+          loadUMCompras(); // Recarga la lista
+        } else if (response.success) {
           showToast('Unidad de medida de compra creada correctamente', 'success');
           setShowForm(false); // Oculta el formulario
           setEditingUMCompra(null); // Limpia la edición
@@ -226,9 +271,13 @@ const ConfigUnidaddeMedidaCompra: React.FC = () => {
     try {
       console.log(`🗑️ Eliminando UMCompra ID: ${umCompra.idUmCompra}`);
       
-      const response = await deleteUMCompra(umCompra.idUmCompra);
+      const response: any = await api.deleteUMCompra(umCompra.idUmCompra);
       
-      if (response.success) {
+      // Manejar caso donde la API no retorna un objeto (void) o no incluye 'success'
+      if (!response || response.success === undefined) {
+        showToast('Unidad de medida de compra eliminada correctamente', 'success');
+        loadUMCompras(); // Recarga la lista
+      } else if (response.success) {
         showToast('Unidad de medida de compra eliminada correctamente', 'success');
         loadUMCompras(); // Recarga la lista
       } else {

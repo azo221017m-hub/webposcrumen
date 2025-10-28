@@ -123,58 +123,28 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* Sección SYSTEMA */}
       <div className="config-section">
         <h3 className="section-title">
           <span className="section-icon">⚙️</span>
           SYSTEMA
-=======
-      {/* Sección SISTEMA */}
-      <div className="config-section">
-        <h3 className="section-title">
-          <span className="section-icon">⚙️</span>
-          SISTEMA
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
         </h3>
         
         <div className="config-grid">
           <button 
             className="config-btn"
-<<<<<<< HEAD
             onClick={() => handleNavigate('config-um-movimiento' as ScreenType)}
           >
             <span className="btn-icon">📏</span>
             <span className="btn-text">Unidades de Medida</span>
-=======
-            onClick={() => handleNavigate('config-umcompras' as ScreenType)}
-          >
-            <span className="btn-icon">📏</span>
-            <span className="btn-text">UMCompras</span>
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
           </button>
 
           <button 
             className="config-btn"
-<<<<<<< HEAD
             onClick={() => handleNavigate('config-cuentas' as ScreenType)}
           >
             <span className="btn-icon">💳</span>
             <span className="btn-text">Cuentas Contables</span>
-=======
-            onClick={() => handleNavigate('config-tipo-movimiento' as ScreenType)}
-          >
-            <span className="btn-icon">📊</span>
-            <span className="btn-text">Tipo Movimientos</span>
-          </button>
-
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-subtipo-movimiento' as ScreenType)}
-          >
-            <span className="btn-icon">📈</span>
-            <span className="btn-text">Subtipo Movimientos</span>
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
           </button>
         </div>
       </div>

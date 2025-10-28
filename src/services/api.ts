@@ -1,7 +1,7 @@
 // src/services/api.ts
 // Servicio para comunicación con la API del backend POSWEBCrumen
 
-import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, CreateNegocioData, UMCompra, CreateUMCompraData, UpdateUMCompraData, TipoMovimiento, CreateTipoMovimientoData, UpdateTipoMovimientoData } from '../types';
+import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, CreateNegocioData } from '../types';
 
 // URL base de la API - se obtiene de variables de entorno o usa localhost por defecto
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -454,7 +454,6 @@ class ApiService {
     });
   }
 
-<<<<<<< HEAD
   // Métodos para UMMovimiento (Unidades de Medida de Compra)
   
   // Método para obtener todas las unidades de medida de compra
@@ -462,23 +461,10 @@ class ApiService {
     console.log('📏 Obteniendo lista de unidades de medida de compra'); // Log de consulta
     
     return this.request<any[]>('/api/ummovimientos', {
-=======
-  // === MÉTODOS PARA UNIDADES DE MEDIDA DE COMPRA === //
-
-  /**
-   * Obtiene todas las unidades de medida de compra
-   * @returns Promise con la respuesta de la API conteniendo las UMCompras
-   */
-  async getUMCompras(): Promise<ApiResponse<UMCompra[]>> {
-    console.log('📋 Obteniendo unidades de medida de compra...'); // Log de solicitud
-    
-    return this.request<UMCompra[]>('/api/um-compras', {
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
       method: 'GET', // Método GET
     });
   }
 
-<<<<<<< HEAD
   // Método para obtener una unidad de medida específica por ID
   async getUMMovimientoById(id: number): Promise<ApiResponse<any>> {
     console.log(`📏 Obteniendo unidad de medida ID: ${id}`); // Log de consulta
@@ -593,51 +579,10 @@ class ApiService {
     console.log(`📦 Desactivando insumo ID: ${id}`); // Log de eliminación
     
     return this.request<any>(`/api/insumos/${id}`, {
-=======
-  /**
-   * Crea una nueva unidad de medida de compra
-   * @param umCompraData - Datos de la nueva UMCompra
-   * @returns Promise con la respuesta de la API
-   */
-  async createUMCompra(umCompraData: CreateUMCompraData): Promise<ApiResponse<UMCompra>> {
-    console.log('📦 Creando nueva unidad de medida de compra:', umCompraData); // Log de creación
-    
-    return this.request<UMCompra>('/api/um-compras', {
-      method: 'POST', // Método POST
-      body: JSON.stringify(umCompraData), // Envía los datos como JSON
-    });
-  }
-
-  /**
-   * Actualiza una unidad de medida de compra existente
-   * @param id - ID de la UMCompra a actualizar
-   * @param umCompraData - Nuevos datos de la UMCompra
-   * @returns Promise con la respuesta de la API
-   */
-  async updateUMCompra(id: number, umCompraData: UpdateUMCompraData): Promise<ApiResponse<UMCompra>> {
-    console.log(`🔄 Actualizando unidad de medida de compra ID: ${id}`, umCompraData); // Log de actualización
-    
-    return this.request<UMCompra>(`/api/um-compras/${id}`, {
-      method: 'PUT', // Método PUT
-      body: JSON.stringify(umCompraData), // Envía los datos como JSON
-    });
-  }
-
-  /**
-   * Elimina una unidad de medida de compra
-   * @param id - ID de la UMCompra a eliminar
-   * @returns Promise con la respuesta de la API
-   */
-  async deleteUMCompra(id: number): Promise<ApiResponse<any>> {
-    console.log(`🗑️ Eliminando unidad de medida de compra ID: ${id}`); // Log de eliminación
-    
-    return this.request<any>(`/api/um-compras/${id}`, {
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
       method: 'DELETE', // Método DELETE
     });
   }
 
-<<<<<<< HEAD
   // Método para obtener cuentas contables para dropdown
   async getCuentasContablesDropdown(): Promise<ApiResponse<any[]>> {
     console.log('💳 Obteniendo cuentas contables para dropdown'); // Log de consulta
@@ -646,63 +591,6 @@ class ApiService {
       method: 'GET', // Método GET
     });
   }
-=======
-  // === MÉTODOS PARA TIPOS DE MOVIMIENTO === //
-
-  /**
-   * Obtiene todos los tipos de movimiento
-   * @returns Promise con la respuesta de la API conteniendo los tipos de movimiento
-   */
-  async getTipoMovimientos(): Promise<ApiResponse<TipoMovimiento[]>> {
-    console.log('📋 Obteniendo tipos de movimiento...'); // Log de solicitud
-    
-    return this.request<TipoMovimiento[]>('/api/tipo-movimiento', {
-      method: 'GET', // Método GET
-    });
-  }
-
-  /**
-   * Crea un nuevo tipo de movimiento
-   * @param tipoMovimientoData - Datos del nuevo tipo de movimiento
-   * @returns Promise con la respuesta de la API
-   */
-  async createTipoMovimiento(tipoMovimientoData: CreateTipoMovimientoData): Promise<ApiResponse<TipoMovimiento>> {
-    console.log('📦 Creando nuevo tipo de movimiento:', tipoMovimientoData); // Log de creación
-    
-    return this.request<TipoMovimiento>('/api/tipo-movimiento', {
-      method: 'POST', // Método POST
-      body: JSON.stringify(tipoMovimientoData), // Envía los datos como JSON
-    });
-  }
-
-  /**
-   * Actualiza un tipo de movimiento existente
-   * @param id - ID del tipo de movimiento a actualizar
-   * @param tipoMovimientoData - Nuevos datos del tipo de movimiento
-   * @returns Promise con la respuesta de la API
-   */
-  async updateTipoMovimiento(id: number, tipoMovimientoData: UpdateTipoMovimientoData): Promise<ApiResponse<TipoMovimiento>> {
-    console.log(`🔄 Actualizando tipo de movimiento ID: ${id}`, tipoMovimientoData); // Log de actualización
-    
-    return this.request<TipoMovimiento>(`/api/tipo-movimiento/${id}`, {
-      method: 'PUT', // Método PUT
-      body: JSON.stringify(tipoMovimientoData), // Envía los datos como JSON
-    });
-  }
-
-  /**
-   * Elimina un tipo de movimiento
-   * @param id - ID del tipo de movimiento a eliminar
-   * @returns Promise con la respuesta de la API
-   */
-  async deleteTipoMovimiento(id: number): Promise<ApiResponse<any>> {
-    console.log(`🗑️ Eliminando tipo de movimiento ID: ${id}`); // Log de eliminación
-    
-    return this.request<any>(`/api/tipo-movimiento/${id}`, {
-      method: 'DELETE', // Método DELETE
-    });
-  }
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -764,7 +652,6 @@ export const updateProveedor = (id: number, proveedorData: any) => apiService.up
 export const deleteProveedor = (id: number) => apiService.deleteProveedor(id);
 
 // Exportaciones para unidades de medida de compra
-<<<<<<< HEAD
 export const getUMMovimientos = () => apiService.getUMMovimientos();
 export const getUMMovimientoById = (id: number) => apiService.getUMMovimientoById(id);
 export const createUMMovimiento = (umData: any) => apiService.createUMMovimiento(umData);
@@ -775,15 +662,26 @@ export const getCuentas = () => apiService.getCuentas();
 export const getCuentaById = (id: number) => apiService.getCuentaById(id);
 export const createCuenta = (cuentaData: any) => apiService.createCuenta(cuentaData);
 export const updateCuenta = (id: number, cuentaData: any) => apiService.updateCuenta(id, cuentaData);
-=======
-export const getUMCompras = () => apiService.getUMCompras();
-export const createUMCompra = (umCompraData: CreateUMCompraData) => apiService.createUMCompra(umCompraData);
-export const updateUMCompra = (id: number, umCompraData: UpdateUMCompraData) => apiService.updateUMCompra(id, umCompraData);
-export const deleteUMCompra = (id: number) => apiService.deleteUMCompra(id);
+export function getUMCompras() {
+  throw new Error('Function not implemented.');
+}
 
-// Exportaciones para tipos de movimiento
-export const getTipoMovimientos = () => apiService.getTipoMovimientos();
-export const createTipoMovimiento = (tipoMovimientoData: CreateTipoMovimientoData) => apiService.createTipoMovimiento(tipoMovimientoData);
-export const updateTipoMovimiento = (id: number, tipoMovimientoData: UpdateTipoMovimientoData) => apiService.updateTipoMovimiento(id, tipoMovimientoData);
-export const deleteTipoMovimiento = (id: number) => apiService.deleteTipoMovimiento(id);
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
+export function updateUMCompra(idUmCompra: number, updateData: { nombreUmCompra: string; valor: number; umMatPrima: string; valorConvertido: number; }) {
+  // Mark parameters as used to satisfy TypeScript's noUnusedParameters rule
+  void idUmCompra;
+  void updateData;
+  throw new Error('Function not implemented.');
+}
+
+export function createUMCompra(formData: { nombreUmCompra: string; valor: number; umMatPrima: string; valorConvertido: number; usuario: string; }) {
+  // Mark parameter as used to satisfy TypeScript's noUnusedParameters rule
+  void formData;
+  throw new Error('Function not implemented.');
+}
+
+export function deleteUMCompra(idUmCompra: number) {
+  // Mark parameter as used to satisfy TypeScript's noUnusedParameters rule
+  void idUmCompra;
+  throw new Error('Function not implemented.');
+}
+

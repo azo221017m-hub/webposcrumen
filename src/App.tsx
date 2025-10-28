@@ -29,16 +29,9 @@ import ConfigRecetas from './components/ConfigRecetas'; // Configuración de rec
 import ConfigSubRecetas from './components/ConfigSubRecetas'; // Configuración de sub-recetas
 import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
 import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
-<<<<<<< HEAD
 import ConfigUMMovimiento from './components/ConfigUMMovimiento'; // Configuración de unidades de medida
 import ConfigCuentas from './components/ConfigCuentas'; // Configuración de cuentas contables
-=======
-import ConfigUnidaddeMedidaCompra from './components/ConfigUnidaddeMedidaCompra'; // Configuración de unidades de medida de compra
-import ConfigTipoMovimiento from './components/ConfigTipoMovimiento'; // Configuración de tipos de movimiento
-import ConfigSubtipoMovimiento from './components/ConfigSubtipoMovimiento'; // Configuración de subtipos de movimiento
->>>>>>> 2eb4f3b3890aa937f162b7ed0fbc077b595973e5
 import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
-
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
 const ConfigUsuariosAny = ConfigUsuarios as any;
@@ -55,6 +48,9 @@ const ConfigCuentasAny = ConfigCuentas as any;
 // Importa estilos
 import './styles/global.css'; // Estilos globales
 import './App.css'; // Estilos específicos de App
+import ConfigUnidaddeMedidaCompra from './components/ConfigUnidaddeMedidaCompra';
+import ConfigTipoMovimiento from './components/ConfigTipoMovimiento';
+import ConfigSubtipoMovimiento from './components/ConfigSubtipoMovimiento';
 
 // Componente principal de la aplicación
 function App() {
