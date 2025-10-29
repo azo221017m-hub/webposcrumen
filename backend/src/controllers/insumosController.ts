@@ -1,206 +1,193 @@
-import { Request, Response } from 'express';
-import pool from '../config/database';
+// backend/src/controllers/insumosController.ts
+// Controlador para gestión de insumos en POSWEBCrumen
 
-export const getAllInsumos = async (req: Request, res: Response): Promise<void> => {
+import type { Request, Response } from 'express'; // Importa tipos de Express
+import pool from '../config/database'; // Importa pool de conexión a MySQL
+import type { 
+  InsumoWeb, 
+  CreateInsumoWebData, 
+  UpdateInsumoWebData, 
+  ApiResponse,
+  UnidadMedidaInsumo 
+} from '../types'; // Importa tipos personalizados
+import type { RowDataPacket, ResultSetHeader } from 'mysql2'; // Importa tipos de MySQL2
+
+// Controlador para obtener todos los insumos
+export const getInsumos = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('?? Obteniendo todos los insumos...');
+    console.log('📦 Iniciando obtención de insumos');
     
-    const query = `
-      SELECT 
-        idinsumo,
-        tipo_insumo,
-        nombre,
-        unidad_medida,
-        stock_actual,
-        stock_minimo,
-        costo_promedio_ponderado,
-        precio_venta,
-        id_cuentacontable,
-        activo
-      FROM tblposcrumenwebinsumos 
-      WHERE activo = 1
-      ORDER BY nombre ASC
-    `;
+    // Ejecutar consulta para obtener todos los insumos
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      'SELECT * FROM tblposcrumenwebinsumos ORDER BY nombre ASC'
+    );
     
-    const [rows] = await pool.execute(query);
-    console.log(`? Se encontraron ${Array.isArray(rows) ? rows.length : 0} insumos`);
+    console.log(`📊 Insumos encontrados: ${rows.length}`);
     
-    res.json({
+    // Convertir los resultados al tipo InsumoWeb
+    const insumos: InsumoWeb[] = rows.map((row: any) => ({
+      id_insumo: row.id_insumo,
+      nombre: row.nombre,
+      unidad_medida: row.unidad_medida as UnidadMedidaInsumo,
+      stock_actual: parseFloat(row.stock_actual),
+      stock_minimo: parseFloat(row.stock_minimo),
+      costo_promedio_ponderado: parseFloat(row.costo_promedio_ponderado || 0),
+      precio_venta: parseFloat(row.precio_venta || 0),
+      idinocuidad: row.idinocuidad || '',
+      id_cuentacontable_insumo: row.id_cuentacontable || '',
+      activo: Boolean(row.activo),
+      inventariable: Boolean(row.inventariable),
+      fechaRegistroauditoria: new Date(row.fechaRegistroauditoria),
+      usuarioauditoria: row.usuarioauditoria,
+      fehamodificacionauditoria: row.fehamodificacionauditoria ? new Date(row.fehamodificacionauditoria) : undefined,
+      idnegocio: row.idnegocio
+    }));
+
+    const response: ApiResponse<InsumoWeb[]> = {
       success: true,
-      data: rows,
-      message: 'Insumos obtenidos correctamente'
-    });
-    
+      message: 'Insumos obtenidos exitosamente',
+      data: insumos
+    };
+    res.json(response);
+
   } catch (error) {
-    console.error('? Error al obtener insumos:', error);
-    res.status(500).json({
+    console.error('❌ Error obteniendo insumos:', error);
+    const response: ApiResponse = {
       success: false,
-      message: 'Error interno del servidor al obtener insumos',
+      message: 'Error del servidor al obtener insumos',
       error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
-export const getInsumoById = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-    console.log(`?? Buscando insumo con ID: ${id}`);
-    
-    const query = `
-      SELECT 
-        idinsumo,
-        tipo_insumo,
-        nombre,
-        unidad_medida,
-        stock_actual,
-        stock_minimo,
-        costo_promedio_ponderado,
-        precio_venta,
-        id_cuentacontable,
-        activo
-      FROM tblposcrumenwebinsumos 
-      WHERE idinsumo = ? AND activo = 1
-    `;
-    
-    const [rows] = await pool.execute(query, [id]);
-    const insumos = rows as any[];
-    
-    if (insumos.length === 0) {
-      res.status(404).json({
-        success: false,
-        message: 'Insumo no encontrado'
-      });
-      return;
-    }
-    
-    console.log(`? Insumo encontrado: ${insumos[0].nombre}`);
-    res.json({
-      success: true,
-      data: insumos[0],
-      message: 'Insumo obtenido correctamente'
-    });
-    
-  } catch (error) {
-    console.error('? Error al obtener insumo:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor al obtener insumo',
-      error: error instanceof Error ? error.message : 'Error desconocido'
-    });
-  }
-};
-
+// Controlador para crear un nuevo insumo
 export const createInsumo = async (req: Request, res: Response): Promise<void> => {
   try {
-    const {
-      tipo_insumo,
-      nombre,
-      unidad_medida,
-      stock_actual,
-      stock_minimo,
-      costo_promedio_ponderado,
-      precio_venta,
-      id_cuentacontable
-    } = req.body;
+    const insumoData: CreateInsumoWebData = req.body;
+    console.log('📦 Iniciando creación de insumo:', insumoData.nombre);
     
-    console.log('?? Creando nuevo insumo:', { nombre, tipo_insumo });
-    
-    if (!nombre || !tipo_insumo || !unidad_medida) {
+    // Validaciones básicas
+    if (!insumoData.nombre || !insumoData.nombre.trim()) {
+      console.log('❌ Nombre de insumo requerido');
       res.status(400).json({
         success: false,
-        message: 'Los campos nombre, tipo_insumo y unidad_medida son obligatorios'
+        message: 'El nombre del insumo es requerido'
       });
       return;
     }
     
-    const checkQuery = 'SELECT COUNT(*) as count FROM tblposcrumenwebinsumos WHERE nombre = ? AND activo = 1';
-    const [checkResult] = await pool.execute(checkQuery, [nombre]);
-    const checkRows = checkResult as any[];
+    if (!insumoData.unidad_medida || !insumoData.unidad_medida.trim()) {
+      console.log('❌ Unidad de medida requerida');
+      res.status(400).json({
+        success: false,
+        message: 'La unidad de medida es requerida'
+      });
+      return;
+    }
+
+    // Validar que la unidad de medida sea una de las opciones permitidas
+    const unidadesPermitidas: string[] = ['Kg', 'Lt', 'Pza'];
+    if (!unidadesPermitidas.includes(insumoData.unidad_medida)) {
+      console.log('❌ Unidad de medida no válida:', insumoData.unidad_medida);
+      res.status(400).json({
+        success: false,
+        message: 'La unidad de medida debe ser: Kg, Lt o Pza'
+      });
+      return;
+    }
     
-    if (checkRows[0].count > 0) {
-      res.status(409).json({
+    if (insumoData.stock_actual < 0) {
+      console.log('❌ Stock actual debe ser mayor o igual a 0');
+      res.status(400).json({
+        success: false,
+        message: 'El stock actual debe ser mayor o igual a 0'
+      });
+      return;
+    }
+    
+    if (insumoData.stock_minimo < 0) {
+      console.log('❌ Stock mínimo debe ser mayor o igual a 0');
+      res.status(400).json({
+        success: false,
+        message: 'El stock mínimo debe ser mayor o igual a 0'
+      });
+      return;
+    }
+    
+    // Verificar si ya existe un insumo con el mismo nombre
+    const [existingRows] = await pool.execute<RowDataPacket[]>(
+      'SELECT id_insumo FROM tblposcrumenwebinsumos WHERE nombre = ? AND idnegocio = ?',
+      [insumoData.nombre.trim(), insumoData.idnegocio]
+    );
+    
+    if (existingRows.length > 0) {
+      console.log('❌ Ya existe un insumo con ese nombre');
+      res.status(400).json({
         success: false,
         message: 'Ya existe un insumo con ese nombre'
       });
       return;
     }
     
+    // Crear el insumo
     const insertQuery = `
-      INSERT INTO tblposcrumenwebinsumos (
-        tipo_insumo,
-        nombre,
-        unidad_medida,
-        stock_actual,
-        stock_minimo,
-        costo_promedio_ponderado,
-        precio_venta,
-        id_cuentacontable,
-        activo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+      INSERT INTO tblposcrumenwebinsumos 
+      (nombre, unidad_medida, stock_actual, stock_minimo, costo_promedio_ponderado, precio_venta, 
+       idinocuidad, id_cuentacontable, activo, inventariable, fechaRegistroauditoria, usuarioauditoria, idnegocio)
+      VALUES (?, ?, ?, ?, 0, 0, '', ?, ?, ?, NOW(), ?, ?)
     `;
     
-    const [result] = await pool.execute(insertQuery, [
-      tipo_insumo,
-      nombre,
-      unidad_medida,
-      stock_actual || 0,
-      stock_minimo || 0,
-      costo_promedio_ponderado || 0,
-      precio_venta || 0,
-      id_cuentacontable || null
-    ]);
+    const insertValues = [
+      insumoData.nombre.trim(),
+      insumoData.unidad_medida,
+      insumoData.stock_actual,
+      insumoData.stock_minimo,
+      insumoData.id_cuentacontable_insumo,
+      insumoData.activo ? 1 : 0,
+      insumoData.inventariable,
+      insumoData.usuarioauditoria,
+      insumoData.idnegocio
+    ];
     
-    const insertResult = result as any;
-    console.log(`? Insumo creado con ID: ${insertResult.insertId}`);
+    const [result] = await pool.execute<ResultSetHeader>(insertQuery, insertValues);
     
-    res.status(201).json({
+    console.log('✅ Insumo creado exitosamente con ID:', result.insertId);
+    
+    const response: ApiResponse = {
       success: true,
-      data: {
-        idinsumo: insertResult.insertId,
-        ...req.body
-      },
-      message: 'Insumo creado correctamente'
-    });
-    
+      message: 'Insumo creado exitosamente',
+      data: { id: result.insertId }
+    };
+    res.status(201).json(response);
+
   } catch (error) {
-    console.error('? Error al crear insumo:', error);
-    res.status(500).json({
+    console.error('❌ Error creando insumo:', error);
+    const response: ApiResponse = {
       success: false,
-      message: 'Error interno del servidor al crear insumo',
+      message: 'Error del servidor al crear insumo',
       error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
+// Controlador para actualizar un insumo
 export const updateInsumo = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const {
-      tipo_insumo,
-      nombre,
-      unidad_medida,
-      stock_actual,
-      stock_minimo,
-      costo_promedio_ponderado,
-      precio_venta,
-      id_cuentacontable
-    } = req.body;
+    const insumoData: UpdateInsumoWebData = req.body;
     
-    console.log(`?? Actualizando insumo ID: ${id}`);
+    console.log('📦 Iniciando actualización de insumo:', id);
     
-    if (!nombre || !tipo_insumo || !unidad_medida) {
-      res.status(400).json({
-        success: false,
-        message: 'Los campos nombre, tipo_insumo y unidad_medida son obligatorios'
-      });
-      return;
-    }
+    // Verificar que el insumo existe
+    const [existingRows] = await pool.execute<RowDataPacket[]>(
+      'SELECT id_insumo FROM tblposcrumenwebinsumos WHERE id_insumo = ?',
+      [id]
+    );
     
-    const checkQuery = 'SELECT COUNT(*) as count FROM tblposcrumenwebinsumos WHERE idinsumo = ? AND activo = 1';
-    const [checkResult] = await pool.execute(checkQuery, [id]);
-    const checkRows = checkResult as any[];
-    
-    if (checkRows[0].count === 0) {
+    if (existingRows.length === 0) {
+      console.log('❌ Insumo no encontrado');
       res.status(404).json({
         success: false,
         message: 'Insumo no encontrado'
@@ -208,135 +195,176 @@ export const updateInsumo = async (req: Request, res: Response): Promise<void> =
       return;
     }
     
-    const duplicateQuery = 'SELECT COUNT(*) as count FROM tblposcrumenwebinsumos WHERE nombre = ? AND idinsumo != ? AND activo = 1';
-    const [duplicateResult] = await pool.execute(duplicateQuery, [nombre, id]);
-    const duplicateRows = duplicateResult as any[];
+    // Construir query dinámico basado en campos proporcionados
+    const updateFields: string[] = [];
+    const updateValues: any[] = [];
     
-    if (duplicateRows[0].count > 0) {
-      res.status(409).json({
+    if (insumoData.nombre !== undefined) {
+      if (!insumoData.nombre.trim()) {
+        res.status(400).json({
+          success: false,
+          message: 'El nombre del insumo no puede estar vacío'
+        });
+        return;
+      }
+      updateFields.push('nombre = ?');
+      updateValues.push(insumoData.nombre.trim());
+    }
+    
+    if (insumoData.unidad_medida !== undefined) {
+      if (!insumoData.unidad_medida.trim()) {
+        res.status(400).json({
+          success: false,
+          message: 'La unidad de medida no puede estar vacía'
+        });
+        return;
+      }
+
+      // Validar que la unidad de medida sea una de las opciones permitidas
+      const unidadesPermitidas: string[] = ['Kg', 'Lt', 'Pza'];
+      if (!unidadesPermitidas.includes(insumoData.unidad_medida.trim())) {
+        res.status(400).json({
+          success: false,
+          message: 'La unidad de medida debe ser: Kg, Lt o Pza'
+        });
+        return;
+      }
+
+      updateFields.push('unidad_medida = ?');
+      updateValues.push(insumoData.unidad_medida.trim());
+    }
+    
+    if (insumoData.stock_actual !== undefined) {
+      if (insumoData.stock_actual < 0) {
+        res.status(400).json({
+          success: false,
+          message: 'El stock actual debe ser mayor o igual a 0'
+        });
+        return;
+      }
+      updateFields.push('stock_actual = ?');
+      updateValues.push(insumoData.stock_actual);
+    }
+    
+    if (insumoData.stock_minimo !== undefined) {
+      if (insumoData.stock_minimo < 0) {
+        res.status(400).json({
+          success: false,
+          message: 'El stock mínimo debe ser mayor o igual a 0'
+        });
+        return;
+      }
+      updateFields.push('stock_minimo = ?');
+      updateValues.push(insumoData.stock_minimo);
+    }
+    
+    if (insumoData.id_cuentacontable_insumo !== undefined) {
+      updateFields.push('id_cuentacontable = ?');
+      updateValues.push(insumoData.id_cuentacontable_insumo);
+    }
+    
+    if (insumoData.activo !== undefined) {
+      updateFields.push('activo = ?');
+      updateValues.push(insumoData.activo ? 1 : 0);
+    }
+    
+    if (insumoData.inventariable !== undefined) {
+      updateFields.push('inventariable = ?');
+      updateValues.push(insumoData.inventariable);
+    }
+    
+    if (insumoData.usuarioauditoria !== undefined) {
+      updateFields.push('usuarioauditoria = ?');
+      updateValues.push(insumoData.usuarioauditoria);
+    }
+    
+    // Agregar fecha de modificación
+    updateFields.push('fehamodificacionauditoria = NOW()');
+    
+    // Agregar ID al final para la condición WHERE
+    updateValues.push(id);
+    
+    if (updateFields.length === 1) { // Solo la fecha de modificación
+      console.log('❌ No hay campos para actualizar');
+      res.status(400).json({
         success: false,
-        message: 'Ya existe otro insumo con ese nombre'
+        message: 'No hay campos válidos para actualizar'
       });
       return;
     }
     
     const updateQuery = `
-      UPDATE tblposcrumenwebinsumos SET
-        tipo_insumo = ?,
-        nombre = ?,
-        unidad_medida = ?,
-        stock_actual = ?,
-        stock_minimo = ?,
-        costo_promedio_ponderado = ?,
-        precio_venta = ?,
-        id_cuentacontable = ?
-      WHERE idinsumo = ? AND activo = 1
+      UPDATE tblposcrumenwebinsumos 
+      SET ${updateFields.join(', ')}
+      WHERE id_insumo = ?
     `;
     
-    await pool.execute(updateQuery, [
-      tipo_insumo,
-      nombre,
-      unidad_medida,
-      stock_actual || 0,
-      stock_minimo || 0,
-      costo_promedio_ponderado || 0,
-      precio_venta || 0,
-      id_cuentacontable || null,
-      id
-    ]);
+    await pool.execute(updateQuery, updateValues);
     
-    console.log(`? Insumo actualizado correctamente`);
+    console.log('✅ Insumo actualizado exitosamente');
     
-    res.json({
+    const response: ApiResponse = {
       success: true,
-      data: {
-        idinsumo: parseInt(id),
-        ...req.body
-      },
-      message: 'Insumo actualizado correctamente'
-    });
-    
+      message: 'Insumo actualizado exitosamente'
+    };
+    res.json(response);
+
   } catch (error) {
-    console.error('? Error al actualizar insumo:', error);
-    res.status(500).json({
+    console.error('❌ Error actualizando insumo:', error);
+    const response: ApiResponse = {
       success: false,
-      message: 'Error interno del servidor al actualizar insumo',
+      message: 'Error del servidor al actualizar insumo',
       error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    };
+    res.status(500).json(response);
   }
 };
 
+// Controlador para eliminar un insumo
 export const deleteInsumo = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    console.log(`??? Eliminando insumo ID: ${id}`);
+    console.log('📦 Iniciando eliminación de insumo:', id);
     
-    const checkQuery = 'SELECT COUNT(*) as count FROM tblposcrumenwebinsumos WHERE idinsumo = ? AND activo = 1';
-    const [checkResult] = await pool.execute(checkQuery, [id]);
-    const checkRows = checkResult as any[];
+    // Verificar que el insumo existe
+    const [existingRows] = await pool.execute<RowDataPacket[]>(
+      'SELECT id_insumo, nombre FROM tblposcrumenwebinsumos WHERE id_insumo = ?',
+      [id]
+    );
     
-    if (checkRows[0].count === 0) {
+    if (existingRows.length === 0) {
+      console.log('❌ Insumo no encontrado');
       res.status(404).json({
         success: false,
         message: 'Insumo no encontrado'
       });
       return;
     }
-    
-    const deleteQuery = `
-      UPDATE tblposcrumenwebinsumos 
-      SET activo = 0 
-      WHERE idinsumo = ?
-    `;
-    
-    await pool.execute(deleteQuery, [id]);
-    console.log(`? Insumo eliminado correctamente`);
-    
-    res.json({
-      success: true,
-      message: 'Insumo eliminado correctamente'
-    });
-    
-  } catch (error) {
-    console.error('? Error al eliminar insumo:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor al eliminar insumo',
-      error: error instanceof Error ? error.message : 'Error desconocido'
-    });
-  }
-};
 
-export const getCuentasContablesForDropdown = async (req: Request, res: Response): Promise<void> => {
-  try {
-    console.log('?? Obteniendo cuentas contables de inventario...');
+    const insumo = existingRows[0];
+    console.log('🗑️ Eliminando insumo:', insumo.nombre);
     
-    const query = `
-      SELECT 
-        idcuentacontable,
-        nombrecuentacontable,
-        categoriacuentacontable,
-        naturalezacuentacontable
-      FROM tblposcrumenwebcuentascontables 
-      WHERE categoriacuentacontable = 'Inventario'
-      ORDER BY nombrecuentacontable ASC
-    `;
+    // Eliminar el insumo
+    await pool.execute(
+      'DELETE FROM tblposcrumenwebinsumos WHERE id_insumo = ?',
+      [id]
+    );
     
-    const [rows] = await pool.execute(query);
-    console.log(`? Se encontraron ${Array.isArray(rows) ? rows.length : 0} cuentas contables de inventario`);
+    console.log('✅ Insumo eliminado exitosamente');
     
-    res.json({
+    const response: ApiResponse = {
       success: true,
-      data: rows,
-      message: 'Cuentas contables obtenidas correctamente'
-    });
-    
+      message: 'Insumo eliminado exitosamente'
+    };
+    res.json(response);
+
   } catch (error) {
-    console.error('? Error al obtener cuentas contables:', error);
-    res.status(500).json({
+    console.error('❌ Error eliminando insumo:', error);
+    const response: ApiResponse = {
       success: false,
-      message: 'Error interno del servidor al obtener cuentas contables',
+      message: 'Error del servidor al eliminar insumo',
       error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    };
+    res.status(500).json(response);
   }
 };

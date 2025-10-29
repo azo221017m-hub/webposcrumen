@@ -43,8 +43,8 @@ export const useAuth = (): AuthContextType => {
         setIsAuthenticated(true); // Marca como autenticado
         console.log('🔓 [useAuth] isAuthenticated establecido a: true'); // Log de autenticación
         
-        console.log('✅ [useAuth] Login exitoso para:', userData.usuario); // Log de éxito
-        console.log('🔄 [useAuth] Estado final - isAuthenticated:', true, 'user:', userData.usuario); // Log de estado
+        console.log('✅ [useAuth] Login exitoso para:', userData.alias); // Log de éxito
+        console.log('🔄 [useAuth] Estado final - isAuthenticated:', true, 'user:', userData.alias); // Log de estado
         setIsLoading(false); // Termina la carga
         return true; // Retorna éxito
         

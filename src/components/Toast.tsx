@@ -19,29 +19,36 @@ const Toast: React.FC<ToastProps> = ({
   onClose,
   autoHide = true 
 }) => {
-  console.log('🍞 [Toast] Renderizando Toast con:', { message, type, duration, autoHide });
+  console.log('🍞 [Toast] ===== TOAST CREADO =====');
+  console.log('🍞 [Toast] Message:', message);
+  console.log('🍞 [Toast] Type:', type);
+  console.log('🍞 [Toast] Duration:', duration);
+  console.log('🍞 [Toast] AutoHide:', autoHide);
   
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
   useEffect(() => {
-    console.log('🎬 [Toast] useEffect ejecutado');
+    console.log('🎬 [Toast] useEffect ejecutado - iniciando timers');
     
     // Activar animación de entrada
     const showTimer = setTimeout(() => {
-      console.log('👀 [Toast] Haciendo visible el toast');
+      console.log('👀 [Toast] Haciendo visible el toast - setIsVisible(true)');
       setIsVisible(true);
     }, 10);
 
     // Auto-ocultar después del tiempo especificado
     let hideTimer: number;
     if (autoHide) {
+      console.log(`⏰ [Toast] Configurando auto-hide en ${duration}ms`);
       hideTimer = setTimeout(() => {
+        console.log('⏰ [Toast] Tiempo agotado - llamando handleClose');
         handleClose();
       }, duration);
     }
 
     return () => {
+      console.log('🧹 [Toast] Cleanup - limpiando timers');
       clearTimeout(showTimer);
       if (hideTimer) clearTimeout(hideTimer);
     };
@@ -89,36 +96,51 @@ const Toast: React.FC<ToastProps> = ({
   console.log('🎨 [Toast] Clases aplicadas:', toastClasses, { isVisible, isLeaving });
 
   return (
-    <div 
-      className={toastClasses}
-      role="alert"
-      aria-live="polite"
-    >
-      <div className="toast-content">
-        <span className="toast-icon">
-          {getIcon()}
-        </span>
-        <span className="toast-message">{message}</span>
-        <button 
-          className="toast-close" 
-          onClick={handleClose}
-          aria-label="Cerrar notificación"
-        >
-          ✕
-        </button>
+    <div className="toast-container">
+      <div 
+        className={toastClasses}
+        role="alert"
+        aria-live="polite"
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 999999,
+          backgroundColor: type === 'error' ? '#ff4444' : '#44ff44',
+          color: 'white',
+          padding: '16px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          transform: isVisible ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.3s ease'
+        }}
+      >
+        <div className="toast-content">
+          <span className="toast-icon">
+            {getIcon()}
+          </span>
+          <span className="toast-message">{message}</span>
+          <button 
+            className="toast-close" 
+            onClick={handleClose}
+            aria-label="Cerrar notificación"
+          >
+            ✕
+          </button>
+        </div>
+        
+        {/* Barra de progreso */}
+        {autoHide && (
+          <div 
+            className="toast-progress"
+            style={{
+              backgroundColor: getProgressColor(),
+              animationDuration: `${duration}ms`,
+              animationPlayState: isLeaving ? 'paused' : 'running'
+            }}
+          />
+        )}
       </div>
-      
-      {/* Barra de progreso */}
-      {autoHide && (
-        <div 
-          className="toast-progress"
-          style={{
-            backgroundColor: getProgressColor(),
-            animationDuration: `${duration}ms`,
-            animationPlayState: isLeaving ? 'paused' : 'running'
-          }}
-        />
-      )}
     </div>
   );
 };

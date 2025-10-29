@@ -13,8 +13,10 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
 
   // Función para manejar navegación
   const handleNavigate = (screen: ScreenType): void => {
-    console.log('🧭 Navegando a configuración:', screen);
+    console.log('🧭 [NavegadorConfig] Navegando a configuración:', screen);
+    console.log('🧭 [NavegadorConfig] Llamando onNavigate con:', screen);
     onNavigate(screen);
+    console.log('🧭 [NavegadorConfig] onNavigate ejecutado');
   };
 
   return (
@@ -25,60 +27,20 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
         <h2>⚡ ACCIONES RAPIDAS</h2>
       </header>
 
-      {/* Sección MI NEGOCIO */}
+      {/* Sección CONFIGURACIONES DISPONIBLES */}
       <div className="config-section">
         <h3 className="section-title">
-          <span className="section-icon">🏢</span>
-          MI NEGOCIO
+          <span className="section-icon">⚙️</span>
+          CONFIGURACIONES DISPONIBLES
         </h3>
         
         <div className="config-grid">
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-usuarios' as ScreenType)}
-          >
-            <span className="btn-icon">👥</span>
-            <span className="btn-text">Usuarios</span>
-          </button>
-
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-roles' as ScreenType)}
-          >
-            <span className="btn-icon">🎭</span>
-            <span className="btn-text">Roles</span>
-          </button>
-
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-clientes' as ScreenType)}
-          >
-            <span className="btn-icon">👤</span>
-            <span className="btn-text">Clientes</span>
-          </button>
-
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-negocios' as ScreenType)}
-          >
-            <span className="btn-icon">🏪</span>
-            <span className="btn-text">Negocios</span>
-          </button>
-
           <button 
             className="config-btn"
             onClick={() => handleNavigate('config-mesas' as ScreenType)}
           >
             <span className="btn-icon">🪑</span>
             <span className="btn-text">Mesas</span>
-          </button>
-
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-productos' as ScreenType)}
-          >
-            <span className="btn-icon">📦</span>
-            <span className="btn-text">Productos</span>
           </button>
 
           <button 
@@ -91,26 +53,50 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
 
           <button 
             className="config-btn"
+            onClick={() => handleNavigate('config-descuentos' as ScreenType)}
+          >
+            <span className="btn-icon">💰</span>
+            <span className="btn-text">Descuentos</span>
+          </button>
+
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-roles' as ScreenType)}
+          >
+            <span className="btn-icon">👤</span>
+            <span className="btn-text">Rol de Usuario</span>
+          </button>
+
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-usuarios' as ScreenType)}
+          >
+            <span className="btn-icon">👥</span>
+            <span className="btn-text">Usuarios</span>
+          </button>
+
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-umedida' as ScreenType)}
+          >
+            <span className="btn-icon">📏</span>
+            <span className="btn-text">Unidades de Medida</span>
+          </button>
+
+          <button 
+            className="config-btn"
             onClick={() => handleNavigate('config-insumos' as ScreenType)}
           >
-            <span className="btn-icon">🥘</span>
+            <span className="btn-icon">📦</span>
             <span className="btn-text">Insumos</span>
           </button>
 
           <button 
             className="config-btn"
-            onClick={() => handleNavigate('config-recetas' as ScreenType)}
+            onClick={() => handleNavigate('config-cuenta-contable' as ScreenType)}
           >
-            <span className="btn-icon">📝</span>
-            <span className="btn-text">Recetas</span>
-          </button>
-
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-sub-recetas' as ScreenType)}
-          >
-            <span className="btn-icon">📋</span>
-            <span className="btn-text">Sub-recetas</span>
+            <span className="btn-icon">💰</span>
+            <span className="btn-text">Cuenta Contable</span>
           </button>
 
           <button 
@@ -120,31 +106,13 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
             <span className="btn-icon">🏪</span>
             <span className="btn-text">Proveedores</span>
           </button>
-        </div>
-      </div>
-
-      {/* Sección SYSTEMA */}
-      <div className="config-section">
-        <h3 className="section-title">
-          <span className="section-icon">⚙️</span>
-          SYSTEMA
-        </h3>
-        
-        <div className="config-grid">
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-um-movimiento' as ScreenType)}
-          >
-            <span className="btn-icon">📏</span>
-            <span className="btn-text">Unidades de Medida</span>
-          </button>
 
           <button 
             className="config-btn"
-            onClick={() => handleNavigate('config-cuentas' as ScreenType)}
+            onClick={() => handleNavigate('config-negocios' as ScreenType)}
           >
-            <span className="btn-icon">💳</span>
-            <span className="btn-text">Cuentas Contables</span>
+            <span className="btn-icon">🏢</span>
+            <span className="btn-text">Negocios</span>
           </button>
         </div>
       </div>

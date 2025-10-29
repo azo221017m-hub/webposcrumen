@@ -1,26 +1,40 @@
 // backend/src/routes/negociosRoutes.ts
-// Rutas para gestión de negocios en POSWEBCrumen
+// Rutas para operaciones CRUD de negocios y sus parámetros
 
-import { Router } from 'express'; // Importa Router de Express
-import { getAllNegocios, createNegocio, updateNegocio } from '../controllers/negociosController'; // Importa controladores
+import express from 'express';
+import {
+  getNegocios,
+  createNegocio,
+  updateNegocio,
+  deleteNegocio,
+  createParametrosNegocio,
+  updateParametrosNegocio
+} from '../controllers/negociosController';
 
-// Crea una instancia del router
-const router = Router();
+const router = express.Router();
 
-// Ruta GET para obtener todos los negocios
-// Endpoint: GET /api/negocios
-router.get('/', getAllNegocios);
+// Ruta para obtener todos los negocios con sus parámetros
+// GET /api/negocios
+router.get('/', getNegocios);
 
-// Ruta POST para crear un nuevo negocio
-// Endpoint: POST /api/negocios
-// Body: CreateNegocioData
+// Ruta para crear un nuevo negocio
+// POST /api/negocios
 router.post('/', createNegocio);
 
-// Ruta PUT para actualizar un negocio existente
-// Endpoint: PUT /api/negocios/:id
-// Params: id (idNegocio)
-// Body: Campos a actualizar
+// Ruta para actualizar un negocio existente
+// PUT /api/negocios/:id
 router.put('/:id', updateNegocio);
 
-// Exporta el router para uso en app principal
+// Ruta para eliminar (desactivar) un negocio
+// DELETE /api/negocios/:id
+router.delete('/:id', deleteNegocio);
+
+// Ruta para crear parámetros de negocio
+// POST /api/negocios/parametros
+router.post('/parametros', createParametrosNegocio);
+
+// Ruta para actualizar parámetros de negocio
+// PUT /api/negocios/:id/parametros
+router.put('/:id/parametros', updateParametrosNegocio);
+
 export default router;

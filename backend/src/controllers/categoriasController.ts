@@ -10,11 +10,19 @@ export const getCategoriasController = async (req: Request, res: Response): Prom
   try {
     console.log('📂 Obteniendo todas las categorías'); // Log de inicio
     
-    // Consulta SQL para obtener todas las categorías activas
+    // Consulta SQL para obtener todas las categorías con todos los campos
     const categorias = await executeQuery(`
-      SELECT idCategoria, nombre, descripcion, estatus, fechaRegistro, fechaActualizacion, usuario
+      SELECT 
+        idCategoria, 
+        nombre, 
+        imagencategoria, 
+        descripcion, 
+        estatus, 
+        fechaRegistroauditoria, 
+        usuarioauditoria, 
+        fehamodificacionauditoria, 
+        idnegocio
       FROM tblposcrumenwebcategorias 
-      WHERE estatus = 1
       ORDER BY nombre ASC
     `, []);
 
@@ -71,13 +79,20 @@ export const getCategoriasDropdownController = async (req: Request, res: Respons
 export const createCategoriaController = async (req: Request, res: Response): Promise<void> => {
   try {
     console.log('📂 Creando nueva categoría'); // Log de inicio
-    const { nombre, descripcion, estatus = 1, usuario = 'system' }: CreateCategoriaData = req.body;
+    const { 
+      nombre, 
+      imagencategoria, 
+      descripcion, 
+      estatus = 1, 
+      usuarioauditoria = 'system', 
+      idnegocio = 1 
+    } = req.body;
 
     // Validación de datos requeridos
-    if (!nombre || !descripcion) {
+    if (!nombre) {
       res.status(400).json({
         success: false,
-        message: 'Nombre y descripción son requeridos',
+        message: 'Nombre es requerido',
         error: 'VALIDATION_ERROR'
       } as ApiResponse);
       return;
@@ -101,9 +116,9 @@ export const createCategoriaController = async (req: Request, res: Response): Pr
     // Insertar nueva categoría
     const result = await executeQuery(`
       INSERT INTO tblposcrumenwebcategorias 
-      (nombre, descripcion, estatus, fechaRegistro, fechaActualizacion, usuario)
-      VALUES (?, ?, ?, NOW(), NOW(), ?)
-    `, [nombre, descripcion, estatus, usuario]);
+      (nombre, imagencategoria, descripcion, estatus, fechaRegistroauditoria, usuarioauditoria, fehamodificacionauditoria, idnegocio)
+      VALUES (?, ?, ?, ?, NOW(), ?, NOW(), ?)
+    `, [nombre, imagencategoria, descripcion, estatus, usuarioauditoria, idnegocio]);
 
     console.log('✅ Categoría creada exitosamente'); // Log de éxito
 
@@ -128,7 +143,13 @@ export const updateCategoriaController = async (req: Request, res: Response): Pr
   try {
     console.log('📂 Actualizando categoría'); // Log de inicio
     const { id } = req.params;
-    const { nombre, descripcion, estatus, usuario = 'system' }: CreateCategoriaData = req.body;
+    const { 
+      nombre, 
+      imagencategoria, 
+      descripcion, 
+      estatus, 
+      usuarioauditoria = 'system' 
+    } = req.body;
 
     // Validación de ID
     if (!id || isNaN(Number(id))) {
@@ -179,6 +200,10 @@ export const updateCategoriaController = async (req: Request, res: Response): Pr
       updateFields.push('nombre = ?');
       updateValues.push(nombre);
     }
+    if (imagencategoria !== undefined) {
+      updateFields.push('imagencategoria = ?');
+      updateValues.push(imagencategoria);
+    }
     if (descripcion) {
       updateFields.push('descripcion = ?');
       updateValues.push(descripcion);
@@ -188,9 +213,9 @@ export const updateCategoriaController = async (req: Request, res: Response): Pr
       updateValues.push(estatus);
     }
     
-    updateFields.push('fechaActualizacion = NOW()');
-    updateFields.push('usuario = ?');
-    updateValues.push(usuario, id);
+    updateFields.push('fehamodificacionauditoria = NOW()');
+    updateFields.push('usuarioauditoria = ?');
+    updateValues.push(usuarioauditoria, id);
 
     // Ejecutar actualización
     await executeQuery(`

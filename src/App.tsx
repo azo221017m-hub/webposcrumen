@@ -8,49 +8,24 @@ import { useAuth } from './hooks/useAuth'; // Importa hook de autenticación
 // Importa componentes
 import PresentationScreen from './components/PresentationScreen'; // Pantalla de presentación
 import LoginScreen from './components/LoginScreen'; // Pantalla de login
-import HomeScreen from './components/HomeScreen'; // Pantalla principal
-// ConfigNegocios removido - ahora se usa FormularioNegocio
-import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de usuarios
-import ConfigRoles from './components/ConfigRoles'; // Configuración de roles
-import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
-import ConfigCategorias from './components/ConfigCategorias'; // Configuración de categorías
-// Configuración de insumos - placeholder component para evitar error de compilación
-// Si más adelante existe ./components/ConfigInsumos, reemplazar este placeholder por la importación real.
-const ConfigInsumos: any = () => {
-  return (
-    <div style={{ padding: 16 }}>
-      <strong>ConfigInsumos</strong> (componente no disponible - placeholder)
-    </div>
-  );
-};
-import FormularioNegocio from './components/FormularioNegocio'; // Formulario completo de negocio
-import ConfigProductos from './components/ConfigProductos'; // Configuración de productos
-import ConfigRecetas from './components/ConfigRecetas'; // Configuración de recetas
-import ConfigSubRecetas from './components/ConfigSubRecetas'; // Configuración de sub-recetas
-import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
-import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
-import ConfigUMMovimiento from './components/ConfigUMMovimiento'; // Configuración de unidades de medida
-import ConfigCuentas from './components/ConfigCuentas'; // Configuración de cuentas contables
 import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
+import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
+import ConfigCategorias from './components/ConfigCategorias'; // Configuración de categorías
+import ConfigDescuentos from './components/ConfigDescuentos'; // Configuración de descuentos
+import ConfigRoldeUsuario from './components/ConfigRoldeUsuario'; // Configuración de roles de usuario
+import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de usuarios del sistema
+import ConfigUMedida from './components/ConfigUMedida'; // Configuración de unidades de medida
+import ConfigInsumos from './components/ConfigInsumos'; // Configuración de insumos
+import ConfigCuentaContable from './components/ConfigCuentaContable'; // Configuración de cuentas contables
+import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
+import ConfigNegocios from './components/ConfigNegocios'; // Configuración de negocios
+
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
-const ConfigUsuariosAny = ConfigUsuarios as any;
-const ConfigRolesAny = ConfigRoles as any;
-const ConfigClientesAny = ConfigClientes as any;
-const ConfigCategoriasAny = ConfigCategorias as any;
-const ConfigInsumosAny = ConfigInsumos as any;
-const FormularioNegocioAny = FormularioNegocio as any;
-const ConfigProductosAny = ConfigProductos as any;
-const ConfigRecetasAny = ConfigRecetas as any;
-const ConfigUMMovimientoAny = ConfigUMMovimiento as any;
-const ConfigCuentasAny = ConfigCuentas as any;
 
 // Importa estilos
 import './styles/global.css'; // Estilos globales
 import './App.css'; // Estilos específicos de App
-import ConfigUnidaddeMedidaCompra from './components/ConfigUnidaddeMedidaCompra';
-import ConfigTipoMovimiento from './components/ConfigTipoMovimiento';
-import ConfigSubtipoMovimiento from './components/ConfigSubtipoMovimiento';
 
 // Componente principal de la aplicación
 function App() {
@@ -64,7 +39,7 @@ function App() {
   useEffect(() => {
     console.log('🔄 [App] Estado de autenticación cambió:', { 
       isAuthenticated, 
-      user: user?.usuario, 
+      user: user?.alias, 
       currentScreen,
       isLoading 
     }); // Log de cambio
@@ -73,7 +48,9 @@ function App() {
     if (isAuthenticated && user && (currentScreen === 'login' || currentScreen === 'presentation')) {
       console.log('📊 [App] Redirigiendo a tablero-inicial - usuario autenticado'); // Log de redirección
       console.log('📱 [App] Cambiando currentScreen de', currentScreen, 'a tablero-inicial'); // Log de cambio de pantalla
-      setCurrentScreen('tablero-inicial');
+      setTimeout(() => {
+        setCurrentScreen('tablero-inicial');
+      }, 100); // Pequeño delay para permitir que el toast se muestre
     }
     
     // Si no está autenticado y no está en login o presentación, va a login
@@ -81,7 +58,7 @@ function App() {
       console.log('🔐 [App] Redirigiendo a login - usuario no autenticado'); // Log de redirección
       setCurrentScreen('login');
     }
-  }, [isAuthenticated, isLoading, user]); // Removido currentScreen de las dependencias para evitar loops
+  }, [isAuthenticated, isLoading, user, currentScreen]);
 
   // Efecto para manejar eventos personalizados de navegación
   useEffect(() => {
@@ -107,20 +84,24 @@ function App() {
 
   // Función para manejar la navegación entre pantallas
   const handleNavigate = (screen: ScreenType): void => {
-    console.log('🧭 Navegando a pantalla:', screen); // Log de navegación
+    console.log('🧭 [App] Navegando a pantalla:', screen); // Log de navegación
+    console.log('🧭 [App] currentScreen antes:', currentScreen);
     setCurrentScreen(screen); // Cambia la pantalla actual
+    console.log('🧭 [App] setCurrentScreen ejecutado con:', screen);
   };
 
   // Función para regresar al TableroInicial desde pantallas de configuración
-  const handleBackToTableroInicial = (): void => {
-    console.log('📊 Regresando al TableroInicial'); // Log de regreso
-    setCurrentScreen('tablero-inicial'); // Cambia al TableroInicial
-  };
+  // Nota: la función fue removida porque no se usa actualmente; llamar directamente
+  // setCurrentScreen('tablero-inicial') donde sea necesario o reinstaurar la
+  // función cuando se agregue su uso.
 
   // Función para manejar logout integrada inline donde se usa
 
   // Renderiza la pantalla actual según el estado
   const renderCurrentScreen = (): React.ReactElement => {
+    console.log('🎯🎯🎯 [App] renderCurrentScreen EJECUTADO con currentScreen:', currentScreen); // Log súper prominente
+    console.log('🔐🔐🔐 [App] Auth state:', { isAuthenticated, isLoading, user: user?.alias }); // Log de auth
+    
     // Si está cargando la autenticación, muestra un loader
     if (isLoading) {
       return (
@@ -139,6 +120,7 @@ function App() {
     }
 
     // Switch para renderizar la pantalla correspondiente
+    console.log('🔍 [App] Evaluando switch con currentScreen:', currentScreen);
     switch (currentScreen) {
       case 'presentation':
         console.log('🎬 Renderizando pantalla de presentación'); // Log de renderizado
@@ -152,14 +134,9 @@ function App() {
               console.log('🔐 [App] Manejando login directamente:', loginData.usuario);
               try {
                 const success = await login(loginData);
-                if (success) {
-                  console.log('✅ [App] Login exitoso, navegando a tablero-inicial');
-                  setCurrentScreen('tablero-inicial');
-                  return true;
-                } else {
-                  console.log('❌ [App] Login falló');
-                  return false;
-                }
+                console.log(`📋 [App] Resultado del login: ${success}`);
+                // No cambiar currentScreen aquí - dejar que useEffect lo maneje
+                return success;
               } catch (error) {
                 console.error('💥 [App] Error en login:', error);
                 return false;
@@ -176,13 +153,17 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('🏠 Renderizando pantalla principal'); // Log de renderizado
+        // Usar TableroInicial como reemplazo para HomeScreen (componente HomeScreen no existe)
         return (
-          <HomeScreen 
+          <TableroInicial 
             user={user} 
             onNavigate={handleNavigate}
+            onLogout={() => {
+              logout();
+              setCurrentScreen('presentation');
+            }}
           />
         );
-
       case 'tablero-inicial':
         if (!isAuthenticated || !user) {
           console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
@@ -201,41 +182,14 @@ function App() {
           />
         );
 
-      case 'config-usuarios':
+      case 'config-mesas':
         if (!isAuthenticated || !user) {
           console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
           setCurrentScreen('login');
           return <div></div>; // Componente vacío temporal
         }
-        console.log('👥 Renderizando configuración de usuarios'); // Log de renderizado
-        return <ConfigUsuariosAny currentUser={user} onBack={handleBackToTableroInicial} />;
-
-      case 'config-negocios':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('🏢 Renderizando formulario de negocios'); // Log de renderizado
-        return <FormularioNegocioAny onBack={handleBackToTableroInicial} />;
-
-      case 'config-roles':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('👥 Renderizando configuración de roles'); // Log de renderizado
-        return <ConfigRolesAny currentUser={user} onBack={handleBackToTableroInicial} />;
-
-      case 'config-clientes':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('👥 Renderizando configuración de clientes'); // Log de renderizado
-        return <ConfigClientesAny currentUser={user} onBack={handleBackToTableroInicial} />;
+        console.log('🪑 Renderizando configuración de mesas'); // Log de renderizado
+        return <ConfigMesas onNavigate={handleNavigate} />;
 
       case 'config-categorias':
         if (!isAuthenticated || !user) {
@@ -244,7 +198,43 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('🏷️ Renderizando configuración de categorías'); // Log de renderizado
-        return <ConfigCategoriasAny currentUser={user} onBack={handleBackToTableroInicial} />;
+        return <ConfigCategorias onNavigate={handleNavigate} />;
+
+      case 'config-descuentos':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('💰 Renderizando configuración de descuentos'); // Log de renderizado
+        return <ConfigDescuentos onNavigate={handleNavigate} />;
+
+      case 'config-roles':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('👤 Renderizando configuración de roles de usuario'); // Log de renderizado
+        return <ConfigRoldeUsuario onNavigate={handleNavigate} />;
+
+      case 'config-usuarios':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('👥 Renderizando configuración de usuarios del sistema'); // Log de renderizado
+        return <ConfigUsuarios onNavigate={handleNavigate} />;
+
+      case 'config-umedida':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📏 Renderizando configuración de unidades de medida'); // Log de renderizado
+        return <ConfigUMedida onNavigate={handleNavigate} />;
 
       case 'config-insumos':
         if (!isAuthenticated || !user) {
@@ -253,43 +243,16 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('📦 Renderizando configuración de insumos'); // Log de renderizado
-        return <ConfigInsumosAny currentUser={user} onBack={handleBackToTableroInicial} />;
+        return <ConfigInsumos onNavigate={handleNavigate} />;
 
-      case 'config-productos':
+      case 'config-cuenta-contable':
         if (!isAuthenticated || !user) {
           console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
           setCurrentScreen('login');
           return <div></div>; // Componente vacío temporal
         }
-        console.log('📦 Renderizando configuración de productos'); // Log de renderizado
-        return <ConfigProductosAny user={user} onBack={handleBackToTableroInicial} />;
-
-      case 'config-recetas':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('📋 Renderizando configuración de recetas'); // Log de renderizado
-        return <ConfigRecetasAny user={user} onBack={handleBackToTableroInicial} />;
-
-      case 'config-sub-recetas':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('🍴 Renderizando configuración de sub-recetas'); // Log de renderizado
-        return <ConfigSubRecetas user={user} onBack={handleBackToTableroInicial} />;
-
-      case 'config-mesas':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('🍽️ Renderizando configuración de mesas'); // Log de renderizado
-        return <ConfigMesas currentUser={user} onBack={handleBackToTableroInicial} />;
+        console.log('💰 Renderizando configuración de cuentas contables'); // Log de renderizado
+        return <ConfigCuentaContable onNavigate={handleNavigate} />;
 
       case 'config-proveedores':
         if (!isAuthenticated || !user) {
@@ -298,63 +261,18 @@ function App() {
           return <div></div>; // Componente vacío temporal
         }
         console.log('🏪 Renderizando configuración de proveedores'); // Log de renderizado
-        return <ConfigProveedores currentUser={user} onBack={handleBackToTableroInicial} />;
+        return <ConfigProveedores onNavigate={handleNavigate} />;
 
-      case 'config-umcompras':
+      case 'config-negocios':
         if (!isAuthenticated || !user) {
           console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
           setCurrentScreen('login');
           return <div></div>; // Componente vacío temporal
         }
-        console.log('📏 Renderizando configuración de unidades de medida de compra'); // Log de renderizado
-        return <ConfigUnidaddeMedidaCompra />;
+        console.log('🏢 Renderizando configuración de negocios'); // Log de renderizado
+        return <ConfigNegocios onNavigate={handleNavigate} />;
 
-      case 'config-tipo-movimiento':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('📊 Renderizando configuración de tipos de movimiento'); // Log de renderizado
-        return <ConfigTipoMovimiento />;
-
-      case 'config-subtipo-movimiento':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('📈 Renderizando configuración de subtipos de movimiento'); // Log de renderizado
-        return <ConfigSubtipoMovimiento />;
-
-      case 'formulario-negocio':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('🏢 Renderizando formulario de negocio completo'); // Log de renderizado
-        return <FormularioNegocioAny currentUser={user} onBack={handleBackToTableroInicial} />;
-
-      case 'config-um-movimiento':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('📏 Renderizando configuración de unidades de medida'); // Log de renderizado
-        return <ConfigUMMovimientoAny currentUser={user} onBack={handleBackToTableroInicial} />;
-
-      case 'config-cuentas':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('💳 Renderizando configuración de cuentas contables'); // Log de renderizado
-        return <ConfigCuentasAny currentUser={user} onBack={handleBackToTableroInicial} />;
-
-      default:
+    default:
         console.log('❓ Pantalla desconocida, redirigiendo a presentación'); // Log de error
         setCurrentScreen('presentation');
         return <div></div>; // Componente vacío temporal

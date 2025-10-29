@@ -1,25 +1,23 @@
-// backend/src/app.ts
-// Aplicación principal del servidor POSWEBCrumen
+﻿// backend/src/app.ts
+// Aplicación principal del servidor
 
-import express from 'express'; // Importa Express para crear el servidor
-import dotenv from 'dotenv'; // Importa dotenv para variables de entorno
-import { testConnection } from './config/database'; // Importa función de prueba de BD
-import corsMiddleware from './middlewares/cors'; // Importa middleware CORS
+import express from 'express';
+import dotenv from 'dotenv';
+import { testConnection } from './config/database';
+import corsMiddleware from './middlewares/cors';
 
-// Importa las rutas de la aplicación
-import authRoutes from './routes/authRoutes'; // Rutas de autenticación
-import usuariosRoutes from './routes/usuariosRoutes'; // Rutas de usuarios
-import negociosRoutes from './routes/negociosRoutes'; // Rutas de negocios
-import rolesRoutes from './routes/rolesRoutes'; // Rutas de roles
-import clientesRoutes from './routes/clientesRoutes'; // Rutas de clientes
-import parametrosNegocioRoutes from './routes/parametrosNegocioRoutes'; // Rutas de parámetros
-import categoriasRoutes from './routes/categoriasRoutes'; // Rutas de categorías
-import productosRoutes from './routes/productosRoutes'; // Rutas de productos
-import insumosRoutes from './routes/insumosRoutes'; // Rutas de insumos
-import recetasRoutes from './routes/recetasRoutes'; // Rutas de recetas
-import subRecetasRoutes from './routes/subRecetasRoutes'; // Rutas de sub-recetas
-import mesasRoutes from './routes/mesasRoutes'; // Rutas de mesas
-import proveedoresRoutes from './routes/proveedoresRoutes'; // Rutas de proveedores
+// Importa las rutas disponibles
+import authRoutes from './routes/authRoutes';
+import usuariosRoutes from './routes/usuariosRoutes';
+import rolesRoutes from './routes/rolesRoutes';
+import categoriasRoutes from './routes/categoriasRoutes';
+import mesasRoutes from './routes/mesasRoutes';
+import descuentosRoutes from './routes/descuentosRoutes';
+import umedidaRoutes from './routes/umedidaRoutes';
+import insumosRoutes from './routes/insumosRoutes';
+import cuentaContableRoutes from './routes/cuentaContableRoutes';
+import proveedoresRoutes from './routes/proveedoresRoutes';
+import negociosRoutes from './routes/negociosRoutes';
 
 // Carga las variables de entorno
 dotenv.config();
@@ -31,7 +29,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware global para parsear JSON
-app.use(express.json({ limit: '10mb' })); // Permite JSON hasta 10MB
+app.use(express.json({ limit: '10mb' }));
 
 // Middleware global para parsear datos de formularios
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -41,13 +39,13 @@ app.use(corsMiddleware);
 
 // Middleware de logging para todas las peticiones
 app.use((req, res, next) => {
-  console.log(`📊 ${req.method} ${req.url} - ${new Date().toISOString()}`); // Log de petición
-  next(); // Continúa al siguiente middleware
+  console.log(`📊 ${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
 });
 
 // Ruta de salud del servidor
 app.get('/health', (req, res) => {
-  console.log('💊 Health check solicitado'); // Log de health check
+  console.log('💊 Health check solicitado');
   res.json({
     success: true,
     message: 'Servidor POSWEBCrumen funcionando correctamente',
@@ -56,120 +54,104 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Rutas de la API
-app.use('/api/auth', authRoutes); // Rutas de autenticación
-app.use('/api/usuarios', usuariosRoutes); // Rutas de usuarios
-app.use('/api/negocios', negociosRoutes); // Rutas de negocios
-app.use('/api/roles', rolesRoutes); // Rutas de roles
-app.use('/api/clientes', clientesRoutes); // Rutas de clientes
-app.use('/api/parametros-negocio', parametrosNegocioRoutes); // Rutas de parámetros
-app.use('/api/categorias', categoriasRoutes); // Rutas de categorías
-app.use('/api/productos', productosRoutes); // Rutas de productos
-app.use('/api/insumos', insumosRoutes); // Rutas de insumos
-app.use('/api/recetas', recetasRoutes); // Rutas de recetas
-app.use('/api/sub-recetas', subRecetasRoutes); // Rutas de sub-recetas
-app.use('/api/mesas', mesasRoutes); // Rutas de mesas
-app.use('/api/proveedores', proveedoresRoutes); // Rutas de proveedores
+// Configuración de rutas
+app.use('/api/auth', authRoutes);
+app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/roles', rolesRoutes);
+app.use('/api/categorias', categoriasRoutes);
+app.use('/api/mesas', mesasRoutes);
+app.use('/api/descuentos', descuentosRoutes);
+app.use('/api/umedidas', umedidaRoutes);
+app.use('/api/insumos', insumosRoutes);
+app.use('/api/cuentas-contables', cuentaContableRoutes);
+app.use('/api/proveedores', proveedoresRoutes);
+app.use('/api/negocios', negociosRoutes);
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {
-  console.log('🏠 Ruta raíz accedida'); // Log de acceso
+  console.log('🏠 Ruta raíz accedida');
   res.json({
     success: true,
     message: '🚀 Bienvenido a POSWEBCrumen API',
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
-      usuarios: '/api/usuarios', 
-      negocios: '/api/negocios',
+      usuarios: '/api/usuarios',
+      roles: '/api/roles',
+      categorias: '/api/categorias',
       mesas: '/api/mesas',
-      proveedores: '/api/proveedores',
+      descuentos: '/api/descuentos',
       health: '/health'
     }
   });
 });
 
-// Middleware para manejar rutas no encontradas
+// Manejo de rutas no encontradas
 app.use('*', (req, res) => {
-  console.log('❌ Ruta no encontrada:', req.originalUrl); // Log de ruta no encontrada
+  console.log(`❌ Ruta no encontrada: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     success: false,
-    message: 'Endpoint no encontrado',
-    error: 'NOT_FOUND'
+    message: `Ruta ${req.method} ${req.originalUrl} no encontrada`,
+    availableEndpoints: [
+      'GET /health',
+      'GET /',
+      'POST /api/auth/login',
+      'GET /api/usuarios',
+      'GET /api/roles',
+      'GET /api/categorias',
+      'GET /api/mesas',
+      'GET /api/descuentos'
+    ]
   });
 });
 
-// Middleware global de manejo de errores
+// Manejo global de errores
 app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('💥 Error no manejado:', error); // Log de error
+  console.error('💥 Error global capturado:', error);
   res.status(500).json({
     success: false,
     message: 'Error interno del servidor',
-    error: 'INTERNAL_ERROR'
+    error: process.env.NODE_ENV === 'development' ? error.message : 'Error del servidor'
   });
 });
 
 // Función para iniciar el servidor
-const startServer = async (): Promise<void> => {
+async function startServer() {
   try {
-    console.log('🚀 Iniciando servidor POSWEBCrumen...'); // Log de inicio
+    console.log('🔄 Iniciando servidor POSWEBCrumen...');
     
     // Prueba la conexión a la base de datos
-    const dbConnected = await testConnection();
-    
-    if (!dbConnected) {
-      console.error('❌ No se pudo conectar a la base de datos'); // Log de error BD
-      process.exit(1); // Termina el proceso si no hay conexión a BD
-    }
+    console.log('🔗 Probando conexión a la base de datos...');
+    await testConnection();
+    console.log('✅ Conexión a la base de datos exitosa');
     
     // Inicia el servidor
     app.listen(PORT, () => {
-      console.log('✅ Servidor iniciado exitosamente'); // Log de éxito
-      console.log(`🌐 Servidor corriendo en puerto: ${PORT}`); // Log de puerto
-      console.log(`📡 URL del servidor: http://localhost:${PORT}`); // Log de URL
-      console.log(`💾 Base de datos: ${process.env.DB_NAME}`); // Log de BD
-      console.log(`🎯 Frontend URL: ${process.env.FRONTEND_URL}`); // Log de frontend
-      console.log('📋 Endpoints disponibles:'); // Log de endpoints
-      console.log('   - GET  /health'); // Health check
-      console.log('   - POST /api/auth/login'); // Login
-      console.log('   - GET  /api/usuarios'); // Obtener usuarios
-      console.log('   - POST /api/usuarios'); // Crear usuario
-      console.log('   - PUT  /api/usuarios/:id'); // Actualizar usuario
-      console.log('   - GET  /api/negocios'); // Obtener negocios
-      console.log('   - POST /api/negocios'); // Crear negocio
-      console.log('   - PUT  /api/negocios/:id'); // Actualizar negocio
-      console.log('   - GET  /api/categorias'); // Obtener categorías
-      console.log('   - POST /api/categorias'); // Crear categoría
-      console.log('   - GET  /api/categorias/dropdown'); // Dropdown categorías
-      console.log('   - GET  /api/insumos'); // Obtener insumos
-      console.log('   - GET  /api/insumos/buscar/:filtro'); // Buscar insumos
-      console.log('   - POST /api/insumos'); // Crear insumo
-      console.log('   - GET  /api/um-compras'); // Obtener UMCompras
-      console.log('   - POST /api/um-compras'); // Crear UMCompra
-      console.log('   - PUT  /api/um-compras/:id'); // Actualizar UMCompra
-      console.log('   - DELETE /api/um-compras/:id'); // Eliminar UMCompra
-      console.log('   - GET  /api/tipo-movimiento'); // Obtener tipos de movimiento
-      console.log('   - POST /api/tipo-movimiento'); // Crear tipo de movimiento
-      console.log('   - PUT  /api/tipo-movimiento/:id'); // Actualizar tipo de movimiento
-      console.log('   - DELETE /api/tipo-movimiento/:id'); // Eliminar tipo de movimiento
+      console.log(`🚀 Servidor POSWEBCrumen corriendo en puerto ${PORT}`);
+      console.log(`🌐 URL: http://localhost:${PORT}`);
+      console.log(`💊 Health check: http://localhost:${PORT}/health`);
+      console.log('📋 Rutas disponibles:');
+      console.log('  - POST /api/auth/login');
+      console.log('  - GET /api/usuarios');
+      console.log('  - GET /api/roles');
+      console.log('  - GET /api/categorias');
+      console.log('  - GET /api/mesas');
+      console.log('  - GET /api/descuentos');
+      console.log('  - GET /api/umedidas');
+      console.log('  - GET /api/proveedores');
     });
     
   } catch (error) {
-    console.error('💥 Error iniciando servidor:', error); // Log de error fatal
-    process.exit(1); // Termina el proceso en caso de error
+    console.error('💥 Error al iniciar el servidor:', error);
+    console.error('🔧 Revisa la configuración de la base de datos');
+    process.exit(1);
   }
-};
+}
 
-// Manejo de señales del sistema para cierre graceful
-process.on('SIGTERM', () => {
-  console.log('🛑 Recibida señal SIGTERM, cerrando servidor...'); // Log de cierre
-  process.exit(0);
-});
+// Inicia el servidor si este archivo es ejecutado directamente
+if (require.main === module) {
+  startServer();
+}
 
-process.on('SIGINT', () => {
-  console.log('🛑 Recibida señal SIGINT, cerrando servidor...'); // Log de cierre
-  process.exit(0);
-});
-
-// Inicia el servidor
-startServer();
+// Exporta la aplicación para testing
+export default app;

@@ -28,10 +28,9 @@ Este proyecto es una aplicación fullstack de punto de venta (POS) desarrollada 
 - Conexión segura a MySQL con pool
 
 ### Base de Datos
-- MySQL con tablas existentes:
+- MySQL con tablas principales:
   - `tblposcrumenwebusuarios`
-  - `tblposcrumenwebnegocio` 
-  - `tbl_access_attempts`
+  - `tblposcrumenwebnegocio`
 
 ## Patrones de Código
 
@@ -59,7 +58,6 @@ Este proyecto es una aplicación fullstack de punto de venta (POS) desarrollada 
 ✅ Gestión de usuarios (CRUD)  
 ✅ Gestión de negocios (CRUD)  
 ✅ Navegación lateral responsive  
-✅ Control de intentos de acceso  
 ✅ Encriptación de contraseñas  
 
 ## Convenciones de Naming

@@ -1,7 +1,21 @@
 // src/services/api.ts
 // Servicio para comunicación con la API del backend POSWEBCrumen
 
-import type { ApiResponse, LoginData, Usuario, Negocio, CreateUsuarioData, CreateNegocioData } from '../types';
+import type { 
+  ApiResponse, 
+  LoginData, 
+  Usuario, 
+  Negocio, 
+  CreateNegocioData,
+  UsuarioSistema,
+  CreateUsuarioSistemaData,
+  UpdateUsuarioSistemaData,
+  NegocioDropdown,
+  RolDropdown,
+  UMedida,
+  CreateUMedidaData,
+  UpdateUMedidaData
+} from '../types';
 
 // URL base de la API - se obtiene de variables de entorno o usa localhost por defecto
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -86,32 +100,59 @@ class ApiService {
     });
   }
 
-  // Método para obtener todos los usuarios
-  async getUsuarios(): Promise<ApiResponse<Usuario[]>> {
-    console.log('👥 Obteniendo lista de usuarios'); // Log de consulta
+  // Método para obtener todos los usuarios del sistema
+  async getUsuarios(): Promise<ApiResponse<UsuarioSistema[]>> {
+    console.log('👥 Obteniendo lista de usuarios del sistema'); // Log de consulta
     
-    return this.request<Usuario[]>('/api/usuarios', {
+    return this.request<UsuarioSistema[]>('/api/usuarios', {
       method: 'GET', // Método GET
     });
   }
 
-  // Método para crear un nuevo usuario
-  async createUsuario(userData: CreateUsuarioData): Promise<ApiResponse<{ idUsuario: number; usuario: string }>> {
-    console.log('👤 Creando nuevo usuario:', userData.usuario); // Log de creación
+  // Método para crear un nuevo usuario del sistema
+  async createUsuario(userData: CreateUsuarioSistemaData): Promise<ApiResponse<{ idUsuario: number; alias: string }>> {
+    console.log('👤 Creando nuevo usuario del sistema:', userData.alias); // Log de creación
     
-    return this.request<{ idUsuario: number; usuario: string }>('/api/usuarios', {
+    return this.request<{ idUsuario: number; alias: string }>('/api/usuarios', {
       method: 'POST', // Método POST
       body: JSON.stringify(userData), // Datos del usuario en JSON
     });
   }
 
-  // Método para actualizar un usuario existente
-  async updateUsuario(id: number, userData: Partial<CreateUsuarioData>): Promise<ApiResponse<{ idUsuario: number }>> {
-    console.log('✏️ Actualizando usuario ID:', id); // Log de actualización
+  // Método para actualizar un usuario existente del sistema
+  async updateUsuario(id: number, userData: UpdateUsuarioSistemaData): Promise<ApiResponse<{ idUsuario: number }>> {
+    console.log('✏️ Actualizando usuario del sistema ID:', id); // Log de actualización
     
     return this.request<{ idUsuario: number }>(`/api/usuarios/${id}`, {
       method: 'PUT', // Método PUT
       body: JSON.stringify(userData), // Datos actualizados en JSON
+    });
+  }
+
+  // Método para eliminar un usuario del sistema (soft delete)
+  async deleteUsuario(id: number): Promise<ApiResponse<{ idUsuario: number }>> {
+    console.log('🗑️ Eliminando usuario del sistema ID:', id); // Log de eliminación
+    
+    return this.request<{ idUsuario: number }>(`/api/usuarios/${id}`, {
+      method: 'DELETE', // Método DELETE
+    });
+  }
+
+  // Método para obtener negocios para dropdown
+  async getNegociosDropdown(): Promise<ApiResponse<NegocioDropdown[]>> {
+    console.log('🏢 Obteniendo negocios para dropdown'); // Log de consulta
+    
+    return this.request<NegocioDropdown[]>('/api/usuarios/negocios/dropdown', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para obtener roles para dropdown
+  async getRolesDropdown(): Promise<ApiResponse<RolDropdown[]>> {
+    console.log('👥 Obteniendo roles para dropdown'); // Log de consulta
+    
+    return this.request<RolDropdown[]>('/api/usuarios/roles/dropdown', {
+      method: 'GET', // Método GET
     });
   }
 
@@ -159,6 +200,16 @@ class ApiService {
     return this.request<{ idRol: number; nombreRol: string }>(`/api/roles/${idRol}`, {
       method: 'PUT', // Método PUT
       body: JSON.stringify(rolData), // Datos del rol en JSON
+    });
+  }
+
+  // Método para eliminar un rol (cambiar a inactivo)
+  async deleteRol(id: number, data: any): Promise<ApiResponse<any>> {
+    console.log(`🗑️ Eliminando rol ID: ${id}`); // Log de eliminación
+    
+    return this.request<any>(`/api/roles/${id}`, {
+      method: 'DELETE', // Método DELETE
+      body: JSON.stringify(data), // Datos de auditoría
     });
   }
 
@@ -414,6 +465,47 @@ class ApiService {
     });
   }
 
+  // Métodos para gestión de descuentos
+  
+  // Método para obtener descuentos
+  async getDescuentos(): Promise<ApiResponse<any[]>> {
+    console.log('💰 Obteniendo descuentos'); // Log de consulta
+    
+    return this.request<any[]>('/api/descuentos', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear un nuevo descuento
+  async createDescuento(descuentoData: any): Promise<ApiResponse<any>> {
+    console.log('💰 Creando nuevo descuento:', descuentoData); // Log de creación
+    
+    return this.request<any>('/api/descuentos', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(descuentoData), // Datos del descuento en JSON
+    });
+  }
+
+  // Método para actualizar un descuento
+  async updateDescuento(id: number, descuentoData: any): Promise<ApiResponse<any>> {
+    console.log(`🔄 Actualizando descuento ID: ${id}`, descuentoData); // Log de actualización
+    
+    return this.request<any>(`/api/descuentos/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(descuentoData), // Datos actualizados en JSON
+    });
+  }
+
+  // Método para eliminar un descuento (cambiar a inactivo)
+  async deleteDescuento(id: number, data: any): Promise<ApiResponse<any>> {
+    console.log(`🗑️ Eliminando descuento ID: ${id}`); // Log de eliminación
+    
+    return this.request<any>(`/api/descuentos/${id}`, {
+      method: 'DELETE', // Método DELETE
+      body: JSON.stringify(data), // Datos de auditoría
+    });
+  }
+
   // Métodos para gestión de proveedores
   
   // Método para obtener proveedores
@@ -591,6 +683,46 @@ class ApiService {
       method: 'GET', // Método GET
     });
   }
+
+  // ===== MÉTODOS PARA UNIDADES DE MEDIDA =====
+
+  // Método para obtener todas las unidades de medida
+  async getUMedidas(): Promise<ApiResponse<UMedida[]>> {
+    console.log('📏 Obteniendo unidades de medida'); // Log de consulta
+    
+    return this.request<UMedida[]>('/api/umedidas', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Método para crear una nueva unidad de medida
+  async createUMedida(umedidaData: CreateUMedidaData): Promise<ApiResponse<{ idUmCompra: number }>> {
+    console.log('📏 Creando nueva unidad de medida:', umedidaData.nombreUmCompra); // Log de creación
+    
+    return this.request<{ idUmCompra: number }>('/api/umedidas', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(umedidaData), // Datos en JSON
+    });
+  }
+
+  // Método para actualizar una unidad de medida existente
+  async updateUMedida(id: number, umedidaData: UpdateUMedidaData): Promise<ApiResponse<{ idUmCompra: number }>> {
+    console.log('📏 Actualizando unidad de medida:', id); // Log de actualización
+    
+    return this.request<{ idUmCompra: number }>(`/api/umedidas/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(umedidaData), // Datos en JSON
+    });
+  }
+
+  // Método para eliminar una unidad de medida
+  async deleteUMedida(id: number): Promise<ApiResponse<any>> {
+    console.log('📏 Eliminando unidad de medida:', id); // Log de eliminación
+    
+    return this.request<any>(`/api/umedidas/${id}`, {
+      method: 'DELETE', // Método DELETE
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -601,8 +733,8 @@ export default apiService;
 // Exportaciones individuales para compatibilidad
 export const login = (loginData: LoginData) => apiService.login(loginData);
 export const getUsuarios = () => apiService.getUsuarios();
-export const createUsuario = (userData: CreateUsuarioData) => apiService.createUsuario(userData);
-export const updateUsuario = (id: number, userData: Partial<CreateUsuarioData>) => apiService.updateUsuario(id, userData);
+export const createUsuario = (userData: CreateUsuarioSistemaData) => apiService.createUsuario(userData);
+export const updateUsuario = (id: number, userData: UpdateUsuarioSistemaData) => apiService.updateUsuario(id, userData);
 export const getRoles = () => apiService.getRoles();
 export const getClientes = () => apiService.getClientes();
 export const createCliente = (clienteData: any) => apiService.createCliente(clienteData);

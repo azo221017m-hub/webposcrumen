@@ -1,345 +1,804 @@
 // src/components/ConfigCategorias.tsx
-// Componente para gestión de categorías con tabla de datos y formulario de inserción
+// Componente para gestionar categorías de productos con diseño de minicards
 
 import React, { useState, useEffect } from 'react';
-import type { Categoria, CreateCategoriaData, ApiResponse, Usuario } from '../types/index';
-import { getCategorias, createCategoria } from '../services/api';
-import Toast from './Toast';
-import '../styles/ConfigScreens.css';
 
-// Interfaz para props del componente
-interface ConfigCategoriasProps {
-  currentUser: Usuario; // Usuario autenticado actual
-  onBack?: () => void; // Función para regresar al TableroInicial
+import type { ScreenType } from '../types';
+
+// Estilos CSS inline para minicards y modal
+const componentStyles = `
+  .categorias-container {
+    padding: 1.5rem;
+    background: #f8fafc;
+    min-height: 100vh;
+  }
+  
+  .categorias-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  
+  .categorias-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .btn-add-categoria {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-add-categoria:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .categoria-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .categoria-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .card-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .status-active {
+    background: #c6f6d5;
+    color: #22543d;
+  }
+  
+  .status-inactive {
+    background: #fed7d7;
+    color: #742a2a;
+  }
+  
+  .card-description {
+    color: #718096;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  
+  .card-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background: #f7fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    font-size: 0.9rem;
+  }
+  
+  .card-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .btn-card-action {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-edit-card {
+    background: #e6fffa;
+    color: #234e52;
+    border: 1px solid #b2f5ea;
+  }
+  
+  .btn-edit-card:hover {
+    background: #b2f5ea;
+    transform: translateY(-2px);
+  }
+  
+  .btn-delete-card {
+    background: #fed7d7;
+    color: #742a2a;
+    border: 1px solid #feb2b2;
+  }
+  
+  .btn-delete-card:hover {
+    background: #feb2b2;
+    transform: translateY(-2px);
+  }
+  
+  .btn-regresar {
+    padding: 0.75rem 1.5rem;
+    background: #4a5568;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .btn-regresar:hover {
+    background: #2d3748;
+    transform: translateY(-2px);
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .btn-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .modal-footer {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+  }
+  
+  .audit-info {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 6px;
+  }
+  
+  .audit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+`;
+
+// Interfaz para las categorías según la tabla tblposcrumenwebcategorias
+interface Categoria {
+  idCategoria: number; // int(11) AI PK
+  nombre: string; // varchar(100)
+  imagencategoria?: string; // longblob (base64 string para display)
+  descripcion?: string; // text
+  estatus: number; // tinyint(1) - 1=activo, 0=inactivo
+  fechaRegistroauditoria: string; // Fecha/hora de insert
+  usuarioauditoria: string; // valor de usuario desde login
+  fehamodificacionauditoria: string; // Fecha/hora de update
+  idnegocio: number; // valor de usuario desde login
 }
 
-// Componente principal de configuración de categorías
-const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ currentUser, onBack }) => {
-  // Estados para el manejo de datos y UI
-  const [categorias, setCategorias] = useState<Categoria[]>([]); // Lista de categorías
-  const [loading, setLoading] = useState<boolean>(true); // Estado de carga
-  const [submitting, setSubmitting] = useState<boolean>(false); // Estado de envío de formulario
+// Props del componente
+interface ConfigCategoriasProps {
+  onNavigate: (screen: ScreenType) => void;
+}
 
-  // Estados para el formulario de nueva categoría
-  const [formData, setFormData] = useState<CreateCategoriaData>({
+const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
+  // Estados del componente
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedCategoria, setSelectedCategoria] = useState<Categoria | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  // Estados del formulario
+  const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
-    estatus: 1,
-    usuario: currentUser.usuario // Llenar automáticamente con el usuario logueado
+    estatus: 1, // 1=activo, 0=inactivo
+    imagencategoria: '' // Para almacenar la imagen como base64
   });
 
-  // Estados para Toast de notificaciones
-  const [showToast, setShowToast] = useState<boolean>(false);
-  const [toastMessage, setToastMessage] = useState<string>('');
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('info');
+  // Estado para el archivo de imagen seleccionado
+  const [imagePreview, setImagePreview] = useState<string>('');
 
-  // Función para mostrar notificaciones
-  const mostrarToast = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
-    setToastMessage(message);
-    setToastType(type);
-    setShowToast(true);
-    // Auto-ocultar se maneja automáticamente por el nuevo componente Toast
-  };
+  // Log de montaje del componente
+  useEffect(() => {
+    console.log('🏷️ ConfigCategorias montado'); // Log de montaje
+    cargarCategorias();
+    
+    return () => {
+      console.log('🏷️ ConfigCategorias desmontado'); // Log de desmontaje
+    };
+  }, []);
 
-  // Función para cargar categorías desde la API
-  const cargarCategorias = async () => {
+  // Función para cargar categorías desde el backend
+  const cargarCategorias = async (): Promise<void> => {
     try {
+      console.log('📊 Cargando categorías desde el backend'); // Log de carga
       setLoading(true);
-      console.log('Cargando categorías...');
       
-      const response: ApiResponse<Categoria[]> = await getCategorias();
-      console.log('Respuesta de categorías:', response);
+      const response = await fetch('http://localhost:4000/api/categorias');
+      const data = await response.json();
       
-      if (response.success && response.data) {
-        setCategorias(response.data);
-        mostrarToast(`${response.data.length} categorías cargadas correctamente`, 'success');
+      if (data.success) {
+        console.log(`✅ ${data.data.length} categorías cargadas`); // Log de éxito
+        setCategorias(data.data);
       } else {
-        setCategorias([]);
-        mostrarToast(response.message || 'Error al cargar categorías', 'error');
+        console.error('❌ Error al cargar categorías:', data.message); // Log de error
+        // Datos de ejemplo si falla la API (usando estructura correcta de BD)
+        const categoriasEjemplo: Categoria[] = [
+          {
+            idCategoria: 1,
+            nombre: 'Bebidas',
+            descripcion: 'Bebidas frías y calientes',
+            estatus: 1,
+            fechaRegistroauditoria: new Date().toISOString(),
+            fehamodificacionauditoria: new Date().toISOString(),
+            usuarioauditoria: 'admin',
+            idnegocio: 1
+          },
+          {
+            idCategoria: 2,
+            nombre: 'Comidas',
+            descripcion: 'Platos principales y entradas',
+            estatus: 1,
+            fechaRegistroauditoria: new Date().toISOString(),
+            fehamodificacionauditoria: new Date().toISOString(),
+            usuarioauditoria: 'admin',
+            idnegocio: 1
+          },
+          {
+            idCategoria: 3,
+            nombre: 'Postres',
+            descripcion: 'Dulces y postres',
+            estatus: 0, // Ejemplo de categoría inactiva
+            fechaRegistroauditoria: new Date().toISOString(),
+            fehamodificacionauditoria: new Date().toISOString(),
+            usuarioauditoria: 'admin',
+            idnegocio: 1
+          }
+        ];
+        setCategorias(categoriasEjemplo);
       }
     } catch (error) {
-      console.error('Error al cargar categorías:', error);
+      console.error('💥 Error al cargar categorías:', error); // Log de error
+      // Datos de ejemplo en caso de error
       setCategorias([]);
-      mostrarToast('Error de conexión al cargar categorías', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  // Cargar categorías al montar el componente
-  useEffect(() => {
-    cargarCategorias();
-  }, []);
+  // Función para abrir modal de nueva categoría
+  const abrirModalNuevo = (): void => {
+    console.log('➕ Abriendo modal para nueva categoría'); // Log de acción
+    setSelectedCategoria(null);
+    setIsEditing(false);
+    setFormData({
+      nombre: '',
+      descripcion: '',
+      estatus: 1, // 1=activo por defecto
+      imagencategoria: ''
+    });
+    setImagePreview('');
+    setShowModal(true);
+  };
+
+  // Función para abrir modal de edición
+  const abrirModalEdicion = (categoria: Categoria): void => {
+    console.log(`✏️ Abriendo modal para editar categoría ID: ${categoria.idCategoria}`); // Log de acción
+    setSelectedCategoria(categoria);
+    setIsEditing(true);
+    setFormData({
+      nombre: categoria.nombre,
+      descripcion: categoria.descripcion || '',
+      estatus: categoria.estatus,
+      imagencategoria: categoria.imagencategoria || ''
+    });
+    setImagePreview(categoria.imagencategoria || '');
+    setShowModal(true);
+  };
+
+  // Función para cerrar modal
+  const cerrarModal = (): void => {
+    console.log('❌ Cerrando modal de categoría'); // Log de acción
+    setShowModal(false);
+    setSelectedCategoria(null);
+    setIsEditing(false);
+    setFormData({
+      nombre: '',
+      descripcion: '',
+      estatus: 1,
+      imagencategoria: ''
+    });
+    setImagePreview('');
+  };
 
   // Función para manejar cambios en el formulario
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'file') {
+      handleImageChange(e as React.ChangeEvent<HTMLInputElement>);
+      return;
+    }
+    
+    const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'estatus' ? Number(value) : value
+      [name]: finalValue
     }));
   };
 
-  // Función para manejar envío del formulario
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validaciones básicas
-    if (!formData.nombre.trim()) {
-      mostrarToast('El nombre de la categoría es obligatorio', 'error');
-      return;
-    }
-
-    if (!formData.descripcion.trim()) {
-      mostrarToast('La descripción de la categoría es obligatoria', 'error');
-      return;
-    }
-
-    // Usuario se toma automáticamente del currentUser, no necesita validación
-
-    try {
-      setSubmitting(true);
-      console.log('Enviando nueva categoría:', formData);
-      
-      // Preparar datos con fechas actuales
-      const categoriaData: CreateCategoriaData = {
-        ...formData,
-        nombre: formData.nombre.trim(),
-        descripcion: formData.descripcion.trim(),
-        usuario: currentUser.usuario // Usar siempre el usuario actual
-      };
-
-      const response: ApiResponse = await createCategoria(categoriaData);
-      console.log('Respuesta de creación:', response);
-      
-      if (response.success) {
-        mostrarToast('Categoría creada exitosamente', 'success');
-        
-        // Limpiar formulario
-        setFormData({
-          nombre: '',
-          descripcion: '',
-          estatus: 1,
-          usuario: currentUser.usuario // Mantener el usuario logueado
-        });
-        
-        // Recargar lista de categorías
-        await cargarCategorias();
-      } else {
-        mostrarToast(response.message || 'Error al crear la categoría', 'error');
+  // Función para manejar cambios en la imagen
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validar tipo de archivo
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        alert('Por favor selecciona una imagen válida (JPG, PNG, GIF)');
+        return;
       }
-    } catch (error) {
-      console.error('Error al crear categoría:', error);
-      mostrarToast('Error de conexión al crear categoría', 'error');
-    } finally {
-      setSubmitting(false);
+
+      // Validar tamaño (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La imagen debe ser menor a 5MB');
+        return;
+      }
+
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64String = event.target?.result as string;
+        setImagePreview(base64String);
+        setFormData(prev => ({
+          ...prev,
+          imagencategoria: base64String
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  // Función para formatear fecha para display
-  const formatearFecha = (fecha: string): string => {
+  // Función para guardar categoría
+  const guardarCategoria = async (): Promise<void> => {
     try {
-      return new Date(fecha).toLocaleString('es-MX', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
+      console.log('💾 Guardando categoría:', formData); // Log de guardado
+      
+      // Validaciones básicas
+      if (!formData.nombre.trim()) {
+        alert('El nombre de la categoría es requerido');
+        return;
+      }
+
+      const url = isEditing 
+        ? `http://localhost:4000/api/categorias/${selectedCategoria?.idCategoria}`
+        : 'http://localhost:4000/api/categorias';
+      
+      const method = isEditing ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          usuarioauditoria: 'admin', // Por ahora hardcodeado - valor de usuario desde login
+          idnegocio: 1 // Por ahora hardcodeado - valor de usuario desde login
+        }),
       });
-    } catch {
-      return fecha;
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Categoría guardada exitosamente'); // Log de éxito
+        cerrarModal();
+        cargarCategorias(); // Recargar la lista
+      } else {
+        console.error('❌ Error al guardar categoría:', data.message); // Log de error
+        alert('Error al guardar la categoría: ' + data.message);
+      }
+    } catch (error) {
+      console.error('💥 Error al guardar categoría:', error); // Log de error
+      alert('Error de conexión al guardar la categoría');
     }
+  };
+
+  // Función para eliminar categoría
+  const eliminarCategoria = async (categoria: Categoria): Promise<void> => {
+    try {
+      console.log(`🗑️ Eliminando categoría ID: ${categoria.idCategoria}`); // Log de eliminación
+      
+      const confirmacion = window.confirm(`¿Está seguro de eliminar la categoría "${categoria.nombre}"?`);
+      if (!confirmacion) return;
+
+      const response = await fetch(`http://localhost:4000/api/categorias/${categoria.idCategoria}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Categoría eliminada exitosamente'); // Log de éxito
+        cargarCategorias(); // Recargar la lista
+      } else {
+        console.error('❌ Error al eliminar categoría:', data.message); // Log de error
+        alert('Error al eliminar la categoría: ' + data.message);
+      }
+    } catch (error) {
+      console.error('💥 Error al eliminar categoría:', error); // Log de error
+      alert('Error de conexión al eliminar la categoría');
+    }
+  };
+
+  // Función para formatear fecha
+  const formatearFecha = (fecha: string): string => {
+    return new Date(fecha).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
-    <div className="config-screen">
-      {/* Toast Component */}
-      {showToast && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          onClose={() => setShowToast(false)}
-        />
-      )}
-      
-      {/* Header con título y navegación */}
-      <div className="config-header">
-        <div className="config-breadcrumb">
-          {onBack && (
-            <span className="breadcrumb-item">
-              <button onClick={onBack}>← Regresar</button>
-            </span>
-          )}
-          <span className="breadcrumb-separator">→</span>
-          <span className="breadcrumb-item">🏷️ Categorías</span>
+    <>
+      <style>{componentStyles}</style>
+      <div className="categorias-container">
+        
+        {/* Botón de regresar */}
+        <button 
+          className="btn-regresar"
+          onClick={() => {
+            console.log('🔙 Navegando de vuelta al tablero inicial');
+            onNavigate('tablero-inicial');
+          }}
+        >
+          ← Regresar al Tablero
+        </button>
+
+        {/* Header con título y botón agregar */}
+        <div className="categorias-header">
+          <h1 className="categorias-title">
+            🏷️ Gestión de Categorías
+          </h1>
+          <button 
+            className="btn-add-categoria"
+            onClick={abrirModalNuevo}
+            disabled={loading}
+          >
+            ➕ Agregar Categoría
+          </button>
         </div>
-        <h1>Gestión de Categorías</h1>
-        <p>Administra las categorías del sistema</p>
-      </div>
 
-      <div className="config-container">
-        {/* Contenido principal */}
-        <div className="config-card">
-          <div className="card-header">
-            <h2 className="card-title">
-              <span className="card-icon">🏷️</span>
-              Nueva Categoría
-            </h2>
+        {/* Contenido principal - Grid de minicards */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#718096' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+            <p>Cargando categorías...</p>
           </div>
-
-          <div className="card-content">
-            {/* Formulario de nueva categoría */}
-            <form onSubmit={handleSubmit} className="config-form">
-              <div className="form-section">
-                <h3>Información de la Categoría</h3>
+        ) : (
+          <div className="cards-grid">
+            {categorias.map((categoria) => (
+              <div key={categoria.idCategoria} className="categoria-card">
                 
-                <div className="form-row">
-                  {/* Campo nombre */}
-                  <div className="form-group">
-                    <label htmlFor="nombre" className="form-label">
-                      Nombre de la Categoría *
-                    </label>
-                    <input
-                      type="text"
-                      id="nombre"
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleInputChange}
-                      className="form-input"
-                      placeholder="Ingrese el nombre de la categoría"
-                      maxLength={100}
-                      required
-                    />
-                  </div>
-
-                  {/* Campo estatus */}
-                  <div className="form-group">
-                    <label htmlFor="estatus" className="form-label">
-                      Estatus
-                    </label>
-                    <select
-                      id="estatus"
-                      name="estatus"
-                      value={formData.estatus}
-                      onChange={handleInputChange}
-                      className="form-input"
-                    >
-                      <option value={1}>Activo</option>
-                      <option value={0}>Inactivo</option>
-                    </select>
+                {/* Header de la card */}
+                <div className="card-header">
+                  <div>
+                    <h3 className="card-title">{categoria.nombre}</h3>
+                    <span className={`card-status ${categoria.estatus === 1 ? 'status-active' : 'status-inactive'}`}>
+                      {categoria.estatus === 1 ? 'Activo' : 'Inactivo'}
+                    </span>
                   </div>
                 </div>
 
-                <div className="form-row">
-                  {/* Campo descripción */}
-                  <div className="form-group">
-                    <label htmlFor="descripcion" className="form-label">
-                      Descripción *
-                    </label>
-                    <textarea
-                      id="descripcion"
-                      name="descripcion"
-                      value={formData.descripcion}
-                      onChange={handleInputChange}
-                      className="form-input form-textarea"
-                      placeholder="Ingrese la descripción de la categoría"
-                      rows={3}
-                      required
+                {/* Imagen de la categoría */}
+                <div className="card-image">
+                  {categoria.imagencategoria ? (
+                    <img 
+                      src={categoria.imagencategoria} 
+                      alt={categoria.nombre}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
                     />
-                  </div>
+                  ) : (
+                    <span>📷 Sin imagen</span>
+                  )}
                 </div>
 
-                {/* Campo usuario oculto - se mantiene automáticamente con currentUser */}
+                {/* Descripción */}
+                <div className="card-description">
+                  {categoria.descripcion || 'Sin descripción disponible'}
+                </div>
+
+                {/* Información adicional */}
+                <div style={{ fontSize: '0.8rem', color: '#a0aec0', marginBottom: '1rem' }}>
+                  <div>ID: {categoria.idCategoria} | Negocio: {categoria.idnegocio}</div>
+                  <div>Creado: {formatearFecha(categoria.fechaRegistroauditoria)}</div>
+                  <div>Usuario: {categoria.usuarioauditoria || '-'}</div>
+                </div>
+
+                {/* Botones de acción */}
+                <div className="card-actions">
+                  <button 
+                    className="btn-card-action btn-edit-card"
+                    onClick={() => abrirModalEdicion(categoria)}
+                    title="Editar categoría"
+                  >
+                    ✏️ Editar
+                  </button>
+                  <button 
+                    className="btn-card-action btn-delete-card"
+                    onClick={() => eliminarCategoria(categoria)}
+                    title="Eliminar categoría"
+                  >
+                    🗑️ Eliminar
+                  </button>
+                </div>
               </div>
+            ))}
 
-              {/* Botones de acción */}
-              <div className="form-actions">
+            {/* Mensaje cuando no hay categorías */}
+            {categorias.length === 0 && (
+              <div style={{ 
+                gridColumn: '1 / -1', 
+                textAlign: 'center', 
+                padding: '3rem',
+                background: 'white',
+                borderRadius: '12px',
+                border: '2px dashed #e2e8f0'
+              }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: '0.5' }}>📷</div>
+                <h3 style={{ color: '#4a5568', marginBottom: '0.5rem' }}>No hay categorías registradas</h3>
+                <p style={{ color: '#718096', marginBottom: '1.5rem' }}>Comienza creando tu primera categoría</p>
                 <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={submitting}
+                  className="btn-add-categoria" 
+                  onClick={abrirModalNuevo}
+                  style={{ position: 'relative', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none' }}
                 >
-                  {submitting ? 'Guardando...' : 'Guardar Categoría'}
+                  ➕ Crear primera categoría
                 </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        {/* Tabla de categorías existentes */}
-        <div className="config-card">
-          <div className="card-header">
-            <h2 className="card-title">
-              <span className="card-icon">📋</span>
-              Categorías Registradas ({categorias.length})
-            </h2>
-          </div>
-          
-          <div className="card-content">
-            {loading ? (
-              <div className="loading-skeleton" style={{ height: '200px' }}></div>
-            ) : categorias.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-state-icon">🏷️</div>
-                <h3>No hay categorías registradas</h3>
-                <p>Crea la primera categoría usando el formulario superior</p>
-              </div>
-            ) : (
-              <div className="table-container">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Nombre</th>
-                      <th>Descripción</th>
-                      <th>Estatus</th>
-                      <th>Fecha Registro</th>
-                      <th>Usuario</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {categorias.map((categoria) => (
-                      <tr key={categoria.idCategoria}>
-                        <td className="text-center">{categoria.idCategoria}</td>
-                        <td>
-                          <strong>{categoria.nombre}</strong>
-                        </td>
-                        <td className="text-description">
-                          {categoria.descripcion.length > 50 
-                            ? `${categoria.descripcion.substring(0, 50)}...` 
-                            : categoria.descripcion}
-                        </td>
-                        <td className="text-center">
-                          <span className={`status-badge ${categoria.estatus === 1 ? 'status-active' : 'status-inactive'}`}>
-                            {categoria.estatus === 1 ? 'Activo' : 'Inactivo'}
-                          </span>
-                        </td>
-                        <td className="text-date">
-                          {formatearFecha(categoria.fechaRegistro)}
-                        </td>
-                        <td>{categoria.usuario}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             )}
           </div>
-        </div>
-
-        {/* Botón de regresar estandarizado */}
-        {onBack && (
-          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-            <button 
-              className="btn btn-secondary btn-lg"
-              onClick={onBack}
-            >
-              ← Regresar
-            </button>
-          </div>
         )}
-      </div>
+
+      {/* Modal para crear/editar categoría */}
+      {showModal && (
+        <div className="modal-overlay" onClick={cerrarModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{isEditing ? '✏️ Editar Categoría' : '➕ Nueva Categoría'}</h2>
+              <button className="btn-close" onClick={cerrarModal}>✕</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="form-group">
+                <label htmlFor="nombre">Nombre *</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleInputChange}
+                  placeholder="Ingrese el nombre de la categoría"
+                  maxLength={100}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="imagencategoria">Imagen de la Categoría</label>
+                <input
+                  type="file"
+                  id="imagencategoria"
+                  name="imagencategoria"
+                  onChange={handleInputChange}
+                  accept="image/jpeg,image/jpg,image/png,image/gif"
+                />
+                {imagePreview && (
+                  <div style={{ marginTop: '10px' }}>
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '5px' }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="descripcion">Descripción</label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  value={formData.descripcion}
+                  onChange={handleInputChange}
+                  placeholder="Ingrese una descripción opcional"
+                  rows={3}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="estatus">Estado</label>
+                <select
+                  id="estatus"
+                  name="estatus"
+                  value={formData.estatus.toString()}
+                  onChange={(e) => setFormData(prev => ({ ...prev, estatus: parseInt(e.target.value) }))}
+                >
+                  <option value="1">Activo</option>
+                  <option value="0">Inactivo</option>
+                </select>
+              </div>
+
+              {/* Información de auditoría para edición */}
+              {isEditing && selectedCategoria && (
+                <div className="audit-info">
+                  <h4>📋 Información de Auditoría</h4>
+                  <div className="audit-grid">
+                    <div>
+                      <strong>Creado:</strong> {formatearFecha(selectedCategoria.fechaRegistroauditoria)}
+                    </div>
+                    <div>
+                      <strong>Por:</strong> {selectedCategoria.usuarioauditoria || '-'}
+                    </div>
+                    <div>
+                      <strong>Modificado:</strong> {formatearFecha(selectedCategoria.fehamodificacionauditoria)}
+                    </div>
+                    <div>
+                      <strong>ID Negocio:</strong> {selectedCategoria.idnegocio}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={cerrarModal}>
+                Cancelar
+              </button>
+              <button className="btn-primary" onClick={guardarCategoria}>
+                {isEditing ? 'Actualizar' : 'Crear'} Categoría
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </>
   );
 };
 

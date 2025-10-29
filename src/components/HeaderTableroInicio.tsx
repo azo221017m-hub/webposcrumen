@@ -27,7 +27,7 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
 
   // Función para manejar logout
   const handleLogout = (): void => {
-    console.log('🚪 Usuario cerrando sesión:', user.usuario);
+    console.log('🚪 Usuario cerrando sesión:', user.nombre || user.alias);
     onLogout();
     setShowUserMenu(false);
   };
@@ -88,7 +88,7 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
           >
             <div className="user-info">
               <span className="user-icon">👤</span>
-              <span className="user-name">{user.usuario}</span>
+              <span className="user-name">{user.nombre || user.alias}</span>
               <span className="dropdown-arrow">▼</span>
             </div>
 
@@ -97,7 +97,7 @@ const HeaderTableroInicio: React.FC<HeaderTableroInicioProps> = ({
               <div className="user-dropdown">
                 <div className="dropdown-item user-details">
                   <span className="detail-label">Usuario:</span>
-                  <span className="detail-value">{user.usuario}</span>
+                  <span className="detail-value">{user.nombre || user.alias}</span>
                 </div>
                 <div className="dropdown-item user-details">
                   <span className="detail-label">Estado:</span>

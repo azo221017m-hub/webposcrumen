@@ -3,7 +3,7 @@
 
 import type { Request, Response } from 'express'; // Importa tipos de Express
 import { executeQuery } from '../config/database'; // Importa función para ejecutar consultas
-import type { LoginData, Usuario, AccessAttempt, ApiResponse } from '../types'; // Importa tipos personalizados
+import type { LoginData, Usuario, ApiResponse, IntentoLogin, CreateIntentoLoginData } from '../types'; // Importa tipos personalizados
 import bcrypt from 'bcrypt'; // Importa bcrypt para hash de contraseñas
 
 // Controlador para el login de usuarios
@@ -23,30 +23,19 @@ export const loginController = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    console.log(`🔍 Buscando usuario: ${usuario}`); // Log de búsqueda
+    console.log(`🔍 Buscando usuario por alias: ${usuario}`); // Log de búsqueda
 
-    // Busca el usuario en la base de datos
+    // Busca el usuario en la base de datos por alias
     const usuarios = await executeQuery(
-      'SELECT * FROM tblposcrumenwebusuarios WHERE usuario = ?',
+      'SELECT * FROM tblposcrumenwebusuarios WHERE alias = ?',
       [usuario]
     );
 
     console.log(`📊 Usuarios encontrados: ${usuarios ? usuarios.length : 0}`); // Log de resultados
-    if (usuarios && usuarios.length > 0) {
-      console.log('👤 Datos del usuario encontrado:', {
-        idUsuario: usuarios[0].idUsuario,
-        usuario: usuarios[0].usuario,
-        nombre: usuarios[0].nombre,
-        estatus: usuarios[0].estatus,
-        email: usuarios[0].email,
-        passwordHash: usuarios[0].password ? '***EXISTE***' : '***VACIO***'
-      }); // Log de datos del usuario (sin mostrar contraseña)
-    }
 
-    // Si no existe el usuario
+    // Si no existe el usuario - NO generar registro de login
     if (!usuarios || usuarios.length === 0) {
       console.log('❌ Usuario no encontrado en la base de datos'); // Log de error
-      await registerFailedAttempt(usuario); // Registra intento fallido
       res.status(401).json({
         success: false,
         message: 'Credenciales inválidas',
@@ -57,13 +46,23 @@ export const loginController = async (req: Request, res: Response): Promise<void
 
     const user: Usuario = usuarios[0]; // Obtiene el primer usuario encontrado
 
+    console.log('👤 Datos del usuario encontrado:', {
+      idUsuario: user.idUsuario,
+      alias: user.alias,
+      nombre: user.nombre,
+      estatus: user.estatus,
+      idNegocio: user.idNegocio,
+      idRol: user.idRol,
+      passwordHash: user.password ? '***EXISTE***' : '***VACIO***'
+    }); // Log de datos del usuario (sin mostrar contraseña)
+
     // Verifica si el usuario está bloqueado
     console.log(`🔍 Verificando estatus del usuario: ${user.estatus}`); // Log de verificación de estatus
     if (user.estatus === 9) {
       console.log('🚫 Usuario bloqueado por seguridad (estatus = 9)'); // Log de bloqueo
       res.status(403).json({
         success: false,
-        message: 'Usuario bloqueado por seguridad',
+        message: 'Usuario bloqueado por seguridad. Contacte al administrador.',
         error: 'USER_BLOCKED'
       } as ApiResponse);
       return;
@@ -82,17 +81,17 @@ export const loginController = async (req: Request, res: Response): Promise<void
 
     console.log('✅ Usuario activo, verificando contraseña...'); // Log de verificación
     
-    // Verifica la contraseña
+    // Verifica la contraseña usando bcrypt
     console.log(`🔐 Comparando contraseñas - Input: ${password.length} caracteres, Hash: ${user.password ? user.password.length : 0} caracteres`);
     
     let isValidPassword = false;
     
-    // Detecta si la contraseña está hasheada con bcrypt (debe tener 60 caracteres y empezar con $2b$)
+    // Siempre usar bcrypt.compare para contraseñas hasheadas
     if (user.password && user.password.length === 60 && user.password.startsWith('$2b$')) {
       console.log('🔒 Contraseña hasheada detectada, usando bcrypt.compare'); // Log de hash detectado
       isValidPassword = await bcrypt.compare(password, user.password);
     } else {
-      console.log('📝 Contraseña en texto plano detectada, comparando directamente'); // Log de texto plano
+      console.log('📝 Contraseña en texto plano detectada, comparando directamente y actualizando'); // Log de texto plano
       isValidPassword = password === user.password;
       
       // Si la contraseña es correcta, actualiza a bcrypt para seguridad futura
@@ -110,8 +109,11 @@ export const loginController = async (req: Request, res: Response): Promise<void
     console.log(`🔍 Resultado de comparación de contraseña: ${isValidPassword}`); // Log del resultado
     
     if (!isValidPassword) {
-      console.log('❌ Contraseña incorrecta'); // Log de error
-      await registerFailedAttempt(usuario); // Registra intento fallido
+      console.log('❌ Contraseña incorrecta - Registrando intento fallido'); // Log de error
+      
+      // Registra el intento fallido en tblposcrumenwebintentoslogin
+      await registrarIntentoFallido(user.alias, user.idNegocio);
+      
       res.status(401).json({
         success: false,
         message: 'Credenciales inválidas',
@@ -120,19 +122,24 @@ export const loginController = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    // Login exitoso - limpia intentos fallidos
-    await clearFailedAttempts(usuario);
+    console.log('✅ Login exitoso - Limpiando intentos y registrando éxito'); // Log de éxito
     
-    console.log('✅ Login exitoso'); // Log de éxito
+    // Login exitoso - resetear intentos y registrar éxito
+    await registrarLoginExitoso(user.alias, user.idNegocio);
     
-    // Retorna datos del usuario sin la contraseña
+    // Retorna datos del usuario sin la contraseña - incluyendo datos para autorización
     const { password: _, ...userWithoutPassword } = user;
     
     res.json({
       success: true,
       message: 'Login exitoso',
       data: {
-        user: userWithoutPassword
+        user: userWithoutPassword,
+        authorization: {
+          alias: user.alias,
+          idNegocio: user.idNegocio,
+          idRol: user.idRol
+        }
       }
     } as ApiResponse);
 
@@ -147,42 +154,50 @@ export const loginController = async (req: Request, res: Response): Promise<void
 };
 
 // Función para registrar intentos fallidos de login
-const registerFailedAttempt = async (usuario: string): Promise<void> => {
+const registrarIntentoFallido = async (aliasusuario: string, idnegocio: number): Promise<void> => {
   try {
-    console.log(`📝 Registrando intento fallido para: ${usuario}`); // Log de registro
+    console.log(`📝 Registrando intento fallido para alias: ${aliasusuario}`); // Log de registro
 
-    // Busca intentos previos
-    const attempts = await executeQuery(
-      'SELECT * FROM tbl_access_attempts WHERE tipo = "usuario" AND referencia = ?',
-      [usuario]
+    // Busca intentos previos del usuario
+    const intentosExistentes = await executeQuery(
+      'SELECT * FROM tblposcrumenwebintentoslogin WHERE aliasusuario = ?',
+      [aliasusuario]
     );
 
-    if (attempts.length === 0) {
+    if (intentosExistentes.length === 0) {
       // Primer intento fallido - crea nuevo registro
       await executeQuery(
-        'INSERT INTO tbl_access_attempts (tipo, referencia, intentos, last_attempt) VALUES (?, ?, 1, NOW())',
-        ['usuario', usuario]
+        'INSERT INTO tblposcrumenwebintentoslogin (aliasusuario, intentos, idnegocio) VALUES (?, 1, ?)',
+        [aliasusuario, idnegocio]
       );
       console.log('📝 Primer intento fallido registrado'); // Log de registro
     } else {
       // Incrementa intentos existentes
-      const attempt: AccessAttempt = attempts[0];
-      const newAttempts = attempt.intentos + 1;
+      const intento: IntentoLogin = intentosExistentes[0];
+      const nuevosIntentos = intento.intentos + 1;
       
-      await executeQuery(
-        'UPDATE tbl_access_attempts SET intentos = ?, last_attempt = NOW() WHERE id = ?',
-        [newAttempts, attempt.id]
-      );
-      
-      console.log(`📝 Intentos actualizados a: ${newAttempts}`); // Log de actualización
-
-      // Si supera 2 intentos, bloquea el usuario
-      if (newAttempts > 2) {
+      if (nuevosIntentos >= 3) {
+        // Al llegar a 3 intentos, bloquea el usuario
         await executeQuery(
-          'UPDATE tblposcrumenwebusuarios SET estatus = 9 WHERE usuario = ?',
-          [usuario]
+          'UPDATE tblposcrumenwebintentoslogin SET intentos = ?, fechabloqueado = NOW() WHERE id = ?',
+          [nuevosIntentos, intento.id]
         );
-        console.log('🚫 Usuario bloqueado por múltiples intentos fallidos'); // Log de bloqueo
+        
+        // Cambia el estatus del usuario a bloqueado (9)
+        await executeQuery(
+          'UPDATE tblposcrumenwebusuarios SET estatus = 9 WHERE alias = ?',
+          [aliasusuario]
+        );
+        
+        console.log(`🚫 Usuario ${aliasusuario} bloqueado por ${nuevosIntentos} intentos fallidos`); // Log de bloqueo
+      } else {
+        // Solo incrementa los intentos
+        await executeQuery(
+          'UPDATE tblposcrumenwebintentoslogin SET intentos = ? WHERE id = ?',
+          [nuevosIntentos, intento.id]
+        );
+        
+        console.log(`📝 Intentos actualizados a: ${nuevosIntentos} para ${aliasusuario}`); // Log de actualización
       }
     }
   } catch (error) {
@@ -190,15 +205,33 @@ const registerFailedAttempt = async (usuario: string): Promise<void> => {
   }
 };
 
-// Función para limpiar intentos fallidos después de login exitoso
-const clearFailedAttempts = async (usuario: string): Promise<void> => {
+// Función para registrar login exitoso y resetear intentos
+const registrarLoginExitoso = async (aliasusuario: string, idnegocio: number): Promise<void> => {
   try {
-    await executeQuery(
-      'DELETE FROM tbl_access_attempts WHERE tipo = "usuario" AND referencia = ?',
-      [usuario]
+    console.log(`🧹 Procesando login exitoso para alias: ${aliasusuario}`); // Log de procesamiento
+
+    // Busca si existe registro de intentos para este usuario
+    const intentosExistentes = await executeQuery(
+      'SELECT * FROM tblposcrumenwebintentoslogin WHERE aliasusuario = ?',
+      [aliasusuario]
     );
-    console.log('🧹 Intentos fallidos limpiados'); // Log de limpieza
+
+    if (intentosExistentes.length === 0) {
+      // No existe registro previo - crear uno con login exitoso
+      await executeQuery(
+        'INSERT INTO tblposcrumenwebintentoslogin (aliasusuario, intentos, ultimologin, idnegocio) VALUES (?, 0, NOW(), ?)',
+        [aliasusuario, idnegocio]
+      );
+      console.log('✅ Nuevo registro de login exitoso creado'); // Log de creación
+    } else {
+      // Resetea intentos y actualiza fecha de último login exitoso
+      await executeQuery(
+        'UPDATE tblposcrumenwebintentoslogin SET intentos = 0, ultimologin = NOW(), fechabloqueado = NULL WHERE aliasusuario = ?',
+        [aliasusuario]
+      );
+      console.log('✅ Intentos reseteados y login exitoso actualizado'); // Log de limpieza
+    }
   } catch (error) {
-    console.error('❌ Error limpiando intentos fallidos:', error); // Log de error
+    console.error('❌ Error procesando login exitoso:', error); // Log de error
   }
 };

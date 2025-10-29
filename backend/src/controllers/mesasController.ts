@@ -1,51 +1,49 @@
 // backend/src/controllers/mesasController.ts
-// Controlador para gestión de mesas
+// Controlador para gestión de mesas en POSWEBCrumen
 
-import { Request, Response } from 'express';
-import { executeQuery } from '../config/database';
-import { Mesa, CreateMesaData, UpdateMesaData } from '../types';
+import type { Request, Response } from 'express'; // Importa tipos de Express
+import { executeQuery } from '../config/database'; // Importa función para ejecutar consultas
+import type { Mesa, CreateMesaData, ApiResponse } from '../types'; // Importa tipos personalizados
+
+// Interfaz para datos de actualización de mesa
+interface UpdateMesaData {
+  nombremesa?: string;
+  numeromesa?: number;
+  cantcomensales?: number;
+  estatusmesa?: 'DISPONIBLE' | 'OCUPADA' | 'RESERVADA' | 'INACTIVA';
+  tiempodeinicio?: string;
+  tiempoactual?: string;
+  estatustiempo?: 'ACTIVO' | 'PAUSADO' | 'FINALIZADO';
+  usuarioauditoria?: string;
+  idnegocio?: number;
+}
 
 // Controlador para obtener todas las mesas
 export const getMesasController = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('🍽️ Obteniendo lista de mesas');
+    console.log('📋 [mesasController] Obteniendo todas las mesas'); // Log de inicio
+    
+    // Ejecuta la consulta para obtener todas las mesas
+    const mesas = await executeQuery(
+      'SELECT * FROM tblposcrumenwebmesas ORDER BY numeromesa ASC',
+      []
+    );
 
-    // Query para obtener todas las mesas
-    const query = `
-      SELECT 
-        idmesa,
-        nombremesa,
-        numeromesa,
-        cantcomensales,
-        estatusmesa,
-        tiempodeinicio,
-        tiempoactual,
-        estatustiempo,
-        creado_en,
-        actualizado_en,
-        creado_por,
-        actualizado_por
-      FROM tblposcrumenwebmesas
-      ORDER BY numeromesa ASC
-    `;
-
-    const mesas = await executeQuery(query);
-    console.log(`✅ ${mesas.length} mesas encontradas`);
-
-    res.status(200).json({
+    console.log(`📊 [mesasController] Mesas encontradas: ${mesas ? mesas.length : 0}`); // Log de resultados
+    
+    res.json({
       success: true,
-      message: `${mesas.length} mesas encontradas`,
-      data: mesas
-    });
+      message: 'Mesas obtenidas exitosamente',
+      data: mesas || []
+    } as ApiResponse<Mesa[]>);
 
   } catch (error) {
-    console.error('❌ Error al obtener mesas:', error);
-    
+    console.error('❌ [mesasController] Error obteniendo mesas:', error); // Log de error
     res.status(500).json({
       success: false,
-      message: 'Error interno del servidor al obtener mesas',
-      error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+      message: 'Error interno del servidor',
+      error: 'INTERNAL_ERROR'
+    } as ApiResponse);
   }
 };
 
@@ -53,14 +51,14 @@ export const getMesasController = async (req: Request, res: Response): Promise<v
 export const createMesaController = async (req: Request, res: Response): Promise<void> => {
   try {
     const mesaData: CreateMesaData = req.body;
-    console.log('🍽️ Creando nueva mesa:', mesaData);
+    console.log('🍽️ [mesasController] Creando nueva mesa:', mesaData);
 
     // Validaciones básicas
     if (!mesaData.nombremesa?.trim()) {
       res.status(400).json({
         success: false,
         message: 'El nombre de la mesa es obligatorio'
-      });
+      } as ApiResponse);
       return;
     }
 
@@ -68,7 +66,7 @@ export const createMesaController = async (req: Request, res: Response): Promise
       res.status(400).json({
         success: false,
         message: 'El número de mesa debe ser un número válido mayor a 0'
-      });
+      } as ApiResponse);
       return;
     }
 
@@ -76,7 +74,7 @@ export const createMesaController = async (req: Request, res: Response): Promise
       res.status(400).json({
         success: false,
         message: 'La cantidad de comensales debe ser un número válido mayor a 0'
-      });
+      } as ApiResponse);
       return;
     }
 
@@ -84,7 +82,7 @@ export const createMesaController = async (req: Request, res: Response): Promise
       res.status(400).json({
         success: false,
         message: 'El estatus de la mesa debe ser DISPONIBLE, OCUPADA, RESERVADA o INACTIVA'
-      });
+      } as ApiResponse);
       return;
     }
 
@@ -98,7 +96,7 @@ export const createMesaController = async (req: Request, res: Response): Promise
       res.status(400).json({
         success: false,
         message: 'Ya existe una mesa con ese número'
-      });
+      } as ApiResponse);
       return;
     }
 
@@ -111,11 +109,14 @@ export const createMesaController = async (req: Request, res: Response): Promise
         numeromesa,
         cantcomensales,
         estatusmesa,
-        creado_en,
-        actualizado_en,
-        creado_por,
-        actualizado_por
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        tiempodeinicio,
+        tiempoactual,
+        estatustiempo,
+        fechaRegistroauditoria,
+        usuarioauditoria,
+        fehamodificacionauditoria,
+        idnegocio
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
@@ -123,17 +124,20 @@ export const createMesaController = async (req: Request, res: Response): Promise
       Number(mesaData.numeromesa),
       Number(mesaData.cantcomensales),
       mesaData.estatusmesa,
+      null, // tiempodeinicio
+      null, // tiempoactual
+      null, // estatustiempo por defecto (null para evitar truncamiento)
       fechaActual,
+      mesaData.usuarioauditoria || 'sistema',
       fechaActual,
-      mesaData.creado_por || 'sistema',
-      mesaData.creado_por || 'sistema'
+      mesaData.idnegocio || 1
     ];
 
-    console.log('🔍 Ejecutando query:', query);
-    console.log('📝 Parámetros:', params);
+    console.log('🔍 [mesasController] Ejecutando query:', query);
+    console.log('📝 [mesasController] Parámetros:', params);
 
     const result = await executeQuery(query, params);
-    console.log('✅ Mesa creada exitosamente. ID:', result.insertId);
+    console.log('✅ [mesasController] Mesa creada exitosamente. ID:', result.insertId);
 
     res.status(201).json({
       success: true,
@@ -142,16 +146,16 @@ export const createMesaController = async (req: Request, res: Response): Promise
         idmesa: result.insertId,
         ...mesaData
       }
-    });
+    } as ApiResponse<Mesa>);
 
   } catch (error) {
-    console.error('❌ Error al crear mesa:', error);
+    console.error('❌ [mesasController] Error al crear mesa:', error);
     
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor al crear mesa',
       error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    } as ApiResponse);
   }
 };
 
@@ -161,18 +165,18 @@ export const updateMesaController = async (req: Request, res: Response): Promise
     const idmesa = parseInt(req.params.id);
     const mesaData: UpdateMesaData = req.body;
     
-    console.log(`🔄 Actualizando mesa ID: ${idmesa}`, mesaData);
+    console.log(`🔄 [mesasController] Actualizando mesa ID: ${idmesa}`, mesaData);
 
     // Validar ID de mesa
     if (isNaN(idmesa)) {
       res.status(400).json({
         success: false,
         message: 'ID de mesa inválido'
-      });
+      } as ApiResponse);
       return;
     }
 
-    // Verificar que la mesa existe
+    // Verificar que la mesa exists
     const existingMesa = await executeQuery(
       'SELECT idmesa FROM tblposcrumenwebmesas WHERE idmesa = ?',
       [idmesa]
@@ -182,7 +186,7 @@ export const updateMesaController = async (req: Request, res: Response): Promise
       res.status(404).json({
         success: false,
         message: 'Mesa no encontrada'
-      });
+      } as ApiResponse);
       return;
     }
 
@@ -195,7 +199,7 @@ export const updateMesaController = async (req: Request, res: Response): Promise
         res.status(400).json({
           success: false,
           message: 'El nombre de la mesa no puede estar vacío'
-        });
+        } as ApiResponse);
         return;
       }
       updateFields.push('nombremesa = ?');
@@ -207,7 +211,7 @@ export const updateMesaController = async (req: Request, res: Response): Promise
         res.status(400).json({
           success: false,
           message: 'El número de mesa debe ser un número válido mayor a 0'
-        });
+        } as ApiResponse);
         return;
       }
 
@@ -221,7 +225,7 @@ export const updateMesaController = async (req: Request, res: Response): Promise
         res.status(400).json({
           success: false,
           message: 'Ya existe otra mesa con ese número'
-        });
+        } as ApiResponse);
         return;
       }
 
@@ -234,7 +238,7 @@ export const updateMesaController = async (req: Request, res: Response): Promise
         res.status(400).json({
           success: false,
           message: 'La cantidad de comensales debe ser un número válido mayor a 0'
-        });
+        } as ApiResponse);
         return;
       }
       updateFields.push('cantcomensales = ?');
@@ -246,30 +250,57 @@ export const updateMesaController = async (req: Request, res: Response): Promise
         res.status(400).json({
           success: false,
           message: 'El estatus de la mesa debe ser DISPONIBLE, OCUPADA, RESERVADA o INACTIVA'
-        });
+        } as ApiResponse);
         return;
       }
       updateFields.push('estatusmesa = ?');
       updateValues.push(mesaData.estatusmesa);
     }
 
+    if (mesaData.tiempodeinicio !== undefined) {
+      updateFields.push('tiempodeinicio = ?');
+      updateValues.push(mesaData.tiempodeinicio);
+    }
+
+    if (mesaData.tiempoactual !== undefined) {
+      updateFields.push('tiempoactual = ?');
+      updateValues.push(mesaData.tiempoactual);
+    }
+
+    if (mesaData.estatustiempo !== undefined) {
+      if (!['ACTIVO', 'PAUSADO', 'FINALIZADO'].includes(mesaData.estatustiempo)) {
+        res.status(400).json({
+          success: false,
+          message: 'El estatus de tiempo debe ser ACTIVO, PAUSADO o FINALIZADO'
+        } as ApiResponse);
+        return;
+      }
+      updateFields.push('estatustiempo = ?');
+      updateValues.push(mesaData.estatustiempo);
+    }
+
+    if (mesaData.idnegocio !== undefined) {
+      updateFields.push('idnegocio = ?');
+      updateValues.push(Number(mesaData.idnegocio));
+    }
+
     if (updateFields.length === 0) {
       res.status(400).json({
         success: false,
         message: 'No se proporcionaron campos para actualizar'
-      });
+      } as ApiResponse);
       return;
     }
 
     // Agregar campos de auditoría
-    updateFields.push('actualizado_en = ?', 'actualizado_por = ?');
-    updateValues.push(new Date(), mesaData.actualizado_por || 'sistema');
+    updateFields.push('fehamodificacionauditoria = ?', 'usuarioauditoria = ?');
+    updateValues.push(new Date(), mesaData.usuarioauditoria || 'sistema');
 
     const query = `UPDATE tblposcrumenwebmesas SET ${updateFields.join(', ')} WHERE idmesa = ?`;
     updateValues.push(idmesa);
 
-    console.log('🔍 Ejecutando query:', query);
-    console.log('📝 Parámetros:', updateValues);
+    console.log('🔍 [mesasController] Ejecutando query:', query);
+    console.log('📝 [mesasController] Parámetros:', updateValues);
 
     const result = await executeQuery(query, updateValues);
 
@@ -277,11 +308,11 @@ export const updateMesaController = async (req: Request, res: Response): Promise
       res.status(404).json({
         success: false,
         message: 'Mesa no encontrada para actualizar'
-      });
+      } as ApiResponse);
       return;
     }
 
-    console.log('✅ Mesa actualizada exitosamente');
+    console.log('✅ [mesasController] Mesa actualizada exitosamente');
 
     res.status(200).json({
       success: true,
@@ -290,16 +321,16 @@ export const updateMesaController = async (req: Request, res: Response): Promise
         idmesa,
         ...mesaData
       }
-    });
+    } as ApiResponse<any>);
 
   } catch (error) {
-    console.error('❌ Error al actualizar mesa:', error);
+    console.error('❌ [mesasController] Error al actualizar mesa:', error);
     
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor al actualizar mesa',
       error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    } as ApiResponse);
   }
 };
 
@@ -307,20 +338,20 @@ export const updateMesaController = async (req: Request, res: Response): Promise
 export const deleteMesaController = async (req: Request, res: Response): Promise<void> => {
   try {
     const idmesa = parseInt(req.params.id);
-    const { actualizado_por } = req.body;
+    const { usuarioauditoria } = req.body;
     
-    console.log(`🗑️ Inactivando mesa ID: ${idmesa}`);
+    console.log(`🗑️ [mesasController] Inactivando mesa ID: ${idmesa}`);
 
     // Validar ID de mesa
     if (isNaN(idmesa)) {
       res.status(400).json({
         success: false,
         message: 'ID de mesa inválido'
-      });
+      } as ApiResponse);
       return;
     }
 
-    // Verificar que la mesa existe
+    // Verificar que la mesa exists
     const existingMesa = await executeQuery(
       'SELECT idmesa, estatusmesa FROM tblposcrumenwebmesas WHERE idmesa = ?',
       [idmesa]
@@ -330,41 +361,41 @@ export const deleteMesaController = async (req: Request, res: Response): Promise
       res.status(404).json({
         success: false,
         message: 'Mesa no encontrada'
-      });
+      } as ApiResponse);
       return;
     }
 
     // Cambiar estatus a INACTIVA
     const query = `
       UPDATE tblposcrumenwebmesas 
-      SET estatusmesa = 'INACTIVA', actualizado_en = ?, actualizado_por = ? 
+      SET estatusmesa = 'INACTIVA', fehamodificacionauditoria = ?, usuarioauditoria = ? 
       WHERE idmesa = ?
     `;
 
-    const result = await executeQuery(query, [new Date(), actualizado_por || 'sistema', idmesa]);
+    const result = await executeQuery(query, [new Date(), usuarioauditoria || 'sistema', idmesa]);
 
     if (result.affectedRows === 0) {
       res.status(404).json({
         success: false,
         message: 'Mesa no encontrada para eliminar'
-      });
+      } as ApiResponse);
       return;
     }
 
-    console.log('✅ Mesa inactivada exitosamente');
+    console.log('✅ [mesasController] Mesa inactivada exitosamente');
 
     res.status(200).json({
       success: true,
       message: 'Mesa eliminada exitosamente'
-    });
+    } as ApiResponse);
 
   } catch (error) {
-    console.error('❌ Error al eliminar mesa:', error);
+    console.error('❌ [mesasController] Error al eliminar mesa:', error);
     
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor al eliminar mesa',
       error: error instanceof Error ? error.message : 'Error desconocido'
-    });
+    } as ApiResponse);
   }
 };

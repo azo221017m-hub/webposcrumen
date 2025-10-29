@@ -1,47 +1,22 @@
 // backend/src/routes/insumosRoutes.ts
-// Rutas para gestión de insumos con tabla tblposcrumenwebinsumos
+// Rutas para gestión de insumos
 
-import { Router } from 'express'; // Importa Router de Express
-import { 
-  getAllInsumos, 
-  getInsumoById,
-  createInsumo, 
-  updateInsumo, 
-  deleteInsumo,
-  getCuentasContablesForDropdown 
-} from '../controllers/insumosController'; // Importa controladores
+import { Router } from 'express';
+import {
+  getInsumos,
+  createInsumo,
+  updateInsumo,
+  deleteInsumo
+} from '../controllers/insumosController';
 
-// Crea una instancia del router
+// Crear instancia del router
 const router = Router();
 
-// Ruta GET para obtener cuentas contables para dropdown (debe ir antes que /:id)
-// Endpoint: GET /api/insumos/cuentas-dropdown
-router.get('/cuentas-dropdown', getCuentasContablesForDropdown);
+// Definir rutas para insumos
+router.get('/', getInsumos);           // GET /api/insumos
+router.post('/', createInsumo);        // POST /api/insumos
+router.put('/:id', updateInsumo);      // PUT /api/insumos/:id
+router.delete('/:id', deleteInsumo);   // DELETE /api/insumos/:id
 
-// Ruta GET para obtener todos los insumos
-// Endpoint: GET /api/insumos
-router.get('/', getAllInsumos);
-
-// Ruta GET para obtener un insumo específico por ID
-// Endpoint: GET /api/insumos/:id
-// Params: id (id_insumo)
-router.get('/:id', getInsumoById);
-
-// Ruta POST para crear un nuevo insumo
-// Endpoint: POST /api/insumos
-// Body: CreateInsumoData
-router.post('/', createInsumo);
-
-// Ruta PUT para actualizar un insumo existente
-// Endpoint: PUT /api/insumos/:id
-// Params: id (id_insumo)
-// Body: CreateInsumoData
-router.put('/:id', updateInsumo);
-
-// Ruta DELETE para desactivar un insumo (soft delete)
-// Endpoint: DELETE /api/insumos/:id
-// Params: id (id_insumo)
-router.delete('/:id', deleteInsumo);
-
-// Exporta el router para uso en app principal
+// Exportar el router
 export default router;

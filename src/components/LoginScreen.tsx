@@ -36,11 +36,17 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
 
   // Función para mostrar toast
   const showToast = (message: string, type: 'success' | 'error') => {
+    console.log('🔔 [LoginScreen] ===== MOSTRANDO TOAST =====');
+    console.log('🔔 [LoginScreen] Message:', message);
+    console.log('🔔 [LoginScreen] Type:', type);
+    
     setToast({
       isVisible: true,
       message,
       type
     });
+    
+    console.log('🔔 [LoginScreen] Toast state actualizado');
   };
 
   // Función para cerrar toast
@@ -216,6 +222,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
         <Toast
           message={toast.message}
           type={toast.type}
+          duration={toast.type === 'error' ? 4000 : 3000} // Error: 4 segundos, otros: 3 segundos
           onClose={closeToast}
         />
       )}

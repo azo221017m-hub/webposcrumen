@@ -1,48 +1,22 @@
 // backend/src/routes/proveedoresRoutes.ts
-// Rutas para la gestión de proveedores en POSWEBCrumen
+// Rutas para gestión de proveedores
 
-import { Router } from 'express'; // Importa Router de Express
-import { 
+import { Router } from 'express';
+import {
   getProveedores,
-  createProveedor, 
+  createProveedor,
   updateProveedor,
   deleteProveedor
-} from '../controllers/proveedoresController'; // Importa controladores
+} from '../controllers/proveedoresController';
 
-// Crea el router para proveedores
-const router = Router(); // Instancia del router
+// Crear instancia del router
+const router = Router();
 
-console.log('🏪 [Routes] Configurando rutas de proveedores'); // Log de configuración
+// Definir rutas para proveedores
+router.get('/', getProveedores);           // GET /api/proveedores
+router.post('/', createProveedor);        // POST /api/proveedores
+router.put('/:id', updateProveedor);      // PUT /api/proveedores/:id
+router.delete('/:id', deleteProveedor);   // DELETE /api/proveedores/:id
 
-/**
- * GET /api/proveedores
- * Obtiene todos los proveedores
- */
-router.get('/', getProveedores);
-console.log('✅ [Routes] Ruta GET /api/proveedores configurada'); // Log de ruta
-
-/**
- * POST /api/proveedores
- * Crea un nuevo proveedor
- */
-router.post('/', createProveedor);
-console.log('✅ [Routes] Ruta POST /api/proveedores configurada'); // Log de ruta
-
-/**
- * PUT /api/proveedores/:id
- * Actualiza un proveedor existente
- */
-router.put('/:id', updateProveedor);
-console.log('✅ [Routes] Ruta PUT /api/proveedores/:id configurada'); // Log de ruta
-
-/**
- * DELETE /api/proveedores/:id
- * Elimina (desactiva) un proveedor
- */
-router.delete('/:id', deleteProveedor);
-console.log('✅ [Routes] Ruta DELETE /api/proveedores/:id configurada'); // Log de ruta
-
-console.log('🏪 [Routes] Todas las rutas de proveedores configuradas correctamente'); // Log de finalización
-
-// Exporta el router
+// Exportar el router
 export default router;

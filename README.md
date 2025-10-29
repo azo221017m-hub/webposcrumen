@@ -30,7 +30,7 @@
 
 ### Base de Datos
 - **MySQL** alojado en Azure
-- Tablas: `tblposcrumenwebusuarios`, `tblposcrumenwebnegocio`, `tbl_access_attempts`
+- Tablas principales: `tblposcrumenwebusuarios`, `tblposcrumenwebnegocio`
 
 ## 🚀 Ejecutar la Aplicación
 

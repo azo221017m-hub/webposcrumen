@@ -9,76 +9,56 @@ export interface ApiResponse<T = any> {
   error?: string; // Mensaje de error opcional
 }
 
-// Tipo para datos de usuario en la base de datos
-export interface Usuario {
-  idUsuario: number; // ID único del usuario
-  idNegocio: number; // ID del negocio al que pertenece
-  idRol: number; // ID del rol del usuario
-  nombre: string; // Nombre completo del usuario
-  usuario: string; // Nombre de usuario para login
-  password: string; // Contraseña encriptada
-  email: string; // Correo electrónico
-  estatus: number; // Estado del usuario (1=activo, 9=bloqueado)
-  fechaRegistro: Date; // Fecha de registro del usuario
-  fechaActualizacion: Date; // Fecha de última actualización
-  usuarioAuditoria: string; // Usuario que realizó la última modificación
-}
 
-// Tipo para datos de negocio en la base de datos
-export interface Negocio {
-  idNegocio: number; // ID único del negocio
-  numerocliente: string; // Número de cliente del negocio
-  nombreNegocio: string; // Nombre del negocio
-  rfc: string; // RFC del negocio
-  direccion: string; // Dirección completa del negocio
-  telefono: string; // Teléfono de contacto
-  estatusCliente: number; // Estado del cliente (1=activo, 0=inactivo)
-  fechaRegistro: Date; // Fecha de registro del negocio
-  fechaActualizacion: Date; // Fecha de última actualización
-  usuario: string; // Usuario que registró el negocio
-}
 
-// Tipo para intentos de acceso fallidos
-export interface AccessAttempt {
-  id: number; // ID único del intento
-  tipo: 'cliente' | 'usuario'; // Tipo de acceso intentado
-  referencia: string; // Referencia del usuario que intentó acceder
-  intentos: number; // Número de intentos fallidos
-  last_attempt: Date; // Fecha del último intento
-  bloqueado_until: Date | null; // Fecha hasta cuando está bloqueado
-}
 
-// Tipo para unidades de medida de compra
-export interface UMMovimiento {
-  idUmCompra: number; // ID único de la unidad de medida
-  nombreUmCompra: string; // Nombre de la unidad de medida (máx 100 caracteres)
-  valor: number; // Valor decimal de la unidad de medida
-  umMatPrima: 'Kl' | 'Lt' | 'gr' | 'ml' | 'pza'; // Unidad de materia prima (valores permitidos)
-  valorConvertido: number; // Valor convertido decimal
-  fechaRegistro: Date; // Fecha de registro
-  fechaActualizacion: Date; // Fecha de última actualización
-  usuario: string; // Usuario que realizó la operación
-}
 
-// Tipos para naturaleza de movimiento contable
-export type NaturalezaMovimiento = 'COMPRA' | 'GASTO';
-
-// Tipos para categorías de movimiento según naturaleza
-export type CategoriaCompra = 'Inventario' | 'activo fijo' | 'servicios' | 'administrativas' | 'extraodinarias' | 'inversión';
-export type CategoriaGasto = 'operación' | 'financiero' | 'extraorinario';
-
-// Tipo para tipos de movimiento contable
-export interface TipoMovimiento {
-  idtipomovimiento: number; // ID único del tipo de movimiento
-  nombretipomovimiento: string; // Nombre del tipo de movimiento (máx 100 caracteres)
-  categoriatipomovimiento: CategoriaCompra | CategoriaGasto; // Categoría según naturaleza
-  naturalezatipomovimiento: NaturalezaMovimiento; // Naturaleza del movimiento (COMPRA|GASTO)
-}
 
 // Tipo para datos de login
 export interface LoginData {
-  usuario: string; // Nombre de usuario
+  usuario: string; // Alias del usuario (se mapea a tblposcrumenwebusuarios.alias)
   password: string; // Contraseña
+}
+
+// Tipo para intentos de login según tabla tblposcrumenwebintentoslogin
+export interface IntentoLogin {
+  id: number; // ID único del intento (AI PK)
+  aliasusuario: string; // Alias del usuario
+  intentos: number; // Conteo de intentos (smallint 6)
+  ultimologin: Date; // Fecha y hora del último login exitoso
+  fechabloqueado: Date; // Fecha y hora de bloqueo
+  idnegocio: number; // ID del negocio
+}
+
+// Tipo para crear/actualizar intentos de login
+export interface CreateIntentoLoginData {
+  aliasusuario: string; // Alias del usuario (requerido)
+  intentos: number; // Número de intentos (requerido)
+  ultimologin?: Date; // Fecha del último login exitoso (opcional)
+  fechabloqueado?: Date; // Fecha de bloqueo (opcional)
+  idnegocio: number; // ID del negocio (requerido)
+}
+
+// Tipo para usuario según tabla tblposcrumenwebusuarios
+export interface Usuario {
+  idUsuario: number; // ID único del usuario
+  idNegocio: number; // ID del negocio
+  idRol: number; // ID del rol
+  nombre: string; // Nombre completo
+  alias: string; // Alias del usuario
+  password: string; // Contraseña
+  telefono: string; // Teléfono
+  cumple: Date; // Fecha de cumpleaños
+  frasepersonal: string; // Frase personal
+  fotoine: Buffer; // Foto INE (LONGBLOB)
+  fotopersona: Buffer; // Foto persona (LONGBLOB)
+  fotoavatar: Buffer; // Foto avatar (LONGBLOB)
+  desempeno: number; // Desempeño (decimal 5,2)
+  popularidad: number; // Popularidad (decimal 5,2)
+  estatus: number; // Estado del usuario (1=activo, 9=bloqueado, 0=inactivo)
+  fechaRegistroauditoria: Date; // Fecha de registro
+  usuarioauditoria: string; // Usuario de auditoría
+  fehamodificacionauditoria: Date; // Fecha de modificación
 }
 
 // Tipo para datos de registro de usuario
@@ -145,12 +125,14 @@ export interface Categoria {
   usuario: string; // Usuario que registró la categoría
 }
 
-// Tipo para datos de registro de categoría
+// Tipo para datos de registro de categoría según tblposcrumenwebcategorias
 export interface CreateCategoriaData {
-  nombre: string; // Nombre de la categoría
-  descripcion: string; // Descripción de la categoría
-  estatus?: number; // Estado (1=activo, 0=inactivo)
-  usuario?: string; // Usuario que crea el registro
+  nombre: string; // varchar(100) - Nombre de la categoría
+  imagencategoria?: string; // longblob - Imagen de la categoría (base64)
+  descripcion?: string; // text - Descripción de la categoría
+  estatus?: number; // tinyint(1) - Estado (1=activo, 0=inactivo)
+  usuarioauditoria?: string; // Usuario que crea/modifica el registro
+  idnegocio?: number; // ID del negocio al que pertenece
 }
 
 // Tipo para datos de producto en la base de datos
@@ -213,29 +195,30 @@ export interface CreateInsumoData {
   id_cuentacontable: number; // ID de cuenta contable (requerido)
 }
 
-// Tipo para datos de mesa en la base de datos
+// Tipo para mesa según tabla tblposcrumenwebmesas
 export interface Mesa {
-  idmesa: number; // ID único de la mesa
-  nombremesa: string; // Nombre de la mesa
-  numeromesa: number; // Número de la mesa
-  cantcomensales: number; // Cantidad de comensales
-  estatusmesa: 'DISPONIBLE' | 'OCUPADA' | 'RESERVADA' | 'INACTIVA'; // Estado de la mesa
-  tiempodeinicio?: Date; // Tiempo de inicio de ocupación
-  tiempoactual?: Date; // Tiempo actual de ocupación
-  estatustiempo?: 'EN_CURSO' | 'FINALIZADO' | 'PENDIENTE'; // Estado del tiempo
-  creado_en?: Date; // Fecha de creación
-  actualizado_en?: Date; // Fecha de actualización
-  creado_por?: string; // Usuario que creó la mesa
-  actualizado_por?: string; // Usuario que actualizó la mesa
+  idmesa: number; // ID único de la mesa (AI PK)
+  nombremesa: string; // Nombre de la mesa (varchar 100)
+  numeromesa: number; // Número de la mesa (int 11)
+  cantcomensales: number; // Cantidad de comensales (int 11)
+  estatusmesa: 'DISPONIBLE' | 'OCUPADA' | 'RESERVADA'; // Estado de la mesa (enum)
+  tiempodeinicio: Date; // Tiempo de inicio (datetime)
+  tiempoactual: Date; // Tiempo actual (datetime)
+  estatustiempo: 'EN_CURSO' | 'DEMORA' | 'INACTIVA'; // Estado del tiempo (enum)
+  fechaRegistroauditoria: Date; // Fecha de registro (datetime)
+  usuarioauditoria: string; // Usuario de auditoría (varchar 100)
+  fehamodificacionauditoria: Date; // Fecha de modificación (datetime)
+  idnegocio: number; // ID del negocio (int 11)
 }
 
-// Tipo para crear una nueva mesa
+// Tipo para crear/actualizar mesa
 export interface CreateMesaData {
-  nombremesa: string; // Nombre de la mesa
-  numeromesa: number; // Número de la mesa
-  cantcomensales: number; // Cantidad de comensales
-  estatusmesa: 'DISPONIBLE' | 'OCUPADA' | 'RESERVADA' | 'INACTIVA'; // Estado de la mesa
-  creado_por: string; // Usuario que crea la mesa
+  nombremesa: string; // Nombre de la mesa (requerido)
+  numeromesa: number; // Número de la mesa (requerido)
+  cantcomensales: number; // Cantidad de comensales (requerido)
+  estatusmesa: 'DISPONIBLE' | 'OCUPADA' | 'RESERVADA'; // Estado de la mesa (requerido)
+  usuarioauditoria: string; // Usuario de auditoría (requerido)
+  idnegocio: number; // ID del negocio (requerido)
 }
 
 // Tipo para actualizar una mesa
@@ -249,41 +232,46 @@ export interface UpdateMesaData {
 
 // Tipo para datos de proveedor en la base de datos
 export interface Proveedor {
-  id: number; // ID único del proveedor (mapeado desde idProveedor)
-  nombre: string; // Nombre del proveedor
-  rfc?: string; // RFC del proveedor
-  telefono?: string; // Teléfono del proveedor
-  correo?: string; // Correo electrónico del proveedor
-  direccion?: string; // Dirección del proveedor
-  banco?: string; // Banco del proveedor
-  cuenta?: string; // Cuenta bancaria del proveedor
-  activo: number; // Estado del proveedor (1=activo, 0=inactivo)
-  created_at: Date; // Fecha de creación (mapeado desde fechaRegistro)
-  updated_at: Date; // Fecha de última actualización (mapeado desde fechaActualizacion)
+  id_proveedor: number; // ID único del proveedor (AI PK)
+  nombre: string; // Nombre del proveedor varchar(150)
+  rfc: string; // RFC varchar(20)
+  telefono: string; // Teléfono varchar(30)
+  correo: string; // Correo electrónico varchar(100)
+  direccion: string; // Dirección text
+  banco: string; // Banco varchar(100)
+  cuenta: string; // Número de cuenta varchar(50)
+  activo: boolean; // Activo tinyint(1) -> boolean
+  fechaRegistroauditoria: Date; // Fecha de registro
+  usuarioauditoria: string; // Usuario que registra
+  fehamodificacionauditoria?: Date; // Fecha de modificación (opcional)
+  idnegocio: number; // ID del negocio
 }
 
 // Tipo para crear un nuevo proveedor
 export interface CreateProveedorData {
   nombre: string; // Nombre del proveedor (requerido)
-  rfc?: string; // RFC del proveedor (opcional)
-  telefono?: string; // Teléfono del proveedor (opcional)
-  correo?: string; // Correo electrónico del proveedor (opcional)
-  direccion?: string; // Dirección del proveedor (opcional)
-  banco?: string; // Banco del proveedor (opcional)
-  cuenta?: string; // Cuenta bancaria del proveedor (opcional)
-  activo?: number; // Estado del proveedor (opcional, por defecto 1)
+  rfc: string; // RFC (requerido)
+  telefono: string; // Teléfono (requerido)
+  correo: string; // Correo electrónico (requerido)
+  direccion: string; // Dirección (requerido)
+  banco: string; // Banco (requerido)
+  cuenta: string; // Número de cuenta (requerido)
+  activo: boolean; // Activo (requerido)
+  usuarioauditoria: string; // Usuario (requerido)
+  idnegocio: number; // ID del negocio (requerido)
 }
 
 // Tipo para actualizar un proveedor
 export interface UpdateProveedorData {
-  nombre: string; // Nombre del proveedor (requerido)
-  rfc?: string; // RFC del proveedor (opcional)
-  telefono?: string; // Teléfono del proveedor (opcional)
-  correo?: string; // Correo electrónico del proveedor (opcional)
-  direccion?: string; // Dirección del proveedor (opcional)
-  banco?: string; // Banco del proveedor (opcional)
-  cuenta?: string; // Cuenta bancaria del proveedor (opcional)
-  activo?: number; // Estado del proveedor (opcional)
+  nombre?: string; // Nombre del proveedor (opcional)
+  rfc?: string; // RFC (opcional)
+  telefono?: string; // Teléfono (opcional)
+  correo?: string; // Correo electrónico (opcional)
+  direccion?: string; // Dirección (opcional)
+  banco?: string; // Banco (opcional)
+  cuenta?: string; // Número de cuenta (opcional)
+  activo?: boolean; // Activo (opcional)
+  usuarioauditoria?: string; // Usuario (opcional)
 }
 
 // Tipo para unidad de medida de compra en la base de datos
@@ -356,4 +344,421 @@ export interface UpdateSubtipoMovimientoData {
   nombretiposubmovimiento: string; // Nombre del subtipo de movimiento (requerido)
   idtipomovimiento: number; // ID del tipo de movimiento (requerido)
   preciosubtipomovimiento: number; // Precio del subtipo de movimiento (requerido)
+}
+
+// Tipo para negocio según tabla tblposcrumenwebnegocio
+export interface Negocio {
+  idNegocio: number; // ID único del negocio
+  numerocliente: string; // Número de cliente
+  nombreNegocio: string; // Nombre del negocio
+  rfc: string; // RFC
+  direccion: string; // Dirección
+  telefono: string; // Teléfono
+  fechaRegistro: Date; // Fecha de registro
+  fechaActualizacion: Date; // Fecha de última actualización
+  usuario: string; // Usuario que creó el registro
+}
+
+// Tipo para naturaleza de movimiento contable (valores permitidos)
+export type NaturalezaMovimiento = 'COMPRA' | 'GASTO';
+
+// Tipo para categoría de compra (valores permitidos)
+export type CategoriaCompra = 'Inventario' | 'activo fijo' | 'servicios' | 'administrativas' | 'extraodinarias' | 'inversión';
+
+// Tipo para categoría de gasto (valores permitidos)
+export type CategoriaGasto = 'operación' | 'financiero' | 'extraorinario';
+
+// Tipo para unidad de medida de movimiento
+export interface UMMovimiento {
+  idum: number; // ID único de la unidad
+  nombreum: string; // Nombre de la unidad de medida
+}
+
+// Tipos para descuentos
+export type TipoDescuento = '$' | '%'; // Tipo de descuento: peso o porcentaje
+export type EstatusDescuento = 'ACTIVO' | 'INACTIVO'; // Estatus del descuento
+export type RequiereAutorizacion = 'SI' | 'NO'; // Si requiere autorización
+
+// Tipo para descuento según tabla tblposcrumenwebdescuentos
+export interface Descuento {
+  id_descuento: number; // ID único del descuento (AI PK)
+  nombre: string; // Nombre del descuento (varchar 100)
+  tipodescuento: string; // Tipo de descuento (varchar 50)
+  valor: number | string; // Valor del descuento (decimal 10,2) - puede ser string desde BD
+  estatusdescuento: string; // Estatus (varchar 20)
+  requiereautorizacion: 'SI' | 'NO'; // Requiere autorización (enum SI, NO)
+  fechaRegistroauditoria: Date | string; // Fecha de registro (datetime)
+  usuarioauditoria: string; // Usuario de auditoría (varchar 100)
+  fehamodificacionauditoria: Date | string; // Fecha de modificación (datetime) - nombre real de la BD
+  idnegocio: number; // ID del negocio (int 11)
+}
+
+// Tipo para crear descuento
+export interface CreateDescuentoData {
+  nombre: string; // Nombre del descuento (requerido)
+  tipodescuento: TipoDescuento; // Tipo de descuento (requerido)
+  valor: number; // Valor del descuento (requerido)
+  estatusdescuento: EstatusDescuento; // Estatus del descuento (requerido)
+  requiereautorizacion: RequiereAutorizacion; // Requiere autorización (requerido)
+  usuarioauditoria?: string; // Usuario de auditoría (opcional)
+  idnegocio?: number; // ID del negocio (opcional)
+}
+
+// Tipo para actualizar descuento
+export interface UpdateDescuentoData {
+  nombre?: string; // Nombre del descuento (opcional)
+  tipodescuento?: TipoDescuento; // Tipo de descuento (opcional)
+  valor?: number; // Valor del descuento (opcional)
+  estatusdescuento?: EstatusDescuento; // Estatus del descuento (opcional)
+  requiereautorizacion?: RequiereAutorizacion; // Requiere autorización (opcional)
+  usuarioauditoria?: string; // Usuario de auditoría (opcional)
+}
+
+// Tipos para roles de usuario
+export type PrivilegioRol = '1' | '2' | '3' | '4'; // Niveles de privilegio
+export type EstatusRol = 0 | 1; // Estatus del rol (0=inactivo, 1=activo)
+
+// Tipo para rol de usuario según tabla tblposcrumenwebrolesdeusuario
+export interface RolUsuario {
+  idRol: number; // ID único del rol (AI PK)
+  nombreRol: string; // Nombre del rol (varchar 100)
+  descripcion: string; // Descripción del rol (text)
+  privilegio: string; // Privilegio del rol (text)
+  estatus: EstatusRol; // Estatus del rol (tinyint 1)
+  fechaRegistroauditoria: Date | string; // Fecha de registro (datetime)
+  usuarioauditoria: string; // Usuario de auditoría (varchar 100)
+  fehamodificacionauditoria: Date | string; // Fecha de modificación (datetime)
+  idnegocio: number; // ID del negocio (int 11)
+}
+
+// Tipo para crear rol de usuario
+export interface CreateRolUsuarioData {
+  nombreRol: string; // Nombre del rol (requerido)
+  descripcion: string; // Descripción del rol (requerido)
+  privilegio: PrivilegioRol; // Privilegio del rol (requerido)
+  estatus: EstatusRol; // Estatus del rol (requerido)
+  usuarioauditoria?: string; // Usuario de auditoría (opcional)
+  idnegocio?: number; // ID del negocio (opcional)
+}
+
+// Tipo para actualizar rol de usuario
+export interface UpdateRolUsuarioData {
+  nombreRol?: string; // Nombre del rol (opcional)
+  descripcion?: string; // Descripción del rol (opcional)
+  privilegio?: PrivilegioRol; // Privilegio del rol (opcional)
+  estatus?: EstatusRol; // Estatus del rol (opcional)
+  usuarioauditoria?: string; // Usuario de auditoría (opcional)
+}
+
+// Tipos para usuarios del sistema
+export type EstatusUsuario = 0 | 1; // Estatus del usuario (0=inactivo, 1=activo)
+
+// Tipo para usuario según tabla tblposcrumenwebusuarios
+export interface UsuarioSistema {
+  idUsuario: number; // ID único del usuario (AI PK)
+  idNegocio: number; // ID del negocio (int 11)
+  idRol: number; // ID del rol (int 11)
+  nombre: string; // Nombre del usuario (varchar 150)
+  alias: string; // Alias del usuario (varchar 100)
+  password?: string; // Contraseña hasheada (varchar 255) - opcional para consultas
+  telefono: string; // Teléfono (varchar 150)
+  cumple: Date | string; // Fecha de cumpleaños (date)
+  frasepersonal: string; // Frase personal (text)
+  fotoine: Buffer | string | null; // Foto INE (longblob)
+  fotopersona: Buffer | string | null; // Foto personal (longblob)
+  fotoavatar: Buffer | string | null; // Foto avatar (longblob)
+  desempeno: number; // Desempeño del 0-5 (decimal 5,2)
+  popularidad: number; // Popularidad del 0-5 (decimal 5,2)
+  estatus: EstatusUsuario; // Estatus del usuario (tinyint 1)
+  fechaRegistroauditoria: Date | string; // Fecha de registro (datetime)
+  usuarioauditoria: string; // Usuario de auditoría (varchar 100)
+  fehamodificacionauditoria: Date | string; // Fecha de modificación (datetime)
+  // Campos adicionales de JOIN
+  nombreNegocio?: string; // Nombre del negocio (join)
+  nombreRol?: string; // Nombre del rol (join)
+}
+
+// Tipo para crear usuario del sistema
+export interface CreateUsuarioSistemaData {
+  idNegocio: number; // ID del negocio (requerido)
+  idRol: number; // ID del rol (requerido)
+  nombre: string; // Nombre del usuario (requerido)
+  alias: string; // Alias del usuario (requerido)
+  password: string; // Contraseña sin hashear (requerido)
+  telefono: string; // Teléfono (requerido)
+  cumple: Date | string; // Fecha de cumpleaños (requerido)
+  frasepersonal?: string; // Frase personal (opcional)
+  fotoine?: Buffer | string; // Foto INE (opcional)
+  fotopersona?: Buffer | string; // Foto personal (opcional)
+  fotoavatar?: Buffer | string; // Foto avatar (opcional)
+  desempeno?: number; // Desempeño (opcional, default 0)
+  popularidad?: number; // Popularidad (opcional, default 0)
+  estatus?: EstatusUsuario; // Estatus (opcional, default 1)
+  usuarioauditoria?: string; // Usuario de auditoría (opcional)
+}
+
+// Tipo para actualizar usuario del sistema
+export interface UpdateUsuarioSistemaData {
+  idNegocio?: number; // ID del negocio (opcional)
+  idRol?: number; // ID del rol (opcional)
+  nombre?: string; // Nombre del usuario (opcional)
+  alias?: string; // Alias del usuario (opcional)
+  password?: string; // Contraseña sin hashear (opcional)
+  telefono?: string; // Teléfono (opcional)
+  cumple?: Date | string; // Fecha de cumpleaños (opcional)
+  frasepersonal?: string; // Frase personal (opcional)
+  fotoine?: Buffer | string; // Foto INE (opcional)
+  fotopersona?: Buffer | string; // Foto personal (opcional)
+  fotoavatar?: Buffer | string; // Foto avatar (opcional)
+  desempeno?: number; // Desempeño (opcional)
+  popularidad?: number; // Popularidad (opcional)
+  estatus?: EstatusUsuario; // Estatus (opcional)
+  usuarioauditoria?: string; // Usuario de auditoría (opcional)
+}
+
+// Tipo para negocio (para dropdown)
+export interface NegocioDropdown {
+  idNegocio: number; // ID del negocio
+  nombreNegocio: string; // Nombre del negocio
+}
+
+// Tipo para rol (para dropdown)
+export interface RolDropdown {
+  idRol: number; // ID del rol
+  nombreRol: string; // Nombre del rol
+}
+
+// ===== TIPOS PARA UNIDADES DE MEDIDA DE COMPRA =====
+
+// Tipo para las unidades de materia prima permitidas
+export type UnidadMateriaPrima = 'Kg' | 'Lt' | 'Pza';
+
+// Tipo para Unidad de Medida según tabla tblposrumenwebumcompra
+export interface UMedida {
+  idUmCompra: number; // ID único de la unidad de medida (AI PK)
+  nombreUmCompra: string; // Nombre de la unidad de medida
+  valor: number; // Valor decimal (12,3)
+  umMatPrima: UnidadMateriaPrima; // Unidad de materia prima (Kg, Lt, Pza)
+  valorConvertido: number; // Valor convertido decimal (12,3)
+  fechaRegistroauditoria: Date; // Fecha de registro
+  usuarioauditoria: string; // Usuario que registra
+  fehamodificacionauditoria?: Date; // Fecha de modificación (opcional)
+  idnegocio: number; // ID del negocio
+}
+
+// Tipo para crear nueva unidad de medida
+export interface CreateUMedidaData {
+  nombreUmCompra: string; // Nombre de la unidad (requerido)
+  valor: number; // Valor (requerido)
+  umMatPrima: UnidadMateriaPrima; // Unidad de materia prima (requerido)
+  valorConvertido: number; // Valor convertido (requerido)
+  usuarioauditoria: string; // Usuario (requerido)
+  idnegocio: number; // ID del negocio (requerido)
+}
+
+// Tipo para actualizar unidad de medida
+export interface UpdateUMedidaData {
+  nombreUmCompra?: string; // Nombre de la unidad (opcional)
+  valor?: number; // Valor (opcional)
+  umMatPrima?: UnidadMateriaPrima; // Unidad de materia prima (opcional)
+  valorConvertido?: number; // Valor convertido (opcional)
+  usuarioauditoria?: string; // Usuario (opcional)
+}
+
+// ===== TIPOS PARA INSUMOS =====
+
+// Tipo para las unidades de medida de insumos permitidas
+export type UnidadMedidaInsumo = 'Kg' | 'Lt' | 'Pza';
+
+// Tipo para Insumo Web según tabla tblposcrumenwebinsumos  
+export interface InsumoWeb {
+  id_insumo: number; // ID único del insumo (AI PK)
+  nombre: string; // Nombre del insumo
+  unidad_medida: UnidadMedidaInsumo; // Unidad de medida (Kg, Lt, Pza)
+  stock_actual: number; // Stock actual decimal (10,2)
+  stock_minimo: number; // Stock mínimo decimal (10,2)
+  costo_promedio_ponderado: number; // Costo promedio ponderado decimal (12,4)
+  precio_venta: number; // Precio de venta decimal (12,2)
+  idinocuidad: string; // ID inocuidad varchar(50)
+  id_cuentacontable_insumo: string; // ID cuenta contable varchar(100)
+  activo: boolean; // Activo tinyint(1) -> boolean
+  inventariable: boolean; // Inventariable tinyint(1) -> boolean
+  fechaRegistroauditoria: Date; // Fecha de registro
+  usuarioauditoria: string; // Usuario que registra
+  fehamodificacionauditoria?: Date; // Fecha de modificación (opcional)
+  idnegocio: number; // ID del negocio
+}
+
+// Tipo para crear nuevo insumo web
+export interface CreateInsumoWebData {
+  nombre: string; // Nombre del insumo (requerido)
+  unidad_medida: UnidadMedidaInsumo; // Unidad de medida (requerido)
+  stock_actual: number; // Stock actual (requerido)
+  stock_minimo: number; // Stock mínimo (requerido)
+  id_cuentacontable_insumo: string; // ID cuenta contable (requerido)
+  activo: boolean; // Activo (requerido)
+  inventariable: boolean; // Inventariable (requerido)
+  usuarioauditoria: string; // Usuario (requerido)
+  idnegocio: number; // ID del negocio (requerido)
+}
+
+// Tipo para actualizar insumo web
+export interface UpdateInsumoWebData {
+  nombre?: string; // Nombre del insumo (opcional)
+  unidad_medida?: UnidadMedidaInsumo; // Unidad de medida (opcional)
+  stock_actual?: number; // Stock actual (opcional)
+  stock_minimo?: number; // Stock mínimo (opcional)
+  id_cuentacontable_insumo?: string; // ID cuenta contable (opcional)
+  activo?: boolean; // Activo (opcional)
+  inventariable?: boolean; // Inventariable (opcional)
+  usuarioauditoria?: string; // Usuario (opcional)
+}
+
+// ===== TIPOS PARA CUENTAS CONTABLES =====
+
+// Tipo para naturaleza de cuenta contable
+export type NaturalezaCuentaContable = 'COMPRA' | 'GASTO';
+
+// Tipo para tipo de cuenta contable
+export type TipoCuentaContable = 
+  // Para COMPRA
+  | 'Inventario' 
+  | 'Activo Fijo' 
+  | 'Servicio' 
+  | 'Administrativa' 
+  | 'Eventual'
+  // Para GASTO (reutiliza 'Administrativa' y 'Eventual')
+  | 'Operativo' 
+  | 'Financiero';
+
+// Tipo para Cuenta Contable según tabla tblposcrumenwebcuentacontable
+export interface CuentaContable {
+  id_cuentacontable: number; // ID único de la cuenta contable (AI PK)
+  naturalezacuentacontable: NaturalezaCuentaContable; // Naturaleza (COMPRA, GASTO)
+  nombrecuentacontable: string; // Nombre de la cuenta contable varchar(150)
+  tipocuentacontable: TipoCuentaContable; // Tipo de cuenta contable varchar(100)
+  fechaRegistroauditoria: Date; // Fecha de registro
+  usuarioauditoria: string; // Usuario que registra
+  fechamodificacionauditoria?: Date; // Fecha de modificación (opcional)
+  idnegocio: number; // ID del negocio
+}
+
+// Tipo para crear nueva cuenta contable
+export interface CreateCuentaContableData {
+  naturalezacuentacontable: NaturalezaCuentaContable; // Naturaleza (requerido)
+  nombrecuentacontable: string; // Nombre de la cuenta (requerido)
+  tipocuentacontable: TipoCuentaContable; // Tipo de cuenta (requerido)
+  usuarioauditoria: string; // Usuario (requerido)
+  idnegocio: number; // ID del negocio (requerido)
+}
+
+// Tipo para actualizar cuenta contable
+export interface UpdateCuentaContableData {
+  naturalezacuentacontable?: NaturalezaCuentaContable; // Naturaleza (opcional)
+  nombrecuentacontable?: string; // Nombre de la cuenta (opcional)
+  tipocuentacontable?: TipoCuentaContable; // Tipo de cuenta (opcional)
+  usuarioauditoria?: string; // Usuario (opcional)
+}
+
+// Tipo para negocio según tabla tblposcrumenwebnegocio
+export interface NegocioConfiguracion {
+  idNegocio: number; // ID único del negocio (AI PK)
+  numeronegocio: string; // Número del negocio
+  nombreNegocio: string; // Nombre del negocio
+  rfcnegocio: string; // RFC del negocio
+  direccionfiscalnegocio: string; // Dirección fiscal
+  contactonegocio: string; // Contacto del negocio
+  logotipo?: Buffer; // Logotipo (longblob - opcional)
+  telefonocontacto: string; // Teléfono de contacto
+  estatusnegocio: boolean; // Estatus del negocio (0/1)
+  fechaRegistroauditoria: Date; // Fecha de registro
+  usuarioauditoria: string; // Usuario auditoría
+  fehamodificacionauditoria?: Date; // Fecha modificación (opcional)
+}
+
+// Tipo para crear negocio
+export interface CreateNegocioConfiguracionData {
+  numeronegocio: string; // Número del negocio (requerido)
+  nombreNegocio: string; // Nombre del negocio (requerido)
+  rfcnegocio: string; // RFC del negocio (requerido)
+  direccionfiscalnegocio: string; // Dirección fiscal (requerido)
+  contactonegocio: string; // Contacto del negocio (requerido)
+  logotipo?: Buffer; // Logotipo (opcional)
+  telefonocontacto: string; // Teléfono de contacto (requerido)
+  estatusnegocio: boolean; // Estatus del negocio (requerido)
+  usuarioauditoria: string; // Usuario auditoría (requerido)
+}
+
+// Tipo para actualizar negocio
+export interface UpdateNegocioConfiguracionData {
+  numeronegocio?: string; // Número del negocio (opcional)
+  nombreNegocio?: string; // Nombre del negocio (opcional)
+  rfcnegocio?: string; // RFC del negocio (opcional)
+  direccionfiscalnegocio?: string; // Dirección fiscal (opcional)
+  contactonegocio?: string; // Contacto del negocio (opcional)
+  logotipo?: Buffer; // Logotipo (opcional)
+  telefonocontacto?: string; // Teléfono de contacto (opcional)
+  estatusnegocio?: boolean; // Estatus del negocio (opcional)
+  usuarioauditoria?: string; // Usuario auditoría (opcional)
+}
+
+// Tipo para parámetros de negocio según tabla tblposcrumenwebparametrosnegocio
+export interface ParametrosNegocioCompletos {
+  idParametro: number; // ID único del parámetro (AI PK)
+  idNegocio: number; // ID del negocio
+  telefonoNegocio: string; // Teléfono del negocio
+  telefonoPedidos: string; // Teléfono para pedidos
+  ubicacion: string; // Ubicación del negocio
+  tipoNegocio: string; // Tipo de negocio
+  impresionRecibo: boolean; // Impresión de recibo (0/1)
+  impresionTablero: boolean; // Impresión de tablero (0/1)
+  envioWhats: boolean; // Envío por WhatsApp (0/1)
+  encabezado: string; // Encabezado de recibos
+  pie: string; // Pie de recibos
+  impresionComanda: boolean; // Impresión de comanda (0/1)
+  envioMensaje: boolean; // Envío de mensaje (0/1)
+  estatus: boolean; // Estatus (activo/inactivo)
+  fechaRegistroAuditoria: Date; // Fecha de registro
+  usuarioAuditoria: string; // Usuario auditoría
+  fechaModificacionAuditoria?: Date; // Fecha modificación (opcional)
+}
+
+// Tipo para crear parámetros de negocio completos
+export interface CreateParametrosNegocioCompletosData {
+  idNegocio: number; // ID del negocio (requerido)
+  telefonoNegocio: string; // Teléfono del negocio (requerido)
+  telefonoPedidos: string; // Teléfono para pedidos (requerido)
+  ubicacion: string; // Ubicación del negocio (requerido)
+  tipoNegocio: string; // Tipo de negocio (requerido)
+  impresionRecibo: boolean; // Impresión de recibo (requerido)
+  impresionTablero: boolean; // Impresión de tablero (requerido)
+  envioWhats: boolean; // Envío por WhatsApp (requerido)
+  encabezado: string; // Encabezado de recibos (requerido)
+  pie: string; // Pie de recibos (requerido)
+  impresionComanda: boolean; // Impresión de comanda (requerido)
+  envioMensaje: boolean; // Envío de mensaje (requerido)
+  estatus: boolean; // Estatus (requerido)
+  usuarioAuditoria: string; // Usuario auditoría (requerido)
+}
+
+// Tipo para actualizar parámetros de negocio completos
+export interface UpdateParametrosNegocioCompletosData {
+  telefonoNegocio?: string; // Teléfono del negocio (opcional)
+  telefonoPedidos?: string; // Teléfono para pedidos (opcional)
+  ubicacion?: string; // Ubicación del negocio (opcional)
+  tipoNegocio?: string; // Tipo de negocio (opcional)
+  impresionRecibo?: boolean; // Impresión de recibo (opcional)
+  impresionTablero?: boolean; // Impresión de tablero (opcional)
+  envioWhats?: boolean; // Envío por WhatsApp (opcional)
+  encabezado?: string; // Encabezado de recibos (opcional)
+  pie?: string; // Pie de recibos (opcional)
+  impresionComanda?: boolean; // Impresión de comanda (opcional)
+  envioMensaje?: boolean; // Envío de mensaje (opcional)
+  estatus?: boolean; // Estatus (opcional)
+  usuarioAuditoria?: string; // Usuario auditoría (opcional)
+}
+
+// Tipo combinado para negocio configuración completo (negocio + parámetros)
+export interface NegocioConfiguracionCompleto extends NegocioConfiguracion {
+  parametros?: ParametrosNegocioCompletos; // Parámetros asociados al negocio
 }
