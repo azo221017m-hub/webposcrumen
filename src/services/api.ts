@@ -14,7 +14,10 @@ import type {
   RolDropdown,
   UMedida,
   CreateUMedidaData,
-  UpdateUMedidaData
+  UpdateUMedidaData,
+  Cliente,
+  CreateClienteData,
+  UpdateClienteData
 } from '../types';
 
 // URL base de la API - se obtiene de variables de entorno o usa localhost por defecto
@@ -213,24 +216,7 @@ class ApiService {
     });
   }
 
-  // Método para obtener todos los clientes
-  async getClientes(): Promise<ApiResponse<any[]>> {
-    console.log('👥 Obteniendo lista de clientes'); // Log de consulta
-    
-    return this.request<any[]>('/api/clientes', {
-      method: 'GET', // Método GET
-    });
-  }
 
-  // Método para crear un nuevo cliente
-  async createCliente(clienteData: any): Promise<ApiResponse<{ idCliente: number; nombre: string }>> {
-    console.log('👥 Creando nuevo cliente:', clienteData.nombre); // Log de creación
-    
-    return this.request<{ idCliente: number; nombre: string }>('/api/clientes', {
-      method: 'POST', // Método POST
-      body: JSON.stringify(clienteData), // Datos del cliente en JSON
-    });
-  }
 
   // Método para obtener parámetros de un negocio
   async getParametrosNegocio(idNegocio: number): Promise<ApiResponse<any[]>> {
@@ -723,6 +709,57 @@ class ApiService {
       method: 'DELETE', // Método DELETE
     });
   }
+
+  // =====================================
+  // MÉTODOS PARA CLIENTES
+  // =====================================
+
+  // Obtener todos los clientes
+  async getClientes(): Promise<ApiResponse<Cliente[]>> {
+    console.log('👥 Obteniendo clientes...'); // Log de obtención
+    
+    return this.request<Cliente[]>('/api/clientes', {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Obtener cliente por ID
+  async getClienteById(id: number): Promise<ApiResponse<Cliente>> {
+    console.log('👥 Obteniendo cliente por ID:', id); // Log de obtención
+    
+    return this.request<Cliente>(`/api/clientes/${id}`, {
+      method: 'GET', // Método GET
+    });
+  }
+
+  // Crear nuevo cliente
+  async createCliente(clienteData: CreateClienteData): Promise<ApiResponse<{id: number}>> {
+    console.log('👥 Creando cliente:', clienteData.nombre); // Log de creación
+    
+    return this.request<{id: number}>('/api/clientes', {
+      method: 'POST', // Método POST
+      body: JSON.stringify(clienteData), // Datos del cliente
+    });
+  }
+
+  // Actualizar cliente
+  async updateCliente(id: number, clienteData: UpdateClienteData): Promise<ApiResponse<any>> {
+    console.log('👥 Actualizando cliente:', id); // Log de actualización
+    
+    return this.request<any>(`/api/clientes/${id}`, {
+      method: 'PUT', // Método PUT
+      body: JSON.stringify(clienteData), // Datos del cliente
+    });
+  }
+
+  // Eliminar cliente
+  async deleteCliente(id: number): Promise<ApiResponse<any>> {
+    console.log('👥 Eliminando cliente:', id); // Log de eliminación
+    
+    return this.request<any>(`/api/clientes/${id}`, {
+      method: 'DELETE', // Método DELETE
+    });
+  }
 }
 
 // Crea y exporta una instancia única del servicio API
@@ -737,7 +774,9 @@ export const createUsuario = (userData: CreateUsuarioSistemaData) => apiService.
 export const updateUsuario = (id: number, userData: UpdateUsuarioSistemaData) => apiService.updateUsuario(id, userData);
 export const getRoles = () => apiService.getRoles();
 export const getClientes = () => apiService.getClientes();
-export const createCliente = (clienteData: any) => apiService.createCliente(clienteData);
+export const createCliente = (clienteData: CreateClienteData) => apiService.createCliente(clienteData);
+export const updateCliente = (id: number, clienteData: UpdateClienteData) => apiService.updateCliente(id, clienteData);
+export const deleteCliente = (id: number) => apiService.deleteCliente(id);
 export const createNegocioCompleto = (data: any) => apiService.createNegocioCompleto(data);
 export const getNegocios = () => apiService.getNegocios();
 export const createNegocio = (negocioData: CreateNegocioData) => apiService.createNegocio(negocioData);

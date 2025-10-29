@@ -97,27 +97,77 @@ export interface CreateRolData {
   usuario?: string; // Usuario que crea el registro
 }
 
-// Tipo para datos de cliente
+// Tipos para enums de clientes
+export type CategoriaCliente = 'NUEVO' | 'RECURRENTE' | 'FRECUENTE' | 'VIP' | 'INACTIVO';
+export type EstatusSeguimiento = 'NINGUNO' | 'EN_PROSPECCIÓN' | 'EN_NEGOCIACIÓN' | 'CERRADO' | 'PERDIDO';
+export type MedioContacto = 'WHATSAPP' | 'LLAMADA' | 'EMAIL' | 'OTRO';
+
+// Tipo para datos completos del cliente
 export interface Cliente {
   idCliente: number; // ID único del cliente
   nombre: string; // Nombre del cliente
+  referencia: string; // Referencia del cliente
+  cumple: string; // Fecha de cumpleaños (YYYY-MM-DD)
+  categoriacliente: CategoriaCliente; // Categoría del cliente
+  satisfaccion: number; // Nivel de satisfacción (1-5)
+  comentarios: string; // Comentarios generales
+  puntosfidelidad: number; // Puntos de fidelidad acumulados
+  estatus_seguimiento: EstatusSeguimiento; // Estado del seguimiento
+  responsable_seguimiento: string; // Responsable del seguimiento
+  medio_contacto: MedioContacto; // Medio de contacto preferido
+  observacionesseguimiento: string; // Observaciones del seguimiento
+  fechaultimoseguimiento: string; // Fecha del último seguimiento (YYYY-MM-DD)
   telefono: string; // Teléfono del cliente
   email: string; // Email del cliente
   direccion: string; // Dirección del cliente
   estatus: number; // Estado del cliente (1=activo, 0=inactivo)
-  fechaRegistro: string; // Fecha de registro
-  fechaActualizacion: string; // Fecha de actualización
-  usuario: string; // Usuario que modificó
+  fecharegistroauditoria: string; // Fecha de registro de auditoría
+  usuarioauditoria: string; // Usuario de auditoría
+  fehamodificacionauditoria: string; // Fecha de modificación de auditoría
+  idnegocio: number; // ID del negocio al que pertenece
 }
 
-// Tipo para datos de registro de cliente
+// Tipo para crear un nuevo cliente
 export interface CreateClienteData {
   nombre: string; // Nombre del cliente
+  referencia: string; // Referencia del cliente
+  cumple: string; // Fecha de cumpleaños (YYYY-MM-DD)
+  categoriacliente: CategoriaCliente; // Categoría del cliente
+  satisfaccion?: number; // Nivel de satisfacción (opcional)
+  comentarios?: string; // Comentarios generales (opcional)
+  puntosfidelidad?: number; // Puntos de fidelidad (opcional)
+  estatus_seguimiento: EstatusSeguimiento; // Estado del seguimiento
+  responsable_seguimiento: string; // Responsable del seguimiento
+  medio_contacto: MedioContacto; // Medio de contacto preferido
+  observacionesseguimiento?: string; // Observaciones del seguimiento
+  fechaultimoseguimiento: string; // Fecha del último seguimiento (YYYY-MM-DD)
   telefono: string; // Teléfono del cliente
   email: string; // Email del cliente
-  direccion: string; // Dirección del cliente
-  estatus?: number; // Estado del cliente (1=activo, 0=inactivo)
-  usuario?: string; // Usuario que crea el registro
+  direccion?: string; // Dirección del cliente (opcional)
+  estatus: number; // Estado del cliente (1=activo, 0=inactivo)
+  usuarioauditoria: string; // Usuario de auditoría
+  idnegocio: number; // ID del negocio
+}
+
+// Tipo para actualizar un cliente existente
+export interface UpdateClienteData {
+  nombre?: string; // Nombre del cliente (opcional)
+  referencia?: string; // Referencia del cliente (opcional)
+  cumple?: string; // Fecha de cumpleaños (opcional)
+  categoriacliente?: CategoriaCliente; // Categoría del cliente (opcional)
+  satisfaccion?: number; // Nivel de satisfacción (opcional)
+  comentarios?: string; // Comentarios generales (opcional)
+  puntosfidelidad?: number; // Puntos de fidelidad (opcional)
+  estatus_seguimiento?: EstatusSeguimiento; // Estado del seguimiento (opcional)
+  responsable_seguimiento?: string; // Responsable del seguimiento (opcional)
+  medio_contacto?: MedioContacto; // Medio de contacto (opcional)
+  observacionesseguimiento?: string; // Observaciones del seguimiento (opcional)
+  fechaultimoseguimiento?: string; // Fecha del último seguimiento (opcional)
+  telefono?: string; // Teléfono del cliente (opcional)
+  email?: string; // Email del cliente (opcional)
+  direccion?: string; // Dirección del cliente (opcional)
+  estatus?: number; // Estado del cliente (opcional)
+  usuarioauditoria: string; // Usuario de auditoría (requerido para actualización)
 }
 
 // Tipo para parámetros de negocio
@@ -178,6 +228,7 @@ export type ScreenType =
   | 'config-insumos' // Configuración de insumos
   | 'config-cuenta-contable' // Configuración de cuentas contables
   | 'config-proveedores' // Configuración de proveedores
+  | 'config-clientes' // Configuración de clientes
   | 'config-negocios' // Configuración de negocios
   | 'config-perfil' // Configuración de perfil
   | 'iniciar-venta' // Iniciar nueva venta
@@ -864,6 +915,8 @@ export interface UpdateParametrosNegocioCompletosData {
   estatus?: boolean; // Estatus (opcional)
   usuarioAuditoria?: string; // Usuario auditoría (opcional)
 }
+
+
 
 
 

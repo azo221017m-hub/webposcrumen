@@ -1,82 +1,76 @@
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+# POSWEBCrumen - AI Coding Instructions
 
-# POSWEBCrumen - Instrucciones para GitHub Copilot
+Fullstack POS system built with React + TypeScript + Vite (frontend) and Node.js + Express + MySQL (backend).
 
-Este proyecto es una aplicación fullstack de punto de venta (POS) desarrollada con tecnologías modernas.
+## Architecture Overview
 
-## Estructura del Proyecto
+**Frontend (`/src/`)**: React 19 with TypeScript, Vite build tool, pure CSS styling
+**Backend (`/backend/src/`)**: Express + TypeScript with MySQL connection pool
+**Database**: Azure MySQL with `tblposcrumenwebusuarios`, `tblposcrumenwebnegocio` core tables
+**State Management**: Screen-based navigation with `useAuth` hook, no external state library
 
-- **Frontend**: React + TypeScript + Vite
-- **Backend**: Node.js + Express + TypeScript
-- **Base de Datos**: MySQL (Azure)
-- **Estilos**: CSS puro (sin frameworks)
+## Key Development Patterns
 
-## Tecnologías y Convenciones
+### Screen Navigation System
+- Main app uses `ScreenType` state: `'presentation' | 'login' | 'tablero-inicial' | 'config-*'`
+- All config screens follow `Config[Entity].tsx` naming and accept `onBack` prop
+- Example: `ConfigUsuarios.tsx`, `ConfigNegocios.tsx`
 
-### Frontend (`/src/`)
-- Usar TypeScript estricto con tipos explícitos
-- Componentes funcionales con hooks
-- CSS modules o archivos CSS independientes
-- Fetch API para llamadas HTTP
-- Manejo de estado con useState/useEffect
+### Type Architecture
+- **Shared types**: Both frontend and backend maintain identical interfaces in `/types/index.ts`
+- **API responses**: Always use `ApiResponse<T>` wrapper with `success`, `message`, `data?`, `error?`
+- **Props**: Use explicit interfaces like `ConfigNegociosProps` or generic `Props` for config components
 
-### Backend (`/backend/src/`)
-- Node.js con Express y TypeScript
-- Controladores para lógica de negocio
-- Rutas RESTful organizadas
-- Middleware para CORS y validación
-- Conexión segura a MySQL con pool
+### Database & API Patterns
+- **Connection**: Use `pool.execute<RowDataPacket[]>()` with prepared statements
+- **Controllers**: Follow pattern: validation → business logic → response with emoji logging
+- **Authentication**: bcrypt hashing, login attempt tracking in `tblposcrumenwebintentoslogin`
+- **Soft deletes**: Update `estatus` field instead of hard deletes
 
-### Base de Datos
-- MySQL con tablas principales:
-  - `tblposcrumenwebusuarios`
-  - `tblposcrumenwebnegocio`
+### CSS Organization
+- **Global styles**: `/src/styles/global.css` with CSS custom properties for color palette
+- **Component styles**: Individual CSS files in `/src/styles/` with section headers `/* ===== SECTION ===== */`
+- **No frameworks**: Pure CSS with consistent class naming patterns
 
-## Patrones de Código
+### Logging Convention
+- **Emoji prefixes**: 🔄 (process), ✅ (success), ❌ (error), 📡 (API), 🔍 (query)
+- **Verbose logging**: Every API call, database query, and major operation should log
 
-### Comentarios
-- Cada función, clase y archivo debe tener comentarios explicativos
-- Usar comentarios de línea (`//`) para explicar lógica compleja
-- Incluir logs con console.log para debugging
+## Critical Development Commands
 
-### Tipos TypeScript
-- Importar tipos explícitamente: `import type { Type } from 'module'`
-- Definir interfaces para props de componentes
-- Usar tipos para respuestas de API
+```bash
+# Start development (run both simultaneously)
+cd backend && npm run dev  # Backend on :4000
+npm run dev               # Frontend on :5173 with API proxy
 
-### Estructura de Archivos
-- Componentes en `/src/components/`
-- Servicios en `/src/services/`
-- Tipos en `/src/types/`
-- Estilos en `/src/styles/`
+# Database operations require Azure connection
+# Check backend/src/config/database.ts for connection setup
+```
 
-## Características Implementadas
+## Component Creation Templates
 
-✅ Pantalla de presentación animada  
-✅ Sistema de login con validación  
-✅ Dashboard con indicadores  
-✅ Gestión de usuarios (CRUD)  
-✅ Gestión de negocios (CRUD)  
-✅ Navegación lateral responsive  
-✅ Encriptación de contraseñas  
+**Config Screen Pattern:**
+```typescript
+interface Props {
+  onBack: () => void;
+}
 
-## Convenciones de Naming
+export default function ConfigEntity({ onBack }: Props) {
+  // State, API calls, handlers
+  return (
+    <div className="config-screen">
+      <button onClick={onBack}>← Regresar</button>
+      {/* Component content */}
+    </div>
+  );
+}
+```
 
-- **Componentes**: PascalCase (`LoginScreen.tsx`)
-- **Funciones**: camelCase (`handleLogin`)
-- **Archivos CSS**: kebab-case (`login-screen.css`)
-- **Variables**: camelCase (`currentUser`)
-- **Constantes**: UPPER_CASE (`API_BASE_URL`)
+**API Service Pattern:**
+```typescript
+async methodName(): Promise<ApiResponse<EntityType[]>> {
+  return this.request<EntityType[]>('/api/endpoint');
+}
+```
 
-## Endpoints API
-
-- `GET /health` - Health check
-- `POST /api/auth/login` - Autenticación
-- `GET /api/usuarios` - Listar usuarios
-- `POST /api/usuarios` - Crear usuario
-- `PUT /api/usuarios/:id` - Actualizar usuario
-- `GET /api/negocios` - Listar negocios
-- `POST /api/negocios` - Crear negocio
-- `PUT /api/negocios/:id` - Actualizar negocio
-
-Al generar código para este proyecto, seguir estas convenciones y mantener consistencia con el estilo existente.
+When adding new features, follow existing patterns for screen navigation, database queries with proper logging, and maintain the established TypeScript type consistency between frontend and backend.

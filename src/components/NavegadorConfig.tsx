@@ -109,6 +109,14 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
 
           <button 
             className="config-btn"
+            onClick={() => handleNavigate('config-clientes' as ScreenType)}
+          >
+            <span className="btn-icon">👥</span>
+            <span className="btn-text">Clientes</span>
+          </button>
+
+          <button 
+            className="config-btn"
             onClick={() => handleNavigate('config-negocios' as ScreenType)}
           >
             <span className="btn-icon">🏢</span>

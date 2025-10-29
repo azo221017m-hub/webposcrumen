@@ -124,10 +124,85 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
     }
   };
   
+  // Función para validar si una sección está completa
+  const isSectionComplete = (section: string): boolean => {
+    switch (section) {
+      case 'perfil':
+        return !!(formData.numeronegocio && formData.nombreNegocio);
+      case 'configuracion':
+        return !!(formData.telefonoNegocio || formData.ubicacion || formData.tipoNegocio);
+      case 'recibos':
+        return !!(formData.encabezado || formData.pie);
+      default:
+        return false;
+    }
+  };
+
+  // Función para obtener el porcentaje de completado
+  const getSectionProgress = (section: string): number => {
+    switch (section) {
+      case 'perfil':
+        const perfilFields = [
+          formData.numeronegocio,
+          formData.nombreNegocio,
+          formData.rfcnegocio,
+          formData.contactonegocio,
+          formData.telefonocontacto,
+          formData.direccionfiscalnegocio
+        ];
+        const perfilCompleted = perfilFields.filter(field => field && field.toString().trim() !== '').length;
+        return Math.round((perfilCompleted / perfilFields.length) * 100);
+      
+      case 'configuracion':
+        const configFields = [
+          formData.telefonoNegocio,
+          formData.telefonoPedidos,
+          formData.ubicacion,
+          formData.tipoNegocio
+        ];
+        const configCompleted = configFields.filter(field => field && field.toString().trim() !== '').length;
+        return Math.round((configCompleted / configFields.length) * 100);
+      
+      case 'recibos':
+        const recibosFields = [
+          formData.encabezado,
+          formData.pie
+        ];
+        const recibosCompleted = recibosFields.filter(field => field && field.toString().trim() !== '').length;
+        const switchValues = [
+          formData.impresionRecibo,
+          formData.impresionTablero,
+          formData.impresionComanda
+        ].filter(Boolean).length;
+        return Math.round(((recibosCompleted + switchValues) / (recibosFields.length + 3)) * 100);
+      
+      default:
+        return 0;
+    }
+  };
+
   // Función para cambiar sección del acordeón
   const handleSectionChange = (section: string) => {
-    console.log('🔄 Cambiando sección:', section);
+    console.log('🔄 Cambiando sección:', section, 'Progreso:', getSectionProgress(section) + '%');
     setActiveSection(section);
+  };
+
+  // Función para navegar a la siguiente sección
+  const goToNextSection = () => {
+    const sections = ['perfil', 'configuracion', 'recibos'];
+    const currentIndex = sections.indexOf(activeSection);
+    if (currentIndex < sections.length - 1) {
+      handleSectionChange(sections[currentIndex + 1]);
+    }
+  };
+
+  // Función para navegar a la sección anterior
+  const goToPreviousSection = () => {
+    const sections = ['perfil', 'configuracion', 'recibos'];
+    const currentIndex = sections.indexOf(activeSection);
+    if (currentIndex > 0) {
+      handleSectionChange(sections[currentIndex - 1]);
+    }
   };
   
   // Función para manejar cambios en inputs
@@ -603,14 +678,23 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                       type="button"
                       className={`accordion-header ${activeSection === 'perfil' ? 'active' : ''}`}
                       onClick={() => handleSectionChange('perfil')}
+                      title="Información básica del negocio y datos de contacto"
                     >
                       <div className="accordion-title">
                         <span className="accordion-icon">🏢</span>
-                        <span className="accordion-text">Perfil del Negocio</span>
+                        <div>
+                          <span className="accordion-text">Perfil del Negocio</span>
+                          <div className="section-subtitle">
+                            Información básica • {getSectionProgress('perfil')}% completado
+                          </div>
+                        </div>
                       </div>
-                      <span className={`accordion-arrow ${activeSection === 'perfil' ? 'expanded' : ''}`}>
-                        ▼
-                      </span>
+                      <div className="accordion-indicators">
+                        <div className={`section-progress ${isSectionComplete('perfil') ? 'completed' : ''}`}></div>
+                        <span className={`accordion-arrow ${activeSection === 'perfil' ? 'expanded' : ''}`}>
+                          ▼
+                        </span>
+                      </div>
                     </button>
                     
                     <div className={`accordion-content ${activeSection === 'perfil' ? 'expanded' : ''}`}>
@@ -696,18 +780,20 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                           </div>
                           <div className="form-group">
                             <label>Estado del Negocio</label>
-                            <div className="form-switch">
-                              <input
-                                type="checkbox"
-                                id="estatusnegocio"
-                                name="estatusnegocio"
-                                checked={formData.estatusnegocio}
-                                onChange={(e) => handleInputChange('estatusnegocio', e.target.checked)}
-                              />
-                              <label htmlFor="estatusnegocio" className="switch-label">
+                            <div className="form-switch switch-labeled switch-success">
+                              <div className="switch-container">
+                                <input
+                                  type="checkbox"
+                                  id="estatusnegocio"
+                                  name="estatusnegocio"
+                                  checked={formData.estatusnegocio}
+                                  onChange={(e) => handleInputChange('estatusnegocio', e.target.checked)}
+                                />
                                 <span className="switch-slider"></span>
+                              </div>
+                              <label htmlFor="estatusnegocio" className="switch-label">
                                 <span className="switch-text">
-                                  {formData.estatusnegocio ? 'Activo' : 'Inactivo'}
+                                  {formData.estatusnegocio ? '🟢 Negocio Activo' : '🔴 Negocio Inactivo'}
                                 </span>
                               </label>
                             </div>
@@ -733,14 +819,23 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                       type="button"
                       className={`accordion-header ${activeSection === 'configuracion' ? 'active' : ''}`}
                       onClick={() => handleSectionChange('configuracion')}
+                      title="Configuración operativa y parámetros del negocio"
                     >
                       <div className="accordion-title">
                         <span className="accordion-icon">⚙️</span>
-                        <span className="accordion-text">Configuración del Negocio</span>
+                        <div>
+                          <span className="accordion-text">Configuración del Negocio</span>
+                          <div className="section-subtitle">
+                            Parámetros operativos • {getSectionProgress('configuracion')}% completado
+                          </div>
+                        </div>
                       </div>
-                      <span className={`accordion-arrow ${activeSection === 'configuracion' ? 'expanded' : ''}`}>
-                        ▼
-                      </span>
+                      <div className="accordion-indicators">
+                        <div className={`section-progress ${isSectionComplete('configuracion') ? 'completed' : ''}`}></div>
+                        <span className={`accordion-arrow ${activeSection === 'configuracion' ? 'expanded' : ''}`}>
+                          ▼
+                        </span>
+                      </div>
                     </button>
                     
                     <div className={`accordion-content ${activeSection === 'configuracion' ? 'expanded' : ''}`}>
@@ -810,14 +905,23 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                       type="button"
                       className={`accordion-header ${activeSection === 'recibos' ? 'active' : ''}`}
                       onClick={() => handleSectionChange('recibos')}
+                      title="Configuración de impresión y mensajes en recibos"
                     >
                       <div className="accordion-title">
                         <span className="accordion-icon">🧾</span>
-                        <span className="accordion-text">Configuración de Recibos</span>
+                        <div>
+                          <span className="accordion-text">Configuración de Recibos</span>
+                          <div className="section-subtitle">
+                            Impresión y mensajes • {getSectionProgress('recibos')}% completado
+                          </div>
+                        </div>
                       </div>
-                      <span className={`accordion-arrow ${activeSection === 'recibos' ? 'expanded' : ''}`}>
-                        ▼
-                      </span>
+                      <div className="accordion-indicators">
+                        <div className={`section-progress ${isSectionComplete('recibos') ? 'completed' : ''}`}></div>
+                        <span className={`accordion-arrow ${activeSection === 'recibos' ? 'expanded' : ''}`}>
+                          ▼
+                        </span>
+                      </div>
                     </button>
                     
                     <div className={`accordion-content ${activeSection === 'recibos' ? 'expanded' : ''}`}>
@@ -850,23 +954,25 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                           </div>
                         </div>
 
-                        {/* Switches de configuración */}
+                        {/* Switches de configuración - SIMPLIFICADOS */}
                         <div className="switches-grid">
                           <div className="switch-row">
                             <div className="form-group">
                               <label>Impresión de Recibo</label>
                               <div className="form-switch">
-                                <input
-                                  type="checkbox"
-                                  id="impresionRecibo"
-                                  name="impresionRecibo"
-                                  checked={formData.impresionRecibo}
-                                  onChange={(e) => handleInputChange('impresionRecibo', e.target.checked)}
-                                />
-                                <label htmlFor="impresionRecibo" className="switch-label">
+                                <div className="switch-container">
+                                  <input
+                                    type="checkbox"
+                                    id="impresionRecibo"
+                                    name="impresionRecibo"
+                                    checked={formData.impresionRecibo}
+                                    onChange={(e) => handleInputChange('impresionRecibo', e.target.checked)}
+                                  />
                                   <span className="switch-slider"></span>
+                                </div>
+                                <label htmlFor="impresionRecibo" className="switch-label">
                                   <span className="switch-text">
-                                    {formData.impresionRecibo ? 'Sí' : 'No'}
+                                    {formData.impresionRecibo ? '✅ Impresión Habilitada' : '❌ Impresión Deshabilitada'}
                                   </span>
                                 </label>
                               </div>
@@ -874,17 +980,19 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                             <div className="form-group">
                               <label>Impresión de Tablero</label>
                               <div className="form-switch">
-                                <input
-                                  type="checkbox"
-                                  id="impresionTablero"
-                                  name="impresionTablero"
-                                  checked={formData.impresionTablero}
-                                  onChange={(e) => handleInputChange('impresionTablero', e.target.checked)}
-                                />
-                                <label htmlFor="impresionTablero" className="switch-label">
+                                <div className="switch-container">
+                                  <input
+                                    type="checkbox"
+                                    id="impresionTablero"
+                                    name="impresionTablero"
+                                    checked={formData.impresionTablero}
+                                    onChange={(e) => handleInputChange('impresionTablero', e.target.checked)}
+                                  />
                                   <span className="switch-slider"></span>
+                                </div>
+                                <label htmlFor="impresionTablero" className="switch-label">
                                   <span className="switch-text">
-                                    {formData.impresionTablero ? 'Sí' : 'No'}
+                                    {formData.impresionTablero ? '✅ Tablero Activo' : '❌ Tablero Inactivo'}
                                   </span>
                                 </label>
                               </div>
@@ -894,18 +1002,20 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                           <div className="switch-row">
                             <div className="form-group">
                               <label>Envío WhatsApp</label>
-                              <div className="form-switch">
-                                <input
-                                  type="checkbox"
-                                  id="envioWhats"
-                                  name="envioWhats"
-                                  checked={formData.envioWhats}
-                                  onChange={(e) => handleInputChange('envioWhats', e.target.checked)}
-                                />
-                                <label htmlFor="envioWhats" className="switch-label">
+                              <div className="form-switch switch-success">
+                                <div className="switch-container">
+                                  <input
+                                    type="checkbox"
+                                    id="envioWhats"
+                                    name="envioWhats"
+                                    checked={formData.envioWhats}
+                                    onChange={(e) => handleInputChange('envioWhats', e.target.checked)}
+                                  />
                                   <span className="switch-slider"></span>
+                                </div>
+                                <label htmlFor="envioWhats" className="switch-label">
                                   <span className="switch-text">
-                                    {formData.envioWhats ? 'Sí' : 'No'}
+                                    {formData.envioWhats ? '📲 WhatsApp Habilitado' : '📵 WhatsApp Deshabilitado'}
                                   </span>
                                 </label>
                               </div>
@@ -913,17 +1023,19 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                             <div className="form-group">
                               <label>Impresión de Comanda</label>
                               <div className="form-switch">
-                                <input
-                                  type="checkbox"
-                                  id="impresionComanda"
-                                  name="impresionComanda"
-                                  checked={formData.impresionComanda}
-                                  onChange={(e) => handleInputChange('impresionComanda', e.target.checked)}
-                                />
-                                <label htmlFor="impresionComanda" className="switch-label">
+                                <div className="switch-container">
+                                  <input
+                                    type="checkbox"
+                                    id="impresionComanda"
+                                    name="impresionComanda"
+                                    checked={formData.impresionComanda}
+                                    onChange={(e) => handleInputChange('impresionComanda', e.target.checked)}
+                                  />
                                   <span className="switch-slider"></span>
+                                </div>
+                                <label htmlFor="impresionComanda" className="switch-label">
                                   <span className="switch-text">
-                                    {formData.impresionComanda ? 'Sí' : 'No'}
+                                    {formData.impresionComanda ? '✅ Comanda Habilitada' : '❌ Comanda Deshabilitada'}
                                   </span>
                                 </label>
                               </div>
@@ -933,36 +1045,40 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                           <div className="switch-row">
                             <div className="form-group">
                               <label>Envío de Mensaje</label>
-                              <div className="form-switch">
-                                <input
-                                  type="checkbox"
-                                  id="envioMensaje"
-                                  name="envioMensaje"
-                                  checked={formData.envioMensaje}
-                                  onChange={(e) => handleInputChange('envioMensaje', e.target.checked)}
-                                />
-                                <label htmlFor="envioMensaje" className="switch-label">
+                              <div className="form-switch switch-warning">
+                                <div className="switch-container">
+                                  <input
+                                    type="checkbox"
+                                    id="envioMensaje"
+                                    name="envioMensaje"
+                                    checked={formData.envioMensaje}
+                                    onChange={(e) => handleInputChange('envioMensaje', e.target.checked)}
+                                  />
                                   <span className="switch-slider"></span>
+                                </div>
+                                <label htmlFor="envioMensaje" className="switch-label">
                                   <span className="switch-text">
-                                    {formData.envioMensaje ? 'Sí' : 'No'}
+                                    {formData.envioMensaje ? '📤 Mensajes Activos' : '📪 Mensajes Inactivos'}
                                   </span>
                                 </label>
                               </div>
                             </div>
                             <div className="form-group">
                               <label>Estado de Parámetros</label>
-                              <div className="form-switch">
-                                <input
-                                  type="checkbox"
-                                  id="estatus"
-                                  name="estatus"
-                                  checked={formData.estatus}
-                                  onChange={(e) => handleInputChange('estatus', e.target.checked)}
-                                />
-                                <label htmlFor="estatus" className="switch-label">
+                              <div className="form-switch switch-success">
+                                <div className="switch-container">
+                                  <input
+                                    type="checkbox"
+                                    id="estatus"
+                                    name="estatus"
+                                    checked={formData.estatus}
+                                    onChange={(e) => handleInputChange('estatus', e.target.checked)}
+                                  />
                                   <span className="switch-slider"></span>
+                                </div>
+                                <label htmlFor="estatus" className="switch-label">
                                   <span className="switch-text">
-                                    {formData.estatus ? 'Activo' : 'Inactivo'}
+                                    {formData.estatus ? '🟢 Parámetros Activos' : '🔴 Parámetros Inactivos'}
                                   </span>
                                 </label>
                               </div>
@@ -972,6 +1088,42 @@ const ConfigNegocios: React.FC<ConfigNegociosProps> = ({ onNavigate }) => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Navegación del acordeón */}
+                <div className="accordion-navigation">
+                  <button 
+                    type="button"
+                    className="nav-btn"
+                    onClick={goToPreviousSection}
+                    disabled={activeSection === 'perfil'}
+                  >
+                    ← Anterior
+                  </button>
+                  
+                  <div className="section-indicators">
+                    <div className={`indicator ${activeSection === 'perfil' ? 'active' : ''} ${isSectionComplete('perfil') ? 'completed' : ''}`}>
+                      <span className="indicator-icon">🏢</span>
+                      <span className="indicator-text">Perfil</span>
+                    </div>
+                    <div className={`indicator ${activeSection === 'configuracion' ? 'active' : ''} ${isSectionComplete('configuracion') ? 'completed' : ''}`}>
+                      <span className="indicator-icon">⚙️</span>
+                      <span className="indicator-text">Config</span>
+                    </div>
+                    <div className={`indicator ${activeSection === 'recibos' ? 'active' : ''} ${isSectionComplete('recibos') ? 'completed' : ''}`}>
+                      <span className="indicator-icon">🧾</span>
+                      <span className="indicator-text">Recibos</span>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button"
+                    className="nav-btn primary"
+                    onClick={goToNextSection}
+                    disabled={activeSection === 'recibos'}
+                  >
+                    Siguiente →
+                  </button>
                 </div>
               </div>
 

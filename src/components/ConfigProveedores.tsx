@@ -1,14 +1,8 @@
-// Componente ConfigProveedores - Gestión de Proveedores
 import React, { useState, useEffect } from 'react';
-import type { 
-  ScreenType, 
-  Proveedor, 
-  CreateProveedorData, 
-  UpdateProveedorData 
-} from '../types';
+import type { ScreenType, Proveedor, CreateProveedorData, UpdateProveedorData } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import Toast from './Toast';
-import '../styles/ConfigScreens.css';
+import apiService from '../services/api';
 import '../styles/FormStyles.css';
 
 interface Props {
@@ -16,13 +10,11 @@ interface Props {
 }
 
 const ConfigProveedores: React.FC<Props> = ({ onNavigate }) => {
-  // Auth context
   const { user } = useAuth();
-
+  
   // Estados del componente
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentProveedor, setCurrentProveedor] = useState<Proveedor | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -37,7 +29,7 @@ const ConfigProveedores: React.FC<Props> = ({ onNavigate }) => {
     banco: '',
     cuenta: '',
     activo: true,
-    usuarioauditoria: user?.nombre || 'system',
+    usuarioauditoria: user?.nombre || 'ADMIN',
     idnegocio: user?.idNegocio || 1
   });
 
@@ -58,38 +50,36 @@ const ConfigProveedores: React.FC<Props> = ({ onNavigate }) => {
     setIsLoading(true);
     try {
       console.log('🏪 Cargando proveedores...');
-      const response = await fetch('http://localhost:4000/api/proveedores');
+      const response = await apiService.getProveedores();
       
-      if (!response.ok) {
-        throw new Error('Error en la petición');
-      }
-
-      const data = await response.json();
-      
-      if (data.success && data.data) {
-        console.log('✅ Proveedores cargados:', data.data.length);
-        setProveedores(data.data);
+      if (response.success && response.data) {
+        setProveedores(response.data);
+        console.log(`✅ Proveedores cargados: ${response.data.length}`);
+        
+        if (response.data.length === 0) {
+          showToastMessage('No se encontraron proveedores', 'info');
+        }
       } else {
-        console.warn('⚠️ No se encontraron proveedores');
+        console.error('❌ Error en respuesta:', response.message);
+        showToastMessage(`Error al cargar proveedores: ${response.message}`, 'error');
         setProveedores([]);
-        showToastMessage('No se encontraron proveedores', 'info');
       }
     } catch (error) {
-      console.error('❌ Error cargando proveedores:', error);
-      showToastMessage('Error al cargar proveedores', 'error');
+      console.error('💥 Error cargando proveedores:', error);
+      showToastMessage('Error de conexión al cargar proveedores', 'error');
       setProveedores([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Efecto para cargar datos al montar el componente
+  // Efecto para cargar proveedores al montar el componente
   useEffect(() => {
     cargarProveedores();
   }, []);
 
-  // Función para resetear el formulario
-  const resetForm = () => {
+  // Función para abrir modal de creación
+  const handleAgregarProveedor = () => {
     setFormData({
       nombre: '',
       rfc: '',
@@ -99,22 +89,16 @@ const ConfigProveedores: React.FC<Props> = ({ onNavigate }) => {
       banco: '',
       cuenta: '',
       activo: true,
-      usuarioauditoria: user?.nombre || 'system',
+      usuarioauditoria: user?.nombre || 'ADMIN',
       idnegocio: user?.idNegocio || 1
     });
     setCurrentProveedor(null);
     setIsEditing(false);
-  };
-
-  // Función para abrir modal de creación
-  const abrirModalCreacion = () => {
-    resetForm();
     setShowModal(true);
   };
 
   // Función para abrir modal de edición
-  const abrirModalEdicion = (proveedor: Proveedor) => {
-    setCurrentProveedor(proveedor);
+  const handleEditarProveedor = (proveedor: Proveedor) => {
     setFormData({
       nombre: proveedor.nombre,
       rfc: proveedor.rfc,
@@ -124,170 +108,116 @@ const ConfigProveedores: React.FC<Props> = ({ onNavigate }) => {
       banco: proveedor.banco,
       cuenta: proveedor.cuenta,
       activo: proveedor.activo,
-      usuarioauditoria: user?.nombre || 'system',
-      idnegocio: user?.idNegocio || 1
+      usuarioauditoria: user?.nombre || 'ADMIN',
+      idnegocio: proveedor.idnegocio
     });
+    setCurrentProveedor(proveedor);
     setIsEditing(true);
     setShowModal(true);
   };
 
-  // Función para cerrar modal
-  const cerrarModal = () => {
-    setShowModal(false);
-    resetForm();
-  };
-
   // Función para manejar cambios en el formulario
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleInputChange = (field: keyof CreateProveedorData, value: string | boolean | number) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Función para cerrar modal
+  const handleCerrarModal = () => {
+    setShowModal(false);
+    setCurrentProveedor(null);
+    setIsEditing(false);
+  };
+
+  // Función para guardar proveedor
+  const handleGuardarProveedor = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    // Manejar campo booleano (switch)
-    if (name === 'activo') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: (e.target as HTMLInputElement).checked
-      }));
-    } 
-    // Manejar campos de texto
-    else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+    // Validaciones básicas
+    if (!formData.nombre.trim()) {
+      showToastMessage('El nombre del proveedor es requerido', 'error');
+      return;
     }
-  };
-
-  // Función para crear proveedor
-  const crearProveedor = async () => {
-    try {
-      setIsProcessing(true);
-      console.log('🏪 Enviando datos del proveedor:', formData);
-
-      const response = await fetch('http://localhost:4000/api/proveedores', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          nombre: formData.nombre,
-          rfc: formData.rfc,
-          telefono: formData.telefono,
-          correo: formData.correo,
-          direccion: formData.direccion,
-          banco: formData.banco,
-          cuenta: formData.cuenta,
-          activo: formData.activo,
-          usuarioauditoria: formData.usuarioauditoria,
-          idnegocio: formData.idnegocio
-        })
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        console.log('✅ Proveedor creado exitosamente');
-        showToastMessage(data.message, 'success');
-        cerrarModal();
-        await cargarProveedores();
-      } else {
-        console.error('❌ Error del servidor:', data.message);
-        showToastMessage(data.message || 'Error al crear proveedor', 'error');
-      }
-    } catch (error) {
-      console.error('❌ Error creando proveedor:', error);
-      showToastMessage('Error de conexión al crear proveedor', 'error');
-    } finally {
-      setIsProcessing(false);
+    if (!formData.rfc.trim()) {
+      showToastMessage('El RFC es requerido', 'error');
+      return;
     }
-  };
-
-  // Función para actualizar proveedor
-  const actualizarProveedor = async () => {
-    if (!currentProveedor) return;
-
-    try {
-      setIsProcessing(true);
-      console.log('🏪 Actualizando proveedor ID:', currentProveedor.id_proveedor);
-
-      const updateData: UpdateProveedorData = {
-        nombre: formData.nombre,
-        rfc: formData.rfc,
-        telefono: formData.telefono,
-        correo: formData.correo,
-        direccion: formData.direccion,
-        banco: formData.banco,
-        cuenta: formData.cuenta,
-        activo: formData.activo,
-        usuarioauditoria: formData.usuarioauditoria
-      };
-
-      const response = await fetch(`http://localhost:4000/api/proveedores/${currentProveedor.id_proveedor}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData)
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        console.log('✅ Proveedor actualizado exitosamente');
-        showToastMessage(data.message, 'success');
-        cerrarModal();
-        await cargarProveedores();
-      } else {
-        console.error('❌ Error del servidor:', data.message);
-        showToastMessage(data.message || 'Error al actualizar proveedor', 'error');
-      }
-    } catch (error) {
-      console.error('❌ Error actualizando proveedor:', error);
-      showToastMessage('Error de conexión al actualizar proveedor', 'error');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // Función para eliminar proveedor
-  const eliminarProveedor = async (proveedor: Proveedor) => {
-    if (!confirm(`¿Estás seguro de que deseas eliminar el proveedor "${proveedor.nombre}"?`)) {
+    if (!formData.telefono.trim()) {
+      showToastMessage('El teléfono es requerido', 'error');
       return;
     }
 
+    setIsLoading(true);
+    
     try {
-      setIsProcessing(true);
-      console.log('🏪 Eliminando proveedor ID:', proveedor.id_proveedor);
-
-      const response = await fetch(`http://localhost:4000/api/proveedores/${proveedor.id_proveedor}`, {
-        method: 'DELETE'
-      });
-
-      const data = await response.json();
+      let response;
       
-      if (data.success) {
-        console.log('✅ Proveedor eliminado exitosamente');
-        showToastMessage(data.message, 'success');
-        await cargarProveedores();
+      if (isEditing && currentProveedor) {
+        // Actualizar proveedor existente
+        const updateData: UpdateProveedorData = {
+          nombre: formData.nombre.trim(),
+          rfc: formData.rfc.trim(),
+          telefono: formData.telefono.trim(),
+          correo: formData.correo.trim(),
+          direccion: formData.direccion.trim(),
+          banco: formData.banco.trim(),
+          cuenta: formData.cuenta.trim(),
+          activo: formData.activo,
+          usuarioauditoria: formData.usuarioauditoria
+        };
+        
+        console.log('🔄 Actualizando proveedor:', updateData);
+        response = await apiService.updateProveedor(currentProveedor.id_proveedor, updateData);
       } else {
-        console.error('❌ Error del servidor:', data.message);
-        showToastMessage(data.message || 'Error al eliminar proveedor', 'error');
+        // Crear nuevo proveedor
+        console.log('✨ Creando nuevo proveedor:', formData);
+        response = await apiService.createProveedor(formData);
+      }
+
+      if (response.success) {
+        const action = isEditing ? 'actualizado' : 'creado';
+        showToastMessage(`Proveedor ${action} exitosamente`, 'success');
+        console.log(`✅ Proveedor ${action} exitosamente`);
+        
+        // Recargar lista de proveedores
+        await cargarProveedores();
+        handleCerrarModal();
+      } else {
+        console.error('❌ Error en la respuesta:', response.message);
+        showToastMessage(`Error: ${response.message}`, 'error');
       }
     } catch (error) {
-      console.error('❌ Error eliminando proveedor:', error);
-      showToastMessage('Error de conexión al eliminar proveedor', 'error');
+      console.error('💥 Error al guardar proveedor:', error);
+      showToastMessage('Error de conexión al guardar proveedor', 'error');
     } finally {
-      setIsProcessing(false);
+      setIsLoading(false);
     }
   };
 
-  // Función para manejar envío del formulario
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (isEditing) {
-      await actualizarProveedor();
-    } else {
-      await crearProveedor();
+  // Función para cambiar estado de proveedor
+  const handleToggleEstatus = async (proveedor: Proveedor) => {
+    try {
+      const nuevoEstatus = !proveedor.activo;
+      console.log(`🔄 Cambiando estatus de proveedor ${proveedor.id_proveedor} a ${nuevoEstatus}`);
+      
+      const updateData: UpdateProveedorData = {
+        activo: nuevoEstatus,
+        usuarioauditoria: user?.nombre || 'ADMIN'
+      };
+
+      const response = await apiService.updateProveedor(proveedor.id_proveedor, updateData);
+      
+      if (response.success) {
+        showToastMessage(`Proveedor ${nuevoEstatus ? 'activado' : 'desactivado'} exitosamente`, 'success');
+        await cargarProveedores(); // Recargar lista
+      } else {
+        showToastMessage(`Error: ${response.message}`, 'error');
+      }
+    } catch (error) {
+      console.error('💥 Error al cambiar estatus:', error);
+      showToastMessage('Error de conexión al cambiar estatus', 'error');
     }
   };
 
@@ -295,269 +225,231 @@ const ConfigProveedores: React.FC<Props> = ({ onNavigate }) => {
     <div className="config-screen">
       {/* Header */}
       <div className="config-header">
-        <div className="header-left">
-          <button 
-            onClick={() => onNavigate('tablero-inicial')}
-            className="btn-back"
-          >
-            ← Regresar
-          </button>
-          <h1>🏪 Configuración de Proveedores</h1>
-        </div>
-        
-        <div className="header-right">
-          <button 
-            onClick={abrirModalCreacion}
-            className="btn-primary"
-            disabled={isProcessing}
-          >
-            + Agregar Proveedor
-          </button>
-        </div>
+        <button 
+          onClick={() => onNavigate('tablero-inicial')}
+          className="btn-back"
+        >
+          ← Regresar
+        </button>
+        <h1>Configuración de Proveedores</h1>
+        <button 
+          onClick={handleAgregarProveedor}
+          className="btn-primary"
+          disabled={isLoading}
+        >
+          + Agregar Proveedor
+        </button>
       </div>
 
-      {/* Lista de proveedores */}
-      <div className="minicards-container">
-        {isLoading && proveedores.length === 0 ? (
-          <div className="loading-message">
-            <p>⏳ Cargando proveedores...</p>
-          </div>
-        ) : proveedores.length === 0 ? (
-          <div className="empty-message">
-            <p>📝 No hay proveedores registrados</p>
-            <p>Haz clic en "Agregar Proveedor" para comenzar</p>
+      {/* Contenido principal */}
+      <div className="config-content">
+        {isLoading && !showModal ? (
+          <div className="loading">
+            <p>🔄 Cargando proveedores...</p>
           </div>
         ) : (
-          proveedores.map((proveedor) => (
-            <div key={proveedor.id_proveedor} className="minicard">
-              <div className="minicard-header">
-                <h3 className="minicard-title">🏪 {proveedor.nombre}</h3>
-                <div className="minicard-actions">
-                  <button 
-                    onClick={() => abrirModalEdicion(proveedor)}
-                    className="btn-edit"
-                    disabled={isProcessing}
-                  >
-                    ✏️
-                  </button>
-                  <button 
-                    onClick={() => eliminarProveedor(proveedor)}
-                    className="btn-delete"
-                    disabled={isProcessing}
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-              
-              <div className="minicard-content">
-                <div className="field-row">
-                  <span className="field-label">RFC:</span>
-                  <span className="field-value">{proveedor.rfc}</span>
-                </div>
-                
-                <div className="field-row">
-                  <span className="field-label">Teléfono:</span>
-                  <span className="field-value">{proveedor.telefono}</span>
-                </div>
-                
-                <div className="field-row">
-                  <span className="field-label">Correo:</span>
-                  <span className="field-value">{proveedor.correo}</span>
-                </div>
-                
-                <div className="field-row">
-                  <span className="field-label">Banco:</span>
-                  <span className="field-value">{proveedor.banco}</span>
-                </div>
-                
-                <div className="field-row">
-                  <span className="field-label">Cuenta:</span>
-                  <span className="field-value">{proveedor.cuenta}</span>
-                </div>
-                
-                <div className="field-row">
-                  <span className="field-label">Estado:</span>
-                  <span className={`status-badge ${proveedor.activo ? 'active' : 'inactive'}`}>
-                    {proveedor.activo ? 'Activo' : 'Inactivo'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>RFC</th>
+                  <th>Teléfono</th>
+                  <th>Correo</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {proveedores.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="no-data">
+                      No hay proveedores registrados
+                    </td>
+                  </tr>
+                ) : (
+                  proveedores.map((proveedor) => (
+                    <tr key={proveedor.id_proveedor}>
+                      <td>{proveedor.id_proveedor}</td>
+                      <td>{proveedor.nombre}</td>
+                      <td>{proveedor.rfc}</td>
+                      <td>{proveedor.telefono}</td>
+                      <td>{proveedor.correo}</td>
+                      <td>
+                        <button
+                          onClick={() => handleToggleEstatus(proveedor)}
+                          className={`btn-toggle ${proveedor.activo ? 'active' : 'inactive'}`}
+                          title={`${proveedor.activo ? 'Desactivar' : 'Activar'} proveedor`}
+                        >
+                          {proveedor.activo ? '✅ Activo' : '❌ Inactivo'}
+                        </button>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button
+                            onClick={() => handleEditarProveedor(proveedor)}
+                            className="btn-edit"
+                            title="Editar proveedor"
+                          >
+                            ✏️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      {/* Modal de formulario */}
+      {/* Modal para agregar/editar proveedor */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={handleCerrarModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{isEditing ? '✏️ Editar Proveedor' : '➕ Nuevo Proveedor'}</h2>
-              <button 
-                onClick={cerrarModal}
-                className="btn-close"
-              >
-                ✕
-              </button>
+              <h3 className="modal-title">
+                {isEditing ? '✏️ Editar Proveedor' : '✨ Nuevo Proveedor'}
+              </h3>
+              <button className="btn-close" onClick={handleCerrarModal}>×</button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-content">
-                {/* Primera fila - Nombre y RFC */}
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="nombre">Nombre *</label>
-                    <input
-                      type="text"
-                      id="nombre"
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleInputChange}
-                      required
-                      maxLength={150}
-                      className="form-input"
-                      placeholder="Nombre completo del proveedor"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="rfc">RFC *</label>
-                    <input
-                      type="text"
-                      id="rfc"
-                      name="rfc"
-                      value={formData.rfc}
-                      onChange={handleInputChange}
-                      required
-                      maxLength={20}
-                      className="form-input"
-                      placeholder="RFC del proveedor"
-                    />
-                  </div>
+            <form onSubmit={handleGuardarProveedor} className="modal-body">
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Nombre del Proveedor *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={formData.nombre}
+                    onChange={(e) => handleInputChange('nombre', e.target.value)}
+                    placeholder="Nombre completo del proveedor"
+                    maxLength={150}
+                    required
+                  />
                 </div>
-
-                {/* Segunda fila - Teléfono y Correo */}
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="telefono">Teléfono *</label>
-                    <input
-                      type="tel"
-                      id="telefono"
-                      name="telefono"
-                      value={formData.telefono}
-                      onChange={handleInputChange}
-                      required
-                      maxLength={30}
-                      className="form-input"
-                      placeholder="Número de teléfono"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="correo">Correo Electrónico *</label>
-                    <input
-                      type="email"
-                      id="correo"
-                      name="correo"
-                      value={formData.correo}
-                      onChange={handleInputChange}
-                      required
-                      maxLength={100}
-                      className="form-input"
-                      placeholder="correo@ejemplo.com"
-                    />
-                  </div>
+                
+                <div className="form-group">
+                  <label className="form-label">RFC *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={formData.rfc}
+                    onChange={(e) => handleInputChange('rfc', e.target.value.toUpperCase())}
+                    placeholder="RFC del proveedor"
+                    maxLength={20}
+                    required
+                  />
                 </div>
+              </div>
 
-                {/* Tercera fila - Dirección */}
-                <div className="form-row">
-                  <div className="form-group full-width">
-                    <label htmlFor="direccion">Dirección *</label>
-                    <textarea
-                      id="direccion"
-                      name="direccion"
-                      value={formData.direccion}
-                      onChange={handleInputChange}
-                      required
-                      className="form-textarea"
-                      placeholder="Dirección completa del proveedor"
-                      rows={3}
-                    />
-                  </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Teléfono *</label>
+                  <input
+                    type="tel"
+                    className="form-input"
+                    value={formData.telefono}
+                    onChange={(e) => handleInputChange('telefono', e.target.value)}
+                    placeholder="Teléfono de contacto"
+                    maxLength={30}
+                    required
+                  />
                 </div>
-
-                {/* Cuarta fila - Banco y Cuenta */}
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="banco">Banco *</label>
-                    <input
-                      type="text"
-                      id="banco"
-                      name="banco"
-                      value={formData.banco}
-                      onChange={handleInputChange}
-                      required
-                      maxLength={100}
-                      className="form-input"
-                      placeholder="Nombre del banco"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="cuenta">Número de Cuenta *</label>
-                    <input
-                      type="text"
-                      id="cuenta"
-                      name="cuenta"
-                      value={formData.cuenta}
-                      onChange={handleInputChange}
-                      required
-                      maxLength={50}
-                      className="form-input"
-                      placeholder="Número de cuenta bancaria"
-                    />
-                  </div>
+                
+                <div className="form-group">
+                  <label className="form-label">Correo Electrónico</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={formData.correo}
+                    onChange={(e) => handleInputChange('correo', e.target.value)}
+                    placeholder="correo@ejemplo.com"
+                    maxLength={100}
+                  />
                 </div>
+              </div>
 
-                {/* Quinta fila - Estado Activo */}
-                <div className="form-row">
-                  <div className="form-group">
-                    <div className="form-switch-container">
-                      <label className="form-switch-label">Estado del Proveedor *</label>
-                      <label className="form-switch">
-                        <input
-                          type="checkbox"
-                          id="activo"
-                          name="activo"
-                          checked={formData.activo}
-                          onChange={handleInputChange}
-                        />
-                        <span className="form-slider"></span>
-                      </label>
-                      <span className="form-switch-label">
-                        {formData.activo ? 'Activo' : 'Inactivo'}
-                      </span>
+              <div className="form-row full-width">
+                <div className="form-group">
+                  <label className="form-label">Dirección</label>
+                  <textarea
+                    className="form-input"
+                    value={formData.direccion}
+                    onChange={(e) => handleInputChange('direccion', e.target.value)}
+                    placeholder="Dirección completa del proveedor"
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Banco</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={formData.banco}
+                    onChange={(e) => handleInputChange('banco', e.target.value)}
+                    placeholder="Nombre del banco"
+                    maxLength={100}
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label className="form-label">Número de Cuenta</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={formData.cuenta}
+                    onChange={(e) => handleInputChange('cuenta', e.target.value)}
+                    placeholder="Número de cuenta bancaria"
+                    maxLength={50}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Estado del Proveedor *</label>
+                  <div className="switch-container">
+                    <div className="switch-group">
+                      <button
+                        type="button"
+                        className={`switch-option ${formData.activo ? 'active' : ''}`}
+                        onClick={() => handleInputChange('activo', true)}
+                      >
+                        ✅ ACTIVO
+                      </button>
+                      <button
+                        type="button"
+                        className={`switch-option ${!formData.activo ? 'active' : ''}`}
+                        onClick={() => handleInputChange('activo', false)}
+                      >
+                        ❌ INACTIVO
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  onClick={cerrarModal}
-                  className="btn-secondary"
-                  disabled={isProcessing}
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={handleCerrarModal}
+                  disabled={isLoading}
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="submit" 
-                  className="btn-primary"
-                  disabled={isProcessing}
+                <button
+                  type="submit"
+                  className="btn-save"
+                  disabled={isLoading}
                 >
-                  {isProcessing ? '⏳ Procesando...' : (isEditing ? 'Actualizar' : 'Crear')}
+                  {isLoading ? '🔄 Guardando...' : (isEditing ? 'Actualizar' : 'Crear Proveedor')}
                 </button>
               </div>
             </form>
@@ -565,9 +457,9 @@ const ConfigProveedores: React.FC<Props> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Toast de notificaciones */}
+      {/* Toast Component */}
       {showToast && (
-        <Toast 
+        <Toast
           message={toastMessage}
           type={toastType}
           onClose={() => setShowToast(false)}

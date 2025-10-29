@@ -18,6 +18,7 @@ import insumosRoutes from './routes/insumosRoutes';
 import cuentaContableRoutes from './routes/cuentaContableRoutes';
 import proveedoresRoutes from './routes/proveedoresRoutes';
 import negociosRoutes from './routes/negociosRoutes';
+import clientesRoutes from './routes/clientesRoutes';
 
 // Carga las variables de entorno
 dotenv.config();
@@ -66,6 +67,7 @@ app.use('/api/insumos', insumosRoutes);
 app.use('/api/cuentas-contables', cuentaContableRoutes);
 app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/negocios', negociosRoutes);
+app.use('/api/clientes', clientesRoutes);
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {

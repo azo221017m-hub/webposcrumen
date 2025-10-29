@@ -18,6 +18,7 @@ import ConfigUMedida from './components/ConfigUMedida'; // Configuración de uni
 import ConfigInsumos from './components/ConfigInsumos'; // Configuración de insumos
 import ConfigCuentaContable from './components/ConfigCuentaContable'; // Configuración de cuentas contables
 import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
+import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
 import ConfigNegocios from './components/ConfigNegocios'; // Configuración de negocios
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
@@ -262,6 +263,15 @@ function App() {
         }
         console.log('🏪 Renderizando configuración de proveedores'); // Log de renderizado
         return <ConfigProveedores onNavigate={handleNavigate} />;
+
+      case 'config-clientes':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('👥 Renderizando configuración de clientes'); // Log de renderizado
+        return <ConfigClientes onNavigate={handleNavigate} />;
 
       case 'config-negocios':
         if (!isAuthenticated || !user) {
