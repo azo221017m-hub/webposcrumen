@@ -9,6 +9,7 @@ import {
   updateCategoriaController,
   deleteCategoriaController
 } from '../controllers/categoriasController'; // Importa controladores
+import uploadCategoriaImage from '../middlewares/multerCategorias';
 
 const router = Router(); // Crea instancia del router
 
@@ -20,9 +21,9 @@ router.get('/', getCategoriasController);
 // GET /api/categorias/dropdown
 router.get('/dropdown', getCategoriasDropdownController);
 
-// Ruta para crear una nueva categoría
+// Ruta para crear una nueva categoría (con imagen)
 // POST /api/categorias
-router.post('/', createCategoriaController);
+router.post('/', uploadCategoriaImage.single('imagencategoria'), createCategoriaController);
 
 // Ruta para actualizar una categoría existente
 // PUT /api/categorias/:id

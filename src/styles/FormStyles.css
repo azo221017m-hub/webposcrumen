@@ -1,3 +1,20 @@
+/* ===== MINICARD IMAGE STYLES ===== */
+.minicard-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+.minicard-image {
+  max-width: 80px;
+  max-height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #f6f6f6;
+}
 /* src/styles/FormStyles.css */
 /* Estilos para formularios estándar POSWEBCrumen */
 

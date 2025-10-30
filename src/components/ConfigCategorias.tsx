@@ -2,6 +2,8 @@
 // Componente para gestionar categorías de productos con diseño de minicards
 
 import React, { useState, useEffect } from 'react';
+import CategoriaImageUpload from './CategoriaImageUpload';
+import axios from 'axios';
 
 import type { ScreenType } from '../types';
 
@@ -9,7 +11,7 @@ import type { ScreenType } from '../types';
 const componentStyles = `
   .categorias-container {
     padding: 1.5rem;
-    background: #f8fafc;
+    background: #fcf8faff;
     min-height: 100vh;
   }
   
@@ -66,7 +68,7 @@ const componentStyles = `
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e2e8f0;
+    border: 1px solid #f072dfff;
     transition: all 0.3s ease;
     position: relative;
   }
@@ -323,12 +325,37 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
-    estatus: 1, // 1=activo, 0=inactivo
-    imagencategoria: '' // Para almacenar la imagen como base64
+    estatus: 1,
+    imagencategoria: '' // Para almacenar la ruta de imagen
   });
 
   // Estado para el archivo de imagen seleccionado
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // Utilidad para obtener la URL de la imagen (base64, dataURL, fallback)
+  function getImageUrl(imagencategoria?: string): string {
+    if (!imagencategoria || imagencategoria === 'null' || imagencategoria === 'undefined') {
+      return '';
+    }
+    // Si es una ruta relativa (archivo físico)
+    if (typeof imagencategoria === 'string' && imagencategoria.startsWith('/uploads/categorias/')) {
+      // Asume que el backend sirve archivos estáticos desde /uploads
+      return `http://localhost:4000${imagencategoria}`;
+    }
+    // Si ya tiene prefijo data:image
+    if (typeof imagencategoria === 'string' && imagencategoria.startsWith('data:image')) {
+      return imagencategoria;
+    }
+    // Si es base64 puro (legacy)
+    if (typeof imagencategoria === 'string' && imagencategoria.length > 200 && /^[A-Za-z0-9+/=]+$/.test(imagencategoria)) {
+      let mime = "image/png";
+      if (imagencategoria.startsWith("/9j/")) mime = "image/jpeg";
+      else if (imagencategoria.startsWith("R0lGOD")) mime = "image/gif";
+      else if (imagencategoria.startsWith("iVBORw")) mime = "image/png";
+      return `data:${mime};base64,${imagencategoria}`;
+    }
+    return '';
+  }
 
   // Log de montaje del componente
   useEffect(() => {
@@ -406,10 +433,10 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
     setFormData({
       nombre: '',
       descripcion: '',
-      estatus: 1, // 1=activo por defecto
+      estatus: 1,
       imagencategoria: ''
     });
-    setImagePreview('');
+    setSelectedFile(null);
     setShowModal(true);
   };
 
@@ -424,7 +451,7 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
       estatus: categoria.estatus,
       imagencategoria: categoria.imagencategoria || ''
     });
-    setImagePreview(categoria.imagencategoria || '');
+    setSelectedFile(null);
     setShowModal(true);
   };
 
@@ -440,97 +467,70 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
       estatus: 1,
       imagencategoria: ''
     });
-    setImagePreview('');
+    setSelectedFile(null);
   };
 
   // Función para manejar cambios en el formulario
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
     const { name, value, type } = e.target;
-    
-    if (type === 'file') {
-      handleImageChange(e as React.ChangeEvent<HTMLInputElement>);
-      return;
-    }
-    
     const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-    
     setFormData(prev => ({
       ...prev,
       [name]: finalValue
     }));
   };
 
-  // Función para manejar cambios en la imagen
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validar tipo de archivo
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-      if (!validTypes.includes(file.type)) {
-        alert('Por favor selecciona una imagen válida (JPG, PNG, GIF)');
-        return;
-      }
-
-      // Validar tamaño (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('La imagen debe ser menor a 5MB');
-        return;
-      }
-
-      // Crear preview
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64String = event.target?.result as string;
-        setImagePreview(base64String);
-        setFormData(prev => ({
-          ...prev,
-          imagencategoria: base64String
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+  // Función para manejar cambios en la imagen (usada por CategoriaImageUpload)
+  const handleImageChange = (file: File | null): void => {
+    setSelectedFile(file);
   };
 
   // Función para guardar categoría
   const guardarCategoria = async (): Promise<void> => {
     try {
       console.log('💾 Guardando categoría:', formData); // Log de guardado
-      
-      // Validaciones básicas
       if (!formData.nombre.trim()) {
         alert('El nombre de la categoría es requerido');
         return;
       }
-
       const url = isEditing 
         ? `http://localhost:4000/api/categorias/${selectedCategoria?.idCategoria}`
         : 'http://localhost:4000/api/categorias';
-      
-      const method = isEditing ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      let response;
+      if (!isEditing) {
+        // Crear FormData para POST (insertar)
+        const form = new FormData();
+        form.append('nombre', formData.nombre);
+        form.append('descripcion', formData.descripcion);
+        form.append('estatus', String(formData.estatus));
+        form.append('usuarioauditoria', 'admin');
+        form.append('idnegocio', '1');
+        if (selectedFile) {
+          form.append('imagencategoria', selectedFile);
+        }
+        response = await axios.post(url, form, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else {
+        // PUT: solo enviar datos si se modificó
+        response = await axios.put(url, {
           ...formData,
-          usuarioauditoria: 'admin', // Por ahora hardcodeado - valor de usuario desde login
-          idnegocio: 1 // Por ahora hardcodeado - valor de usuario desde login
-        }),
-      });
-
-      const data = await response.json();
-      
+          usuarioauditoria: 'admin',
+          idnegocio: 1
+        });
+      }
+      const data = response.data;
       if (data.success) {
         console.log('✅ Categoría guardada exitosamente'); // Log de éxito
         cerrarModal();
-        cargarCategorias(); // Recargar la lista
+        cargarCategorias();
       } else {
         console.error('❌ Error al guardar categoría:', data.message); // Log de error
         alert('Error al guardar la categoría: ' + data.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('💥 Error al guardar categoría:', error); // Log de error
       alert('Error de conexión al guardar la categoría');
     }
@@ -540,16 +540,8 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
   const eliminarCategoria = async (categoria: Categoria): Promise<void> => {
     try {
       console.log(`🗑️ Eliminando categoría ID: ${categoria.idCategoria}`); // Log de eliminación
-      
-      const confirmacion = window.confirm(`¿Está seguro de eliminar la categoría "${categoria.nombre}"?`);
-      if (!confirmacion) return;
-
-      const response = await fetch(`http://localhost:4000/api/categorias/${categoria.idCategoria}`, {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-      
+      const response = await axios.delete(`http://localhost:4000/api/categorias/${categoria.idCategoria}`);
+      const data = response.data;
       if (data.success) {
         console.log('✅ Categoría eliminada exitosamente'); // Log de éxito
         cargarCategorias(); // Recargar la lista
@@ -593,7 +585,7 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
         {/* Header con título y botón agregar */}
         <div className="categorias-header">
           <h1 className="categorias-title">
-            🏷️ Gestión de Categorías
+            🏷️ Gestión de C4tegorías
           </h1>
           <button 
             className="btn-add-categoria"
@@ -614,7 +606,6 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
           <div className="cards-grid">
             {categorias.map((categoria) => (
               <div key={categoria.idCategoria} className="categoria-card">
-                
                 {/* Header de la card */}
                 <div className="card-header">
                   <div>
@@ -624,32 +615,29 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
                     </span>
                   </div>
                 </div>
-
-                {/* Imagen de la categoría */}
-                <div className="card-image">
-                  {categoria.imagencategoria ? (
-                    <img 
-                      src={categoria.imagencategoria} 
+                {/* Imagen de la categoría o texto si no hay */}
+                <div className="minicard-image-container" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '120px'}}>
+                  {getImageUrl(categoria.imagencategoria) ? (
+                    <img
+                      className="minicard-image"
+                      src={getImageUrl(categoria.imagencategoria)}
                       alt={categoria.nombre}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                      style={{maxHeight: '100%', maxWidth: '100%'}}
                     />
                   ) : (
-                    <span>📷 Sin imagen</span>
+                    <span style={{color: '#a0aec0', fontSize: '1rem'}}>sin img</span>
                   )}
                 </div>
-
                 {/* Descripción */}
                 <div className="card-description">
                   {categoria.descripcion || 'Sin descripción disponible'}
                 </div>
-
                 {/* Información adicional */}
                 <div style={{ fontSize: '0.8rem', color: '#a0aec0', marginBottom: '1rem' }}>
                   <div>ID: {categoria.idCategoria} | Negocio: {categoria.idnegocio}</div>
                   <div>Creado: {formatearFecha(categoria.fechaRegistroauditoria)}</div>
                   <div>Usuario: {categoria.usuarioauditoria || '-'}</div>
                 </div>
-
                 {/* Botones de acción */}
                 <div className="card-actions">
                   <button 
@@ -669,7 +657,6 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
                 </div>
               </div>
             ))}
-
             {/* Mensaje cuando no hay categorías */}
             {categorias.length === 0 && (
               <div style={{ 
@@ -720,23 +707,12 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="imagencategoria">Imagen de la Categoría</label>
-                <input
-                  type="file"
-                  id="imagencategoria"
-                  name="imagencategoria"
-                  onChange={handleInputChange}
-                  accept="image/jpeg,image/jpg,image/png,image/gif"
+                <label htmlFor="imagencategoria">Archivo de imagen</label>
+                <CategoriaImageUpload
+                  onFileSelect={handleImageChange}
+                  initialImage={selectedFile ? URL.createObjectURL(selectedFile) : getImageUrl(formData.imagencategoria)}
+                  disabled={false}
                 />
-                {imagePreview && (
-                  <div style={{ marginTop: '10px' }}>
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '5px' }}
-                    />
-                  </div>
-                )}
               </div>
 
               <div className="form-group">

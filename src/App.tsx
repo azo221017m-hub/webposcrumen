@@ -10,7 +10,7 @@ import PresentationScreen from './components/PresentationScreen'; // Pantalla de
 import LoginScreen from './components/LoginScreen'; // Pantalla de login
 import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
 import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
-import ConfigCategorias from './components/ConfigCategorias'; // Configuración de categorías
+// ConfigCategorias eliminado
 import ConfigDescuentos from './components/ConfigDescuentos'; // Configuración de descuentos
 import ConfigRoldeUsuario from './components/ConfigRoldeUsuario'; // Configuración de roles de usuario
 import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de usuarios del sistema
@@ -192,14 +192,6 @@ function App() {
         console.log('🪑 Renderizando configuración de mesas'); // Log de renderizado
         return <ConfigMesas onNavigate={handleNavigate} />;
 
-      case 'config-categorias':
-        if (!isAuthenticated || !user) {
-          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
-          setCurrentScreen('login');
-          return <div></div>; // Componente vacío temporal
-        }
-        console.log('🏷️ Renderizando configuración de categorías'); // Log de renderizado
-        return <ConfigCategorias onNavigate={handleNavigate} />;
 
       case 'config-descuentos':
         if (!isAuthenticated || !user) {

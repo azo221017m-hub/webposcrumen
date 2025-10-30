@@ -11,7 +11,7 @@ export const getCategoriasController = async (req: Request, res: Response): Prom
     console.log('📂 Obteniendo todas las categorías'); // Log de inicio
     
     // Consulta SQL para obtener todas las categorías con todos los campos
-    const categorias = await executeQuery(`
+    let categorias = await executeQuery(`
       SELECT 
         idCategoria, 
         nombre, 
@@ -25,6 +25,21 @@ export const getCategoriasController = async (req: Request, res: Response): Prom
       FROM tblposcrumenwebcategorias 
       ORDER BY nombre ASC
     `, []);
+
+    // Convertir imagencategoria Buffer a base64 string si existe y evitar doble codificación
+    categorias = categorias.map((cat: any) => {
+      if (cat.imagencategoria) {
+        if (Buffer.isBuffer(cat.imagencategoria)) {
+          cat.imagencategoria = cat.imagencategoria.toString('base64');
+        } else if (typeof cat.imagencategoria === 'string' && cat.imagencategoria.startsWith('data:image/')) {
+          // Ya es una imagen válida, no modificar
+        } else if (typeof cat.imagencategoria === 'object') {
+          // Si es un objeto tipo JSON, ignora o corrige
+          cat.imagencategoria = null;
+        }
+      }
+      return cat;
+    });
 
     console.log(`✅ ${categorias.length} categorías encontradas`); // Log de éxito
 
@@ -81,12 +96,20 @@ export const createCategoriaController = async (req: Request, res: Response): Pr
     console.log('📂 Creando nueva categoría'); // Log de inicio
     const { 
       nombre, 
-      imagencategoria, 
       descripcion, 
       estatus = 1, 
       usuarioauditoria = 'system', 
       idnegocio = 1 
     } = req.body;
+
+    // Procesar imagen si se subió archivo
+    let imagenCategoriaFinal: string | null = null;
+    if (req.file) {
+      // Guardar ruta relativa del archivo
+      imagenCategoriaFinal = `/uploads/categorias/${req.file.filename}`;
+    } else if (req.body.imagencategoria) {
+      imagenCategoriaFinal = req.body.imagencategoria;
+    }
 
     // Validación de datos requeridos
     if (!nombre) {
@@ -118,7 +141,7 @@ export const createCategoriaController = async (req: Request, res: Response): Pr
       INSERT INTO tblposcrumenwebcategorias 
       (nombre, imagencategoria, descripcion, estatus, fechaRegistroauditoria, usuarioauditoria, fehamodificacionauditoria, idnegocio)
       VALUES (?, ?, ?, ?, NOW(), ?, NOW(), ?)
-    `, [nombre, imagencategoria, descripcion, estatus, usuarioauditoria, idnegocio]);
+    `, [nombre, imagenCategoriaFinal, descripcion, estatus, usuarioauditoria, idnegocio]);
 
     console.log('✅ Categoría creada exitosamente'); // Log de éxito
 

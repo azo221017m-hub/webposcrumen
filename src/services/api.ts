@@ -329,34 +329,6 @@ class ApiService {
   // ===== MÉTODOS PARA PRODUCTOS =====
 
   // Método para obtener todos los productos
-  async getProductos(): Promise<ApiResponse<any[]>> {
-    console.log('📦 Obteniendo productos'); // Log de obtención
-    
-    return this.request<any[]>('/api/productos', {
-      method: 'GET', // Método GET
-    });
-  }
-
-  // Método para obtener productos por negocio
-  async getProductosByNegocio(idNegocio: number): Promise<ApiResponse<any[]>> {
-    console.log('📦 Obteniendo productos del negocio:', idNegocio); // Log de obtención
-    
-    return this.request<any[]>(`/api/productos/negocio/${idNegocio}`, {
-      method: 'GET', // Método GET
-    });
-  }
-
-  // Método para crear un nuevo producto (con imagen)
-  async createProducto(productoData: FormData): Promise<ApiResponse<{ idProducto: number }>> {
-    console.log('📦 Creando nuevo producto'); // Log de creación
-    
-    // Para FormData, no establecer Content-Type (el navegador lo hace automáticamente)
-    return this.request<{ idProducto: number }>('/api/productos', {
-      method: 'POST', // Método POST
-      headers: {}, // Headers vacíos para FormData
-      body: productoData, // FormData con imagen
-    });
-  }
 
   // Método para actualizar un producto existente (con imagen)
   async updateProducto(id: number, productoData: FormData): Promise<ApiResponse<{ idProducto: number }>> {
@@ -784,18 +756,14 @@ export const updateNegocio = (id: number, negocioData: Partial<CreateNegocioData
 export const healthCheck = () => apiService.healthCheck();
 
 // Exportaciones para categorías
-export const getCategorias = () => apiService.getCategorias();
-export const getCategoriasDropdown = () => apiService.getCategoriasDropdown();
+// Categorias API methods removed
 export const createCategoria = (categoriaData: any) => apiService.createCategoria(categoriaData);
 export const updateCategoria = (id: number, categoriaData: any) => apiService.updateCategoria(id, categoriaData);
 export const deleteCategoria = (id: number, data: any) => apiService.deleteCategoria(id, data);
 
 // Exportaciones para productos
-export const getProductos = () => apiService.getProductos();
-export const getProductosByNegocio = (idNegocio: number) => apiService.getProductosByNegocio(idNegocio);
 export const getProductoImagen = (id: number) => apiService.getProductoImagen(id);
 export const getProductoImagenUrl = (id: number) => apiService.getProductoImagenUrl(id);
-export const createProducto = (productoData: FormData) => apiService.createProducto(productoData);
 export const updateProducto = (id: number, productoData: FormData) => apiService.updateProducto(id, productoData);
 export const deleteProducto = (id: number, data: any) => apiService.deleteProducto(id, data);
 

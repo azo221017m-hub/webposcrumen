@@ -219,7 +219,7 @@ export type ScreenType =
   | 'login' // Pantalla de login
   | 'home' // Pantalla principal/dashboard
   | 'tablero-inicial' // Nuevo tablero inicial
-  | 'config-categorias' // Configuración de categorías
+  // 'config-categorias' eliminado
   | 'config-mesas' // Configuración de mesas
   | 'config-descuentos' // Configuración de descuentos
   | 'config-roles' // Configuración de roles de usuario

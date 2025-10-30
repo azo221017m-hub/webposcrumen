@@ -45,7 +45,7 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
 
           <button 
             className="config-btn"
-            onClick={() => handleNavigate('config-categorias' as ScreenType)}
+            // ConfigCategorias eliminado
           >
             <span className="btn-icon">📁</span>
             <span className="btn-text">Categorías</span>
