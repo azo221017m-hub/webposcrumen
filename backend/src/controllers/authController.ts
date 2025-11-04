@@ -26,11 +26,13 @@ export const loginController = async (req: Request, res: Response): Promise<void
     console.log(`🔍 Buscando usuario por alias: ${usuario}`); // Log de búsqueda
 
     // Busca el usuario en la base de datos por alias
+    console.log(`🔍 Ejecutando consulta SQL: SELECT * FROM tblposcrumenwebusuarios WHERE alias = ?`);
+    console.log(`📝 Parámetros: [ '${usuario}' ]`);
     const usuarios = await executeQuery(
       'SELECT * FROM tblposcrumenwebusuarios WHERE alias = ?',
       [usuario]
     );
-
+    console.log('✅ Consulta ejecutada exitosamente');
     console.log(`📊 Usuarios encontrados: ${usuarios ? usuarios.length : 0}`); // Log de resultados
 
     // Si no existe el usuario - NO generar registro de login
@@ -58,6 +60,7 @@ export const loginController = async (req: Request, res: Response): Promise<void
 
     // Verifica si el usuario está bloqueado
     console.log(`🔍 Verificando estatus del usuario: ${user.estatus}`); // Log de verificación de estatus
+    console.log('🔍 Verificando estatus del usuario:', user.estatus);
     if (user.estatus === 9) {
       console.log('🚫 Usuario bloqueado por seguridad (estatus = 9)'); // Log de bloqueo
       res.status(403).json({
@@ -80,9 +83,8 @@ export const loginController = async (req: Request, res: Response): Promise<void
     }
 
     console.log('✅ Usuario activo, verificando contraseña...'); // Log de verificación
-    
-    // Verifica la contraseña usando bcrypt
-    console.log(`🔐 Comparando contraseñas - Input: ${password.length} caracteres, Hash: ${user.password ? user.password.length : 0} caracteres`);
+    console.log(`🔐 Comparando contraseñas - Input: ${password.length} caracteres, Hash: ${user.password?.length || 0} caracteres`);
+    console.log('🔒 Contraseña hasheada detectada, usando bcrypt.compare');
     
     let isValidPassword = false;
     
@@ -127,6 +129,18 @@ export const loginController = async (req: Request, res: Response): Promise<void
     // Login exitoso - resetear intentos y registrar éxito
     await registrarLoginExitoso(user.alias, user.idNegocio);
     
+    // Almacena idNegocio y aliasusuario en la sesión
+    if (req.session) {
+      req.session.idNegocio = user.idNegocio;
+      req.session.usuarioAuditoria = user.alias;
+      console.log('✅ idNegocio y usuarioAuditoria almacenados en la sesión:', {
+        idNegocio: req.session.idNegocio,
+        usuarioAuditoria: req.session.usuarioAuditoria,
+      });
+    }
+
+    console.log('🔍 [authController] idNegocio del usuario antes de almacenar en sesión:', user.idNegocio);
+
     // Retorna datos del usuario sin la contraseña - incluyendo datos para autorización
     const { password: _, ...userWithoutPassword } = user;
     
@@ -235,3 +249,5 @@ const registrarLoginExitoso = async (aliasusuario: string, idnegocio: number): P
     console.error('❌ Error procesando login exitoso:', error); // Log de error
   }
 };
+
+// console.log('🔄 [authController] Insertando moderador con payload:', req.body); // Removed due to undefined 'req'

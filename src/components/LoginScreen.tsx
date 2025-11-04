@@ -5,11 +5,14 @@ import { useState } from 'react'; // Importa hooks de React
 import type { LoginData } from '../types'; // Importa tipos
 import Toast from './Toast'; // Importa componente Toast
 import '../styles/LoginScreenNew.css'; // Importa estilos específicos
+import { useAuth } from '../hooks/useAuth'; // Importa el hook de autenticación
 
 // Interfaz para las props del componente
 interface LoginScreenProps {
-  onLogin: (loginData: LoginData) => Promise<boolean>; // Función de login
+  onLogin: (loginData: LoginData) => Promise<{ success: boolean; idnegocio: string; usuario: string; perfilusuario?: string }>; // Made perfilusuario optional
   isLoading: boolean; // Estado de carga
+  idnegocio: string; // ID del negocio
+  usuario: string; // Usuario autenticado
 }
 
 // Componente de pantalla de login
@@ -66,6 +69,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
     console.log(`📝 Campo ${name} actualizado`); // Log de cambio
   };
 
+  // Llamar al hook dentro del cuerpo del componente
+  const auth = useAuth(); 
+
   // Función para manejar el envío del formulario
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault(); // Previene el comportamiento por defecto del formulario
@@ -73,34 +79,39 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
     console.log('🔐 Intentando login...'); // Log de intento
     
     // Validación básica de campos
-    if (!formData.usuario.trim()) {
-      showToast('El usuario es requerido', 'error');
-      console.log('❌ Usuario requerido'); // Log de error
-      return;
-    }
-    
-    if (!formData.password.trim()) {
-      showToast('La contraseña es requerida', 'error');
-      console.log('❌ Contraseña requerida'); // Log de error
+    if (!formData.usuario.trim() || !formData.password.trim()) {
+      showToast('Usuario y contraseña son obligatorios', 'error');
+      console.log('❌ Usuario y contraseña requeridos'); // Log de error
       return;
     }
 
     try {
       // Intenta realizar el login
       console.log('🚀 [LoginScreen] Enviando datos de login:', { usuario: formData.usuario, password: '***' }); // Log de envío
-      const success = await onLogin(formData);
-      console.log('📋 [LoginScreen] Resultado del login:', success); // Log de resultado
+      const result = await onLogin(formData);
+      console.log('📋 [LoginScreen] Resultado del login:', result); // Log de resultado
       
-      if (!success) {
+      if (result.success) {
+        // Si el login es exitoso, almacena datos del usuario
+        auth.login({
+          usuario: formData.usuario,
+          password: formData.password,
+          idNegocio: Number(result.idnegocio), // Convertir idNegocio a número
+        });
+
+        showToast('¡Acceso exitoso! Bienvenido al sistema', 'success');
+        console.log('✅ [LoginScreen] Login exitoso'); // Log de éxito
+      } else {
         // Si falla el login, muestra mensaje de error
-        showToast('Usuario o contraseña incorrectos', 'error');
+        showToast('Credenciales incorrectas', 'error');
         console.log('❌ [LoginScreen] Credenciales incorrectas'); // Log de error
         
         // Limpia la contraseña por seguridad
         setFormData(prev => ({ ...prev, password: '' }));
-      } else {
-        console.log('✅ [LoginScreen] Login exitoso, debería navegar automáticamente'); // Log de éxito
-        showToast('¡Acceso exitoso! Bienvenido al sistema', 'success');
+        
+        // Notify user of server-side error
+        console.error('❌ [LoginScreen] Error en el servidor:', result);
+        alert('Error en el servidor: Error desconocido');
       }
       
     } catch (error) {
@@ -209,7 +220,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading }) => {
               ¿Problemas para acceder? Contacta al administrador
             </p>
             <div className="version-info">
-              <p className="version">v.B1010</p>
+              <p className="version">v.C1010</p>
               <p className="copyright">© 2025 - PosWebCrumen</p>
             </div>
           </div>

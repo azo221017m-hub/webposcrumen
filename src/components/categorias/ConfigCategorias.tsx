@@ -3,10 +3,16 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import CategoriaList from './CategoriaList';
 import ModalCategoria from './ModalCategoria';
-import '../styles/categorias/ConfigCategorias.css';
+import '../../styles/categorias/ConfigCategorias.css';
 import type { Categoria } from '../../types/categoria';
 
-export default function ConfigCategorias() {
+import type { ScreenType } from '../../types';
+
+interface Props {
+  onNavigate?: (screen: ScreenType) => void;
+}
+
+export default function ConfigCategorias({ onNavigate }: Props) {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -64,27 +70,29 @@ export default function ConfigCategorias() {
 
   // Render
   return (
-    <div className="config-categorias">
-      <button className="btn-regresar" onClick={() => window.location.href = '/'}>
-        ← Regresar a TableroInicial
-      </button>
-      <div className="header-categorias">
-        <h2>Categorías</h2>
-        <button className="btn-add" onClick={handleAdd}>Agregar Categoría</button>
+    <div className="config-screen">
+      <div className="config-container">
+        <div className="config-header">
+          <button className="btn-regresar" onClick={() => onNavigate && onNavigate('tablero-inicial')}>
+            ← Regresar a TableroInicial
+          </button>
+          <h2 style={{ margin: 0 }}>Categorías</h2>
+          <button className="btn-add" onClick={handleAdd}>Agregar Categoría</button>
+        </div>
+        {message && <div className="msg-categorias">{message}</div>}
+        {loading ? (
+          <div className="loading-categorias">Cargando...</div>
+        ) : (
+          <CategoriaList categorias={categorias} onEdit={handleEdit} />
+        )}
+        {showModal && (
+          <ModalCategoria
+            categoria={editCategoria}
+            onClose={() => setShowModal(false)}
+            onSave={handleSave}
+          />
+        )}
       </div>
-      {message && <div className="msg-categorias">{message}</div>}
-      {loading ? (
-        <div className="loading-categorias">Cargando...</div>
-      ) : (
-        <CategoriaList categorias={categorias} onEdit={handleEdit} />
-      )}
-      {showModal && (
-        <ModalCategoria
-          categoria={editCategoria}
-          onClose={() => setShowModal(false)}
-          onSave={handleSave}
-        />
-      )}
     </div>
   );
 }

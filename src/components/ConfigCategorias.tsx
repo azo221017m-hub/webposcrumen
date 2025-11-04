@@ -304,7 +304,7 @@ interface Categoria {
   estatus: number; // tinyint(1) - 1=activo, 0=inactivo
   fechaRegistroauditoria: string; // Fecha/hora de insert
   usuarioauditoria: string; // valor de usuario desde login
-  fehamodificacionauditoria: string; // Fecha/hora de update
+  fechamodificacionauditoria: string; // Fecha/hora de update
   idnegocio: number; // valor de usuario desde login
 }
 
@@ -389,7 +389,7 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
             descripcion: 'Bebidas frías y calientes',
             estatus: 1,
             fechaRegistroauditoria: new Date().toISOString(),
-            fehamodificacionauditoria: new Date().toISOString(),
+            fechamodificacionauditoria: new Date().toISOString(),
             usuarioauditoria: 'admin',
             idnegocio: 1
           },
@@ -399,7 +399,7 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
             descripcion: 'Platos principales y entradas',
             estatus: 1,
             fechaRegistroauditoria: new Date().toISOString(),
-            fehamodificacionauditoria: new Date().toISOString(),
+            fechamodificacionauditoria: new Date().toISOString(),
             usuarioauditoria: 'admin',
             idnegocio: 1
           },
@@ -409,7 +409,7 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
             descripcion: 'Dulces y postres',
             estatus: 0, // Ejemplo de categoría inactiva
             fechaRegistroauditoria: new Date().toISOString(),
-            fehamodificacionauditoria: new Date().toISOString(),
+            fechamodificacionauditoria: new Date().toISOString(),
             usuarioauditoria: 'admin',
             idnegocio: 1
           }
@@ -752,7 +752,7 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
                       <strong>Por:</strong> {selectedCategoria.usuarioauditoria || '-'}
                     </div>
                     <div>
-                      <strong>Modificado:</strong> {formatearFecha(selectedCategoria.fehamodificacionauditoria)}
+                      <strong>Modificado:</strong> {formatearFecha(selectedCategoria.fechamodificacionauditoria)}
                     </div>
                     <div>
                       <strong>ID Negocio:</strong> {selectedCategoria.idnegocio}
@@ -778,4 +778,5 @@ const ConfigCategorias: React.FC<ConfigCategoriasProps> = ({ onNavigate }) => {
   );
 };
 
+// (Removed duplicate default export and placeholder component)
 export default ConfigCategorias;

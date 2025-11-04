@@ -9,10 +9,15 @@ export interface ApiResponse<T = any> {
   error?: string; // Mensaje de error opcional
 }
 
+// Extiende los tipos de Express para incluir la sesión
+import 'express-session';
 
-
-
-
+declare module 'express-session' {
+  interface SessionData {
+    idNegocio?: number;
+    usuarioAuditoria?: string;
+  }
+}
 
 // Tipo para datos de login
 export interface LoginData {
@@ -654,15 +659,16 @@ export interface InsumoWeb {
 
 // Tipo para crear nuevo insumo web
 export interface CreateInsumoWebData {
-  nombre: string; // Nombre del insumo (requerido)
-  unidad_medida: UnidadMedidaInsumo; // Unidad de medida (requerido)
-  stock_actual: number; // Stock actual (requerido)
-  stock_minimo: number; // Stock mínimo (requerido)
-  id_cuentacontable_insumo: string; // ID cuenta contable (requerido)
-  activo: boolean; // Activo (requerido)
-  inventariable: boolean; // Inventariable (requerido)
-  usuarioauditoria: string; // Usuario (requerido)
-  idnegocio: number; // ID del negocio (requerido)
+  nombre: string; // Nombre del insumo
+  unidad_medida: string; // Unidad de medida (Kg, Lt, Pza)
+  stock_actual: number; // Stock actual
+  stock_minimo: number; // Stock mínimo
+  costo_promedio_ponderado?: number; // Costo promedio ponderado (opcional)
+  precio_venta?: number; // Precio de venta (opcional)
+  idinocuidad?: string; // ID de inocuidad (opcional)
+  id_cuentacontable?: string; // ID de cuenta contable (opcional)
+  activo?: boolean; // Estado del insumo (activo/inactivo)
+  inventariable?: boolean; // Si el insumo es inventariable
 }
 
 // Tipo para actualizar insumo web

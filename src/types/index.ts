@@ -7,6 +7,10 @@ export interface ApiResponse<T = any> {
   message: string; // Mensaje descriptivo de la respuesta
   data?: T; // Datos opcionales de la respuesta
   error?: string; // Mensaje de error opcional
+  authorization?: {
+    idNegocio: number; // ID del negocio
+    usuarioAuditoria: string; // Usuario auditoria
+  }; // Información de autorización opcional
 }
 
 // Tipo para datos de usuario
@@ -45,6 +49,7 @@ export interface Negocio {
 export interface LoginData {
   usuario: string; // Nombre de usuario
   password: string; // Contraseña
+  idNegocio?: number; // ID del negocio (opcional)
 }
 
 // Tipo para el contexto de autenticación
@@ -219,7 +224,7 @@ export type ScreenType =
   | 'login' // Pantalla de login
   | 'home' // Pantalla principal/dashboard
   | 'tablero-inicial' // Nuevo tablero inicial
-  // 'config-categorias' eliminado
+  | 'config-categorias' // Configuración de categorías
   | 'config-mesas' // Configuración de mesas
   | 'config-descuentos' // Configuración de descuentos
   | 'config-roles' // Configuración de roles de usuario
@@ -229,11 +234,14 @@ export type ScreenType =
   | 'config-cuenta-contable' // Configuración de cuentas contables
   | 'config-proveedores' // Configuración de proveedores
   | 'config-clientes' // Configuración de clientes
+  | 'config-productos' // Configuración de productos
+  
   | 'config-negocios' // Configuración de negocios
   | 'config-perfil' // Configuración de perfil
   | 'iniciar-venta' // Iniciar nueva venta
   | 'indicadores-ventas' // Indicadores de ventas
-  | 'sistema-configuracion'; // Configuración del sistema
+  | 'sistema-configuracion' // Configuración del sistema
+  | 'config-moderadores' // Configuración de moderadores
 
 // Tipo para los indicadores del dashboard
 export interface Indicator {
@@ -914,6 +922,20 @@ export interface UpdateParametrosNegocioCompletosData {
   envioMensaje?: boolean; // Envío de mensaje (opcional)
   estatus?: boolean; // Estatus (opcional)
   usuarioAuditoria?: string; // Usuario auditoría (opcional)
+}
+
+// Tipo para la categoría de moderador
+export interface CategoriaModerador {
+  id: number; // ID único de la categoría
+  nombre: string; // Nombre de la categoría
+  descripcion: string; // Descripción de la categoría
+}
+
+// Tipo para datos de moderador
+export interface Moderador {
+  id: number; // ID único del moderador
+  nombre: string; // Nombre del moderador
+  email: string; // Email del moderador
 }
 
 

@@ -11,6 +11,9 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       }
+    },
+    headers: {
+      'Content-Security-Policy': "worker-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
     }
   }
 })

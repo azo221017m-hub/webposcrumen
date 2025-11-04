@@ -20,7 +20,7 @@ export const getCategoriasController = async (req: Request, res: Response): Prom
         estatus, 
         fechaRegistroauditoria, 
         usuarioauditoria, 
-        fehamodificacionauditoria, 
+        fechamodificacionauditoria, 
         idnegocio
       FROM tblposcrumenwebcategorias 
       ORDER BY nombre ASC
@@ -139,7 +139,7 @@ export const createCategoriaController = async (req: Request, res: Response): Pr
     // Insertar nueva categoría
     const result = await executeQuery(`
       INSERT INTO tblposcrumenwebcategorias 
-      (nombre, imagencategoria, descripcion, estatus, fechaRegistroauditoria, usuarioauditoria, fehamodificacionauditoria, idnegocio)
+      (nombre, imagencategoria, descripcion, estatus, fechaRegistroauditoria, usuarioauditoria, fechamodificacionauditoria, idnegocio)
       VALUES (?, ?, ?, ?, NOW(), ?, NOW(), ?)
     `, [nombre, imagenCategoriaFinal, descripcion, estatus, usuarioauditoria, idnegocio]);
 
@@ -164,7 +164,6 @@ export const createCategoriaController = async (req: Request, res: Response): Pr
 // Controlador para actualizar una categoría existente
 export const updateCategoriaController = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('📂 Actualizando categoría'); // Log de inicio
     const { id } = req.params;
     const { 
       nombre, 
@@ -236,7 +235,7 @@ export const updateCategoriaController = async (req: Request, res: Response): Pr
       updateValues.push(estatus);
     }
     
-    updateFields.push('fehamodificacionauditoria = NOW()');
+    updateFields.push('fechamodificacionauditoria = NOW()');
     updateFields.push('usuarioauditoria = ?');
     updateValues.push(usuarioauditoria, id);
 

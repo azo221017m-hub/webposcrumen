@@ -116,9 +116,12 @@ export const createInsumo = async (req: Request, res: Response): Promise<void> =
     }
     
     // Verificar si ya existe un insumo con el mismo nombre
+    const idnegocio = req.session?.idNegocio;
+
+    // Verificar si ya existe un insumo con el mismo nombre para el negocio actual
     const [existingRows] = await pool.execute<RowDataPacket[]>(
       'SELECT id_insumo FROM tblposcrumenwebinsumos WHERE nombre = ? AND idnegocio = ?',
-      [insumoData.nombre.trim(), insumoData.idnegocio]
+      [insumoData.nombre.trim(), idnegocio]
     );
     
     if (existingRows.length > 0) {
@@ -130,36 +133,50 @@ export const createInsumo = async (req: Request, res: Response): Promise<void> =
       return;
     }
     
-    // Crear el insumo
-    const insertQuery = `
-      INSERT INTO tblposcrumenwebinsumos 
-      (nombre, unidad_medida, stock_actual, stock_minimo, costo_promedio_ponderado, precio_venta, 
-       idinocuidad, id_cuentacontable, activo, inventariable, fechaRegistroauditoria, usuarioauditoria, idnegocio)
-      VALUES (?, ?, ?, ?, 0, 0, '', ?, ?, ?, NOW(), ?, ?)
-    `;
-    
-    const insertValues = [
-      insumoData.nombre.trim(),
-      insumoData.unidad_medida,
-      insumoData.stock_actual,
-      insumoData.stock_minimo,
-      insumoData.id_cuentacontable_insumo,
-      insumoData.activo ? 1 : 0,
-      insumoData.inventariable,
-      insumoData.usuarioauditoria,
-      insumoData.idnegocio
-    ];
-    
-    const [result] = await pool.execute<ResultSetHeader>(insertQuery, insertValues);
-    
+    // Extraer datos de auditoría de la sesión
+    const usuarioauditoria = req.session?.usuarioAuditoria;
+
+    if (!idnegocio || !usuarioauditoria) {
+      console.log('❌ idNegocio o usuarioAuditoria faltantes en la sesión');
+      res.status(403).json({
+        success: false,
+        message: 'No se puede realizar la operación. Falta información de auditoría.'
+      });
+      return;
+    }
+
+    const fechaRegistroauditoria = new Date();
+
+    // Insertar el nuevo insumo en la base de datos
+    const [result] = await pool.execute<ResultSetHeader>(
+      `INSERT INTO tblposcrumenwebinsumos (
+        nombre, unidad_medida, stock_actual, stock_minimo, costo_promedio_ponderado,
+        precio_venta, idinocuidad, id_cuentacontable, activo, inventariable,
+        fechaRegistroauditoria, usuarioauditoria, idnegocio
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        insumoData.nombre,
+        insumoData.unidad_medida,
+        insumoData.stock_actual,
+        insumoData.stock_minimo,
+        insumoData.costo_promedio_ponderado || 0,
+        insumoData.precio_venta || 0,
+        insumoData.idinocuidad || null,
+        insumoData.id_cuentacontable || null,
+        insumoData.activo ? 1 : 0,
+        insumoData.inventariable ? 1 : 0,
+        fechaRegistroauditoria,
+        usuarioauditoria,
+        idnegocio
+      ]
+    );
+
     console.log('✅ Insumo creado exitosamente con ID:', result.insertId);
-    
-    const response: ApiResponse = {
+    res.status(201).json({
       success: true,
       message: 'Insumo creado exitosamente',
-      data: { id: result.insertId }
-    };
-    res.status(201).json(response);
+      data: { id_insumo: result.insertId }
+    });
 
   } catch (error) {
     console.error('❌ Error creando insumo:', error);

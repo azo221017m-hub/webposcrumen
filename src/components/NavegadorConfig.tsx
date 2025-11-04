@@ -2,6 +2,7 @@
 // Navegador de configuraciones con acceso a todos los componentes config
 
 import type { ScreenType } from '../types';
+import React from 'react';
 
 // Props del componente NavegadorConfig
 interface NavegadorConfigProps {
@@ -45,10 +46,18 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
 
           <button 
             className="config-btn"
-            // ConfigCategorias eliminado
+            onClick={() => handleNavigate('config-categorias' as ScreenType)}
           >
             <span className="btn-icon">📁</span>
             <span className="btn-text">Categorías</span>
+          </button>
+
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-cat-moderadores' as ScreenType)}
+          >
+            <span className="btn-icon">📂</span>
+            <span className="btn-text">Categorias Moderadores</span>
           </button>
 
           <button 
@@ -117,10 +126,24 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
 
           <button 
             className="config-btn"
+            onClick={() => handleNavigate('config-productos' as ScreenType)}
+          >
+            <span className="btn-icon">🛒</span>
+            <span className="btn-text">Productos</span>
+          </button>
+          <button 
+            className="config-btn"
             onClick={() => handleNavigate('config-negocios' as ScreenType)}
           >
             <span className="btn-icon">🏢</span>
             <span className="btn-text">Negocios</span>
+          </button>
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-moderadores' as ScreenType)}
+          >
+            <span className="btn-icon">🛡️</span>
+            <span className="btn-text">Moderadores</span>
           </button>
         </div>
       </div>

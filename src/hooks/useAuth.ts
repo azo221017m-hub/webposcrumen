@@ -36,14 +36,36 @@ export const useAuth = (): AuthContextType => {
         // Login exitoso
         const userData = response.data.user;
         console.log('👤 [useAuth] Datos del usuario recibidos:', userData); // Log de datos del usuario
-        
-        setUser(userData); // Establece el usuario
-        console.log('👤 [useAuth] Usuario establecido en estado:', userData); // Log de establecimiento
-        
+
+        const { authorization } = response.data as { user: Usuario; authorization?: { idNegocio: number; usuarioAuditoria: string } };
+
+        console.log('🔍 [useAuth] Contenido de authorization:', authorization);
+
+        const idNegocio = authorization?.idNegocio ?? userData.idNegocio;
+        const usuarioAuditoria = authorization?.usuarioAuditoria ?? userData.usuarioauditoria;
+
+        console.log('🔍 [useAuth] idNegocio obtenido:', idNegocio);
+
+        if (!idNegocio || idNegocio === 0) {
+          console.warn('⚠️ [useAuth] idNegocio no válido recibido del backend:', idNegocio);
+        } else {
+          console.log('✅ [useAuth] idNegocio válido recibido:', idNegocio);
+        }
+
+        const userWithAudit: Usuario = {
+          ...userData,
+          idNegocio,
+          usuarioauditoria: usuarioAuditoria, // Ensure compatibility with Usuario type
+        };
+
+        setUser(userWithAudit); // Establece el usuario con datos de auditoría
+        console.log('👤 [useAuth] Usuario con auditoría establecido:', userWithAudit);
+
         setIsAuthenticated(true); // Marca como autenticado
         console.log('🔓 [useAuth] isAuthenticated establecido a: true'); // Log de autenticación
-        
+
         console.log('✅ [useAuth] Login exitoso para:', userData.alias); // Log de éxito
+        console.log('🛠️ Estado del usuario después del login:', userData);
         console.log('🔄 [useAuth] Estado final - isAuthenticated:', true, 'user:', userData.alias); // Log de estado
         setIsLoading(false); // Termina la carga
         return true; // Retorna éxito
@@ -82,4 +104,10 @@ export const useAuth = (): AuthContextType => {
     login, // Función de login
     logout, // Función de logout
   };
+};
+
+// Función para mostrar alerta de usuario logueado
+export const showAlert = (user: Usuario): void => {
+  console.log('🔍 [useAuth] Datos del usuario logueado:', user);
+  alert(`Usuario logueado:\nAlias: ${user.alias}\nNombre: ${user.nombre}\nID Negocio: ${user.idNegocio}`);
 };

@@ -10,7 +10,7 @@ import PresentationScreen from './components/PresentationScreen'; // Pantalla de
 import LoginScreen from './components/LoginScreen'; // Pantalla de login
 import TableroInicial from './components/TableroInicial'; // Nuevo tablero inicial
 import ConfigMesas from './components/ConfigMesas'; // Configuración de mesas
-// ConfigCategorias eliminado
+import ConfigCategorias from './components/categorias/ConfigCategorias'; // Configuración de categorías
 import ConfigDescuentos from './components/ConfigDescuentos'; // Configuración de descuentos
 import ConfigRoldeUsuario from './components/ConfigRoldeUsuario'; // Configuración de roles de usuario
 import ConfigUsuarios from './components/ConfigUsuarios'; // Configuración de usuarios del sistema
@@ -20,6 +20,7 @@ import ConfigCuentaContable from './components/ConfigCuentaContable'; // Configu
 import ConfigProveedores from './components/ConfigProveedores'; // Configuración de proveedores
 import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
 import ConfigNegocios from './components/ConfigNegocios'; // Configuración de negocios
+import ConfigModeradores from './components/ConfigModeradores'; // Import ConfigModeradores
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
@@ -136,14 +137,23 @@ function App() {
               try {
                 const success = await login(loginData);
                 console.log(`📋 [App] Resultado del login: ${success}`);
-                // No cambiar currentScreen aquí - dejar que useEffect lo maneje
-                return success;
+                if (success) {
+                  return {
+                    success: true,
+                    idnegocio: user?.idNegocio?.toString() || '',
+                    usuario: user?.alias || '',
+                  };
+                } else {
+                  return { success: false, idnegocio: '', usuario: '' };
+                }
               } catch (error) {
                 console.error('💥 [App] Error en login:', error);
-                return false;
+                return { success: false, idnegocio: '', usuario: '' };
               }
             }}
             isLoading={isLoading}
+            idnegocio={user?.idNegocio?.toString() || ''} // Pass idnegocio
+            usuario={user?.alias || ''} // Pass usuario
           />
         );
 
@@ -182,6 +192,15 @@ function App() {
             }}
           />
         );
+
+      case 'config-categorias':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('🏷️ Renderizando configuración de categorías'); // Log de renderizado
+  return <ConfigCategorias onNavigate={handleNavigate} />;
 
       case 'config-mesas':
         if (!isAuthenticated || !user) {
@@ -273,6 +292,10 @@ function App() {
         }
         console.log('🏢 Renderizando configuración de negocios'); // Log de renderizado
         return <ConfigNegocios onNavigate={handleNavigate} />;
+
+      case 'config-moderadores':
+        console.log('🛠 Renderizando pantalla de ConfigModeradores'); // Log de renderizado
+        return <ConfigModeradores onBack={() => setCurrentScreen('tablero-inicial')} />;
 
     default:
         console.log('❓ Pantalla desconocida, redirigiendo a presentación'); // Log de error

@@ -68,6 +68,16 @@ class ApiService {
       const response = await fetch(url, config);
       console.log(`📊 Status de respuesta: ${response.status}`); // Log de status
       
+      // Verificar si la respuesta es válida antes de analizar el JSON
+      if (!response.ok) {
+        console.error('❌ Respuesta HTTP no válida:', response.status, response.statusText);
+        return {
+          success: false,
+          message: `Error HTTP: ${response.status} ${response.statusText}`,
+          error: 'HTTP_ERROR',
+        };
+      }
+      
       // Parsea la respuesta JSON
       const data: ApiResponse<T> = await response.json();
       console.log(`📦 Datos de respuesta completos:`, data); // Log de datos completos
