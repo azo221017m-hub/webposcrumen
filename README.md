@@ -1,6 +1,67 @@
+
 # POSWEBCrumen
 
-🏪 **Sistema de Punto de Venta Completo** - Aplicación fullstack desarrollada con React + TypeScript + Vite (Frontend) y Node.js + Express + MySQL (Backend).
+Sistema POS Web Fullstack
+
+## Arquitectura
+
+- **Frontend:** React 19 + TypeScript + Vite
+- **Backend:** Node.js + Express + TypeScript + MySQL
+- **Base de datos:** Azure MySQL
+
+## Estructura de carpetas
+
+- `/src/` - Frontend React
+   - `components/` - Componentes principales (LoginScreen, ConfigCategoriaModeradores, etc.)
+   - `hooks/` - Hooks personalizados (`useAuth` para autenticación y contexto)
+   - `services/` - Servicios de API
+   - `styles/` - Archivos CSS
+   - `types/` - Tipos TypeScript compartidos
+- `/backend/src/` - Backend Express
+   - `controllers/` - Lógica de negocio y endpoints
+   - `middlewares/` - Middlewares (autenticación, logging)
+   - `routes/` - Rutas API REST
+   - `config/` - Configuración de base de datos
+   - `types/` - Tipos compartidos
+
+## Flujo de autenticación y manejo de idNegocio
+
+- El usuario inicia sesión en `LoginScreen`.
+- El backend responde con los datos del usuario y el campo `idNegocio`.
+- El hook `useAuth` guarda `idNegocio` en el contexto global.
+- Todos los módulos que requieren el id del negocio (por ejemplo, para crear categorías) lo obtienen desde el contexto (`auth.user?.idNegocio`).
+- Si el backend no envía el valor, se fuerza a `1` por defecto para evitar errores.
+
+## Módulos principales
+
+- **LoginScreen:** Pantalla de acceso y validación de usuario.
+- **ConfigCategoriaModeradores:** Gestión de categorías de moderadores (CRUD), usando el idNegocio del contexto.
+- **NavegadorConfig:** Navegación entre pantallas de configuración.
+- **useAuth:** Hook para autenticación y manejo de sesión.
+
+## Buenas prácticas
+
+- Todos los fetch POST incluyen el idNegocio en el payload.
+- Los controladores backend validan la presencia de `nombremodref` e `idnegocio`.
+- Los componentes React usan keys únicos en listas para evitar warnings.
+
+## Ejemplo de payload para crear categoría
+
+```json
+{
+   "nombremodref": "nombre",
+   "idnegocio": 1,
+   "usuario": "alias"
+}
+```
+
+## Comandos útiles
+
+- `npm run dev` (frontend y backend)
+
+## Contacto y soporte
+
+¿Problemas para acceder? Contacta al administrador.
 
 ## 🚀 Características Principales
 
@@ -90,5 +151,5 @@ Para probar la aplicación:
 
 ---
 
-**POSWEBCrumen v1.0.0** - Sistema de Punto de Venta Completo  
+**POSWEBCrumen v1.11.100** - Sistema de Punto de Venta Completo  
 Desarrollado con ❤️ por el equipo de CrumenDev

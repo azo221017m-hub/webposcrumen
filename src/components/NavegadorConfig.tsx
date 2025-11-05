@@ -25,16 +25,12 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
       
       {/* Título del navegador */}
       <header className="navegador-header">
-        <h2>⚡ ACCIONES RAPIDAS</h2>
+        <h2>⚙️ CONFIGURACIÓN de MI NEGOCIO</h2>
       </header>
 
-      {/* Sección CONFIGURACIONES DISPONIBLES */}
+      {/* Sección CONFIGURACIÓN de MI NEGOCIO */}
       <div className="config-section">
-        <h3 className="section-title">
-          <span className="section-icon">⚙️</span>
-          CONFIGURACIONES DISPONIBLES
-        </h3>
-        
+                
         <div className="config-grid">
           <button 
             className="config-btn"
@@ -52,13 +48,6 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
             <span className="btn-text">Categorías</span>
           </button>
 
-          <button 
-            className="config-btn"
-            onClick={() => handleNavigate('config-cat-moderadores' as ScreenType)}
-          >
-            <span className="btn-icon">📂</span>
-            <span className="btn-text">Categorias Moderadores</span>
-          </button>
 
           <button 
             className="config-btn"

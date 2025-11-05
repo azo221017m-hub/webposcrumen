@@ -1,3 +1,37 @@
+// Eliminar una categoría de moderador
+export const deleteCategoriaModerador = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ message: 'ID requerido' });
+  }
+  try {
+    await pool.execute(
+      'DELETE FROM tblposcrumenwebmodref WHERE idmodref = ?',
+      [id]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar categoría', error });
+  }
+};
+// Editar una categoría de moderador
+// ...existing code...
+export const updateCategoriaModerador = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { nombremodref } = req.body;
+  if (!nombremodref || !id) {
+    return res.status(400).json({ message: 'Nombre y ID requeridos' });
+  }
+  try {
+    await pool.execute(
+      'UPDATE tblposcrumenwebmodref SET nombremodref = ? WHERE idmodref = ?',
+      [nombremodref, id]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar categoría', error });
+  }
+};
 import { Request, Response } from 'express';
 import pool from '../config/database';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
@@ -21,13 +55,17 @@ export const getCategoriasModeradores = async (req: Request, res: Response) => {
 // Crear una nueva categoría de moderador
 export const createCategoriaModerador = async (req: AuthenticatedRequest, res: Response) => {
   console.log('📡 [POST] /api/categorias-moderadores - Creando nueva categoría:', req.body);
-  const { nombremodref } = req.body;
-  const usuarioauditoria = req.user?.alias || 'unknown'; // Using extended AuthenticatedRequest
-  const idnegocio = req.user?.idNegocio || null; // Using extended AuthenticatedRequest
+  const { nombremodref, idnegocio: idnegocioBody } = req.body;
+  const usuarioauditoria = req.user?.alias || 'unknown';
+  // Prioriza el idnegocio del body, si existe, si no usa el del contexto
+  const idnegocio = Number(idnegocioBody ?? req.user?.idNegocio);
 
-  if (!nombremodref || !idnegocio) {
-    console.error('❌ Nombre de categoría e idnegocio son requeridos');
-    return res.status(400).json({ message: 'Nombre de categoría e idnegocio son requeridos' });
+  console.log('Payload recibido:', req.body);
+  console.log('idnegocio usado:', idnegocio);
+
+  if (!nombremodref || typeof nombremodref !== 'string' || idnegocio <= 0 || isNaN(idnegocio)) {
+    console.error('❌ Nombre de categoría e idnegocio son requeridos o inválidos');
+    return res.status(400).json({ message: 'Nombre de categoría e idnegocio son requeridos o inválidos' });
   }
 
   try {

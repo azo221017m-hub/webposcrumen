@@ -9,6 +9,9 @@ interface CategoriaModerador {
 
 // Componente para gestionar categorías de moderadores
 const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  // Estado para edición
+  const [editCategoria, setEditCategoria] = useState<CategoriaModerador | null>(null);
+  const [editNombre, setEditNombre] = useState('');
   const [categorias, setCategorias] = useState<CategoriaModerador[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [nombreCategoria, setNombreCategoria] = useState('');
@@ -28,15 +31,23 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
 
   // Manejar el envío del formulario para agregar una categoría
   const handleAddCategoria = () => {
-    // Depuración: mostrar valores antes de enviar
-    console.log('Valor a enviar en nombremodref:', nombreCategoria);
-    console.log('IDNEGOCIO a enviar:', auth.user?.idNegocio);
+    // Validación: nombre no vacío
+    if (!nombreCategoria.trim()) {
+      alert('Debes ingresar el nombre de la categoría.');
+      return;
+    }
+    // Validación: nombre único
+    if (categorias.some(c => c.nombremodref.trim().toLowerCase() === nombreCategoria.trim().toLowerCase())) {
+      alert('Ya existe una categoría con ese nombre.');
+      return;
+    }
+    // ...existing code...
     fetch('/api/categorias-moderadores', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nombremodref: nombreCategoria,
-        idnegocio: auth.user?.idNegocio ?? 1, // Fuerza idnegocio=1 si está undefined
+        idnegocio: auth.user?.idNegocio ?? 1,
         usuario: auth.user?.alias
       }),
     })
@@ -68,7 +79,26 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
         <tbody>
           {categorias.map((categoria) => (
             <tr key={categoria.idmodref}>
-              <td>{categoria.idmodref}</td><td>{categoria.nombremodref}</td><td><button>Editar</button><button>Eliminar</button></td>
+              <td>{categoria.idmodref}</td>
+              <td>{categoria.nombremodref}</td>
+              <td>
+                <button onClick={() => {
+                  setEditCategoria(categoria);
+                  setEditNombre(categoria.nombremodref);
+                }}>Editar</button>
+                <button onClick={() => {
+                  if (window.confirm('¿Seguro que deseas eliminar esta categoría?')) {
+                    fetch(`/api/categorias-moderadores/${categoria.idmodref}`, {
+                      method: 'DELETE',
+                    })
+                      .then((res) => res.json())
+                      .then(() => {
+                        setCategorias(categorias.filter(c => c.idmodref !== categoria.idmodref));
+                      })
+                      .catch((err) => console.error('❌ Error al eliminar categoría:', err));
+                  }
+                }}>Eliminar</button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -89,6 +119,32 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
           />
           <button onClick={handleAddCategoria}>Guardar</button>
           <button onClick={() => setShowModal(false)}>Cancelar</button>
+        </div>
+      )}
+
+      {/* Modal para editar categoría */}
+      {editCategoria && (
+        <div className="modal">
+          <h3>Editar Categoría</h3>
+          <input
+            type="text"
+            value={editNombre}
+            onChange={(e) => setEditNombre(e.target.value)}
+          />
+          <button onClick={() => {
+            fetch(`/api/categorias-moderadores/${editCategoria.idmodref}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombremodref: editNombre }),
+            })
+              .then((res) => res.json())
+              .then(() => {
+                setCategorias(categorias.map(c => c.idmodref === editCategoria.idmodref ? { ...c, nombremodref: editNombre } : c));
+                setEditCategoria(null);
+              })
+              .catch((err) => console.error('❌ Error al editar categoría:', err));
+          }}>Guardar</button>
+          <button onClick={() => setEditCategoria(null)}>Cancelar</button>
         </div>
       )}
     </div>
