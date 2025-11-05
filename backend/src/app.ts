@@ -22,6 +22,8 @@ import proveedoresRoutes from './routes/proveedoresRoutes';
 import negociosRoutes from './routes/negociosRoutes';
 import clientesRoutes from './routes/clientesRoutes';
 import moderadoresRoutes from './routes/moderadoresRoutes';
+import categoriasModeradoresRoutes from './routes/categoriasModeradoresRoutes';
+import { attachUserMiddleware } from './middlewares/attachUserMiddleware';
 
 // Carga las variables de entorno
 dotenv.config();
@@ -95,6 +97,8 @@ app.use('/api/negocios', negociosRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/moderadores', moderadoresRoutes);
 
+// Rutas para categorías de moderadores
+app.use('/api', categoriasModeradoresRoutes);
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {

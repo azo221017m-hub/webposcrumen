@@ -38,24 +38,24 @@ export const useAuth = (): AuthContextType => {
         console.log('👤 [useAuth] Datos del usuario recibidos:', userData); // Log de datos del usuario
 
         const { authorization } = response.data as { user: Usuario; authorization?: { idNegocio: number; usuarioAuditoria: string } };
-
         console.log('🔍 [useAuth] Contenido de authorization:', authorization);
 
-        const idNegocio = authorization?.idNegocio ?? userData.idNegocio;
-        const usuarioAuditoria = authorization?.usuarioAuditoria ?? userData.usuarioauditoria;
+        let idNegocioFinal = authorization?.idNegocio ?? userData.idNegocio;
+        let usuarioAuditoriaFinal = authorization?.usuarioAuditoria ?? userData.usuarioauditoria;
 
-        console.log('🔍 [useAuth] idNegocio obtenido:', idNegocio);
+        console.log('🔍 [useAuth] idNegocio obtenido:', idNegocioFinal);
 
-        if (!idNegocio || idNegocio === 0) {
-          console.warn('⚠️ [useAuth] idNegocio no válido recibido del backend:', idNegocio);
+        if (!idNegocioFinal || idNegocioFinal === 0) {
+          idNegocioFinal = 1; // Valor por defecto si no viene del backend
+          console.warn('⚠️ [useAuth] idNegocio no válido recibido, se fuerza a 1');
         } else {
-          console.log('✅ [useAuth] idNegocio válido recibido:', idNegocio);
+          console.log('✅ [useAuth] idNegocio válido recibido:', idNegocioFinal);
         }
 
         const userWithAudit: Usuario = {
           ...userData,
-          idNegocio,
-          usuarioauditoria: usuarioAuditoria, // Ensure compatibility with Usuario type
+          idNegocio: idNegocioFinal,
+          usuarioauditoria: usuarioAuditoriaFinal,
         };
 
         setUser(userWithAudit); // Establece el usuario con datos de auditoría

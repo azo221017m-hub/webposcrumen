@@ -145,6 +145,13 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
             <span className="btn-icon">🛡️</span>
             <span className="btn-text">Moderadores</span>
           </button>
+          <button 
+            className="config-btn"
+            onClick={() => handleNavigate('config-categoria-moderadores' as ScreenType)}
+          >
+            <span className="btn-icon">📂</span>
+            <span className="btn-text">Categorías Moderadores</span>
+          </button>
         </div>
       </div>
 

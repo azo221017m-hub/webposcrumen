@@ -243,6 +243,7 @@ export type ScreenType =
   | 'sistema-configuracion' // Configuración del sistema
   | 'config-moderadores' // Configuración de moderadores
   | 'config-cat-moderadores' // Configuración de categorías de moderadores
+  | 'config-categoria-moderadores' // Configuración de categorías de moderadores
 
 // Tipo para los indicadores del dashboard
 export interface Indicator {

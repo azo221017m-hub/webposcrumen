@@ -832,3 +832,13 @@ export interface NegocioConfiguracionCompleto extends NegocioConfiguracion {
   parametros?: ParametrosNegocioCompletos; // Parámetros asociados al negocio
 }
 
+// Extend the Request interface to include user property
+import { Request } from 'express';
+
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    alias: string;
+    idNegocio: number;
+  };
+}
+

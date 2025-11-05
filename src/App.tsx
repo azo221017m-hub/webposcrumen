@@ -21,6 +21,7 @@ import ConfigProveedores from './components/ConfigProveedores'; // Configuració
 import ConfigClientes from './components/ConfigClientes'; // Configuración de clientes
 import ConfigNegocios from './components/ConfigNegocios'; // Configuración de negocios
 import ConfigModeradores from './components/ConfigModeradores'; // Import ConfigModeradores
+import ConfigCategoriaModeradores from './components/ConfigCategoriaModeradores'; // Configuración de categorías de moderadores
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
@@ -296,6 +297,9 @@ function App() {
       case 'config-moderadores':
         console.log('🛠 Renderizando pantalla de ConfigModeradores'); // Log de renderizado
         return <ConfigModeradores onBack={() => setCurrentScreen('tablero-inicial')} />;
+      case 'config-categoria-moderadores':
+        console.log('🎭 Renderizando configuración de categorías de moderadores'); // Log de renderizado
+        return <ConfigCategoriaModeradores onBack={() => setCurrentScreen('tablero-inicial')} />;
 
     default:
         console.log('❓ Pantalla desconocida, redirigiendo a presentación'); // Log de error
