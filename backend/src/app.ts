@@ -1,4 +1,5 @@
-﻿// backend/src/app.ts
+﻿import moderadoresMiembrosRoutes from './routes/moderadoresMiembrosRoutes';
+// backend/src/app.ts
 // Aplicación principal del servidor
 
 import express from 'express';
@@ -121,6 +122,12 @@ app.get('/', (req, res) => {
 });
 
 // Manejo de rutas no encontradas
+
+// Rutas para asignaciones de moderadores a grupos
+app.use('/api/moderadores-miembros', moderadoresMiembrosRoutes);
+console.log('✅ moderadoresMiembrosRoutes cargado correctamente');
+
+// Manejo de rutas no encontradas (debe ir al final)
 app.use('*', (req, res) => {
   console.log(`❌ Ruta no encontrada: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
@@ -134,7 +141,9 @@ app.use('*', (req, res) => {
       'GET /api/roles',
       'GET /api/categorias',
       'GET /api/mesas',
-      'GET /api/descuentos'
+      'GET /api/descuentos',
+      'POST /api/moderadores-miembros',
+      'GET /api/moderadores-miembros'
     ]
   });
 });
@@ -190,4 +199,7 @@ if (require.main === module) {
 // Exporta la aplicación para testing
 export default app;
 
-console.log('✅ categoriasModeradoresRoutes cargado correctamente');
+
+// Rutas para asignaciones de moderadores a grupos
+app.use('/api/moderadores-miembros', moderadoresMiembrosRoutes);
+console.log('✅ moderadoresMiembrosRoutes cargado correctamente');

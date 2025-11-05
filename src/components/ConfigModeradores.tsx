@@ -138,17 +138,24 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const handleDeleteModerador = (id: number) => {
     fetch(`/api/moderadores/${id}`, { method: 'DELETE' })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error('Failed to delete moderador');
+          let errorMsg = 'Failed to delete moderador';
+          try {
+            const errorJson = await response.json();
+            errorMsg = errorJson.message || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
         }
+        // Si la respuesta es OK, parsea el JSON
+        await response.json();
         setModeradores((prev) => prev.filter((mod) => mod.idmoderador !== id));
         setToastMessage('Moderador eliminado con éxito');
         setShowToast(true);
       })
       .catch((error) => {
         console.error('Error deleting moderador:', error);
-        setToastMessage('No se pudo eliminar el moderador. Intente nuevamente.');
+        setToastMessage(error.message || 'No se pudo eliminar el moderador. Intente nuevamente.');
         setShowToast(true);
       });
   };

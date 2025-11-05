@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getModeradores, createModerador, getCategoriasModerador, createCategoriaModerador, updateModerador } from '../controllers/moderadoresController';
+import { getModeradores, createModerador, getCategoriasModerador, createCategoriaModerador, updateModerador, deleteModerador } from '../controllers/moderadoresController';
 
 const router = Router();
 
@@ -17,5 +17,8 @@ router.post('/categorias', createCategoriaModerador);
 
 // Actualizar un moderador existente
 router.put('/:id', updateModerador);
+
+// Eliminar (soft delete) un moderador
+router.delete('/:id', deleteModerador);
 
 export default router;

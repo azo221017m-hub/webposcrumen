@@ -1,3 +1,27 @@
+// Eliminar (soft delete) un moderador
+export async function deleteModerador(req: Request, res: Response) {
+  const { id } = req.params;
+  console.log('🔄 [DELETE] Intentando eliminar moderador id:', id);
+  if (!id) {
+    return res.status(400).json({ success: false, message: 'Falta el id del moderador' });
+  }
+  try {
+    // Soft delete: actualizar estatus a 0
+    const result = await pool.execute(
+      'UPDATE tblposcrumenwebmoderadores SET estatus = 0 WHERE idmoderador = ?',
+      [id]
+    );
+    const affectedRows = (result[0] as ResultSetHeader).affectedRows;
+    console.log('🔍 [DELETE] affectedRows:', affectedRows);
+    if (affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Moderador no encontrado', id });
+    }
+    res.json({ success: true, message: 'Moderador eliminado correctamente', id });
+  } catch (error) {
+    console.error('❌ [DELETE] Error al eliminar moderador:', error);
+    res.status(500).json({ success: false, message: 'Error al eliminar moderador', error: String(error), id });
+  }
+}
 import { Request, Response } from 'express';
 import { executeQuery } from '../config/database';
 import pool from '../config/database';

@@ -22,6 +22,7 @@ import ConfigClientes from './components/ConfigClientes'; // Configuración de c
 import ConfigNegocios from './components/ConfigNegocios'; // Configuración de negocios
 import ConfigModeradores from './components/ConfigModeradores'; // Import ConfigModeradores
 import ConfigCategoriaModeradores from './components/ConfigCategoriaModeradores'; // Configuración de categorías de moderadores
+import ConfigAsignaModeradores from './components/ConfigAsignaModeradores'; // Asignación de moderadores
 
 // Workaround: permite pasar props no tipadas al componente cuando el tipo de props
 // del componente no incluye onBack (evita error de compilación hasta ajustar tipos)
@@ -300,6 +301,16 @@ function App() {
       case 'config-categoria-moderadores':
         console.log('🎭 Renderizando configuración de categorías de moderadores'); // Log de renderizado
         return <ConfigCategoriaModeradores onBack={() => setCurrentScreen('tablero-inicial')} />;
+
+      case 'config-asigna-moderadores':
+        if (!isAuthenticated || !user) {
+          console.log('❌ Usuario no autenticado, redirigiendo a login'); // Log de error
+          setCurrentScreen('login');
+          return <div></div>; // Componente vacío temporal
+        }
+        console.log('📝 Renderizando pantalla de asignación de moderadores'); // Log de renderizado
+  // Importación estática y render directo
+  return <ConfigAsignaModeradores onBack={() => setCurrentScreen('tablero-inicial')} idNegocio={user.idNegocio} />;
 
     default:
         console.log('❓ Pantalla desconocida, redirigiendo a presentación'); // Log de error

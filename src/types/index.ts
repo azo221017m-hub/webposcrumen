@@ -1,6 +1,32 @@
 // src/types/index.ts
 // Tipos TypeScript para el frontend de POSWEBCrumen
 
+// Tipo para las pantallas de la aplicación
+export type ScreenType = 
+  | 'presentation' // Pantalla de presentación inicial
+  | 'login' // Pantalla de login
+  | 'home' // Pantalla principal/dashboard
+  | 'tablero-inicial' // Nuevo tablero inicial
+  | 'config-categorias' // Configuración de categorías
+  | 'config-mesas' // Configuración de mesas
+  | 'config-descuentos' // Configuración de descuentos
+  | 'config-roles' // Configuración de roles de usuario
+  | 'config-usuarios' // Configuración de usuarios del sistema
+  | 'config-umedida' // Configuración de unidades de medida
+  | 'config-insumos' // Configuración de insumos
+  | 'config-cuenta-contable' // Configuración de cuentas contables
+  | 'config-proveedores' // Configuración de proveedores
+  | 'config-clientes' // Configuración de clientes
+  | 'config-productos' // Configuración de productos
+  | 'config-negocios' // Configuración de negocios
+  | 'config-perfil' // Configuración de perfil
+  | 'iniciar-venta' // Iniciar nueva venta
+  | 'indicadores-ventas' // Indicadores de ventas
+  | 'sistema-configuracion' // Configuración del sistema
+  | 'config-moderadores' // Configuración de moderadores
+  | 'config-categoria-moderadores' // Configuración de categorías de moderadores
+  | 'config-asigna-moderadores';
+
 // Tipo para la respuesta estándar de la API
 export interface ApiResponse<T = any> {
   success: boolean; // Indica si la operación fue exitosa
@@ -219,31 +245,6 @@ export interface CreateNegocioCompletoData {
 }
 
 // Tipo para las pantallas de la aplicación
-export type ScreenType = 
-  | 'presentation' // Pantalla de presentación inicial
-  | 'login' // Pantalla de login
-  | 'home' // Pantalla principal/dashboard
-  | 'tablero-inicial' // Nuevo tablero inicial
-  | 'config-categorias' // Configuración de categorías
-  | 'config-mesas' // Configuración de mesas
-  | 'config-descuentos' // Configuración de descuentos
-  | 'config-roles' // Configuración de roles de usuario
-  | 'config-usuarios' // Configuración de usuarios del sistema
-  | 'config-umedida' // Configuración de unidades de medida
-  | 'config-insumos' // Configuración de insumos
-  | 'config-cuenta-contable' // Configuración de cuentas contables
-  | 'config-proveedores' // Configuración de proveedores
-  | 'config-clientes' // Configuración de clientes
-  | 'config-productos' // Configuración de productos
-  
-  | 'config-negocios' // Configuración de negocios
-  | 'config-perfil' // Configuración de perfil
-  | 'iniciar-venta' // Iniciar nueva venta
-  | 'indicadores-ventas' // Indicadores de ventas
-  | 'sistema-configuracion' // Configuración del sistema
-  | 'config-moderadores' // Configuración de moderadores
-  | 'config-cat-moderadores' // Configuración de categorías de moderadores
-  | 'config-categoria-moderadores' // Configuración de categorías de moderadores
 
 // Tipo para los indicadores del dashboard
 export interface Indicator {
