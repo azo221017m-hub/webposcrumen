@@ -242,6 +242,7 @@ export type ScreenType =
   | 'indicadores-ventas' // Indicadores de ventas
   | 'sistema-configuracion' // Configuración del sistema
   | 'config-moderadores' // Configuración de moderadores
+  | 'config-cat-moderadores' // Configuración de categorías de moderadores
 
 // Tipo para los indicadores del dashboard
 export interface Indicator {

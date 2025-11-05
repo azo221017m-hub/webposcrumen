@@ -22,6 +22,7 @@ import proveedoresRoutes from './routes/proveedoresRoutes';
 import negociosRoutes from './routes/negociosRoutes';
 import clientesRoutes from './routes/clientesRoutes';
 import moderadoresRoutes from './routes/moderadoresRoutes';
+import categoriasModeradoresRoutes from './routes/categoriasModeradoresRoutes';
 
 // Carga las variables de entorno
 dotenv.config();
@@ -49,6 +50,12 @@ app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 // Middleware de logging para todas las peticiones
 app.use((req, res, next) => {
   console.log(`📊 ${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+});
+
+// Middleware para registrar todas las solicitudes entrantes
+app.use((req, res, next) => {
+  console.log(`📥 [Request] ${req.method} ${req.originalUrl}`);
   next();
 });
 
@@ -88,6 +95,7 @@ app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/negocios', negociosRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/moderadores', moderadoresRoutes);
+app.use('/api/categorias-moderadores', categoriasModeradoresRoutes);
 
 // Ruta de bienvenida
 app.get('/', (req, res) => {
@@ -178,3 +186,5 @@ if (require.main === module) {
 
 // Exporta la aplicación para testing
 export default app;
+
+console.log('✅ categoriasModeradoresRoutes cargado correctamente');

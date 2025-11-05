@@ -25,17 +25,27 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
-    // Fetch data from the backend
+    console.log('Fetching data from /api/moderadores with idnegocio:', idnegocio);
     fetch(`/api/moderadores?idnegocio=${idnegocio}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         if (data.success) {
+          console.log('Data fetched successfully:', data.data);
           setModeradores(data.data);
         } else {
           console.error('Error fetching moderadores:', data.message);
+          alert('Error al cargar los moderadores.');
         }
       })
-      .catch((err) => console.error('Fetch error:', err));
+      .catch((err) => {
+        console.error('Fetch error:', err);
+        alert('No se pudo conectar con el servidor.');
+      });
   }, [idnegocio]);
 
   const handleOpenModal = (moderador?: Moderador) => {
@@ -51,7 +61,8 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const handleSaveModerador = async () => {
     if (!nombreModerador.trim()) {
-      console.error('Nombre del moderador es obligatorio.');
+      setToastMessage('El nombre del moderador es obligatorio.');
+      setShowToast(true);
       return;
     }
 
@@ -61,7 +72,8 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     );
 
     if (nombreDuplicado) {
-      alert('El nombre del moderador ya existe. Por favor, elige otro nombre.');
+      setToastMessage('El nombre del moderador ya existe. Por favor, elige otro nombre.');
+      setShowToast(true);
       return;
     }
 
@@ -89,7 +101,9 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       if (!response.ok) {
         const errorResponse = await response.json();
         console.error('Backend error response:', errorResponse); // Log backend response
-        throw new Error(`HTTP error! status: ${response.status}`);
+        setToastMessage('Error al guardar el moderador. Intente nuevamente.');
+        setShowToast(true);
+        return;
       }
 
       const data = await response.json();
@@ -117,7 +131,7 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       await fetchModeradores();
     } catch (error) {
       console.error('Error saving moderador:', error);
-      setToastMessage('Error al guardar el moderador');
+      setToastMessage('Error al guardar el moderador. Intente nuevamente.');
       setShowToast(true);
     }
   };
@@ -129,10 +143,13 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           throw new Error('Failed to delete moderador');
         }
         setModeradores((prev) => prev.filter((mod) => mod.idmoderador !== id));
+        setToastMessage('Moderador eliminado con éxito');
+        setShowToast(true);
       })
       .catch((error) => {
         console.error('Error deleting moderador:', error);
-        alert('No se pudo eliminar el moderador. Intente nuevamente.');
+        setToastMessage('No se pudo eliminar el moderador. Intente nuevamente.');
+        setShowToast(true);
       });
   };
 
