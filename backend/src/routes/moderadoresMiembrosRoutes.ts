@@ -6,7 +6,8 @@ import {
   getModeradoresMiembros,
   createModeradoresMiembros,
   updateModeradoresMiembros,
-  deleteModeradoresMiembros
+  deleteModeradoresMiembros,
+  getGruposModeradores
 } from '../controllers/moderadoresMiembrosController';
 
 const router = Router();
@@ -19,5 +20,7 @@ router.post('/', createModeradoresMiembros);
 router.put('/:id', updateModeradoresMiembros);
 // Eliminar una asignación
 router.delete('/:id', deleteModeradoresMiembros);
+// Obtener los grupos de moderadores
+router.get('/grupos', getGruposModeradores);
 
 export default router;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import Toast from './Toast';
@@ -13,6 +14,7 @@ interface Moderador {
 }
 
 const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+
   const { user } = useAuth();
   const idnegocio = user?.idNegocio || 1;
   const usuarioauditoria = user?.alias || 'unknown';
@@ -24,27 +26,12 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
 
+
   useEffect(() => {
-    console.log('Fetching data from /api/moderadores with idnegocio:', idnegocio);
     fetch(`/api/moderadores?idnegocio=${idnegocio}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          console.log('Data fetched successfully:', data.data);
-          setModeradores(data.data);
-        } else {
-          console.error('Error fetching moderadores:', data.message);
-          alert('Error al cargar los moderadores.');
-        }
-      })
-      .catch((err) => {
-        console.error('Fetch error:', err);
-        alert('No se pudo conectar con el servidor.');
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) setModeradores(data.data);
       });
   }, [idnegocio]);
 
@@ -60,17 +47,10 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   };
 
   const handleSaveModerador = async () => {
-    if (!nombreModerador.trim()) {
-      setToastMessage('El nombre del moderador es obligatorio.');
-      setShowToast(true);
-      return;
-    }
-
     // Validar duplicados
     const nombreDuplicado = moderadores.some(
       (mod) => mod.nombremoderador.toLowerCase() === nombreModerador.toLowerCase()
     );
-
     if (nombreDuplicado) {
       setToastMessage('El nombre del moderador ya existe. Por favor, elige otro nombre.');
       setShowToast(true);
@@ -136,6 +116,7 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   };
 
+
   const handleDeleteModerador = (id: number) => {
     fetch(`/api/moderadores/${id}`, { method: 'DELETE' })
       .then(async (response) => {
@@ -147,71 +128,47 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           } catch {}
           throw new Error(errorMsg);
         }
-        // Si la respuesta es OK, parsea el JSON
         await response.json();
         setModeradores((prev) => prev.filter((mod) => mod.idmoderador !== id));
         setToastMessage('Moderador eliminado con éxito');
         setShowToast(true);
       })
       .catch((error) => {
-        console.error('Error deleting moderador:', error);
         setToastMessage(error.message || 'No se pudo eliminar el moderador. Intente nuevamente.');
         setShowToast(true);
       });
   };
 
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateRows: 'auto 1fr',
-    gap: '10px',
-    width: '100%',
-    height: '100%',
-  };
 
-  const tableStyle: React.CSSProperties = {
-    width: '100%',
-    borderCollapse: 'collapse',
-  };
-
-  const actionButtonStyle: React.CSSProperties = {
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '18px',
-  };
 
   return (
-    <div style={gridStyle}>
-      <button onClick={onBack}>Regresa Tablero</button>
-      <button className="add-button" onClick={() => handleOpenModal()}>Agregar Moderador</button>
-      <div>
-        <table style={tableStyle}>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {moderadores.map((moderador) => (
-              <tr key={moderador.idmoderador}>
-                <td>{moderador.nombremoderador}</td>
-                <td>
-                  <button style={actionButtonStyle} onClick={() => handleOpenModal(moderador)}>
-                    <FaEdit />
-                  </button>
-                  <button style={actionButtonStyle} onClick={() => handleDeleteModerador(moderador.idmoderador)}>
-                    <FaTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="config-screen">
+      <button onClick={onBack} className="btn-primary">← Regresar</button>
+      <h2>Moderadores</h2>
+      <button className="btn-primary" onClick={() => handleOpenModal()}>Agregar Moderador</button>
+      <div className="moderadores-card-grid">
+        {moderadores.map((moderador) => (
+          <div className="moderador-card" key={moderador.idmoderador}>
+            <div className="moderador-card-header">
+              <div className="moderador-avatar">
+                <span>{moderador.nombremoderador.charAt(0).toUpperCase()}</span>
+              </div>
+              <div className="moderador-actions">
+                <button className="btn-edit" title="Editar" onClick={() => handleOpenModal(moderador)}><FaEdit /></button>
+                <button className="btn-delete" title="Eliminar" onClick={() => handleDeleteModerador(moderador.idmoderador)}><FaTrash /></button>
+              </div>
+            </div>
+            <div className="moderador-card-body">
+              <div className="moderador-nombre">{moderador.nombremoderador}</div>
+              <div className="moderador-meta">Registro: {moderador.fechaRegistroauditoria}</div>
+              <div className="moderador-meta">Usuario: {moderador.usuarioauditoria}</div>
+            </div>
+          </div>
+        ))}
       </div>
-
+      {/* ...existing code for modal de moderador y toast... */}
       {isModalOpen && (
-        <div className="modal" style={{}}>
+        <div className="modal">
           <div className="modal-content">
             <h4>{editingModerador ? 'Editar Moderador' : 'Agregar Moderador'}</h4>
             <input
@@ -222,16 +179,11 @@ const ConfigModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             />
             <div className="modal-actions">
               <button onClick={() => setIsModalOpen(false)}>Cancelar</button>
-              <button
-                onClick={handleSaveModerador}
-              >
-                Guardar
-              </button>
+              <button onClick={handleSaveModerador}>Guardar</button>
             </div>
           </div>
         </div>
       )}
-
       {showToast && <Toast message={toastMessage} type="success" onClose={() => setShowToast(false)} />}
     </div>
   );

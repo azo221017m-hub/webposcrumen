@@ -1,4 +1,4 @@
-// Eliminar una categoría de moderador
+// Soft delete: actualizar estatus a 0
 export const deleteCategoriaModerador = async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!id) {
@@ -6,7 +6,7 @@ export const deleteCategoriaModerador = async (req: Request, res: Response) => {
   }
   try {
     await pool.execute(
-      'DELETE FROM tblposcrumenwebmodref WHERE idmodref = ?',
+      'UPDATE tblposcrumenwebmodref SET estatus = 0 WHERE idmodref = ?',
       [id]
     );
     res.json({ success: true });
@@ -37,12 +37,12 @@ import pool from '../config/database';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { AuthenticatedRequest } from '../types'; // Import the extended Request type
 
-// Obtener todas las categorías de moderadores
+// Obtener solo categorías activas (estatus=1)
 export const getCategoriasModeradores = async (req: Request, res: Response) => {
   console.log('📡 [GET] /api/categorias-moderadores - Obteniendo categorías de moderadores');
   try {
     const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM tblposcrumenwebmodref ORDER BY idmodref ASC'
+      'SELECT * FROM tblposcrumenwebmodref WHERE estatus = 1 ORDER BY idmodref ASC'
     );
     console.log('✅ Categorías obtenidas:', rows);
     res.json(rows);
@@ -55,7 +55,7 @@ export const getCategoriasModeradores = async (req: Request, res: Response) => {
 // Crear una nueva categoría de moderador
 export const createCategoriaModerador = async (req: AuthenticatedRequest, res: Response) => {
   console.log('📡 [POST] /api/categorias-moderadores - Creando nueva categoría:', req.body);
-  const { nombremodref, idnegocio: idnegocioBody } = req.body;
+  const { nombremodref, idnegocio: idnegocioBody, moderadores } = req.body;
   const usuarioauditoria = req.user?.alias || 'unknown';
   // Prioriza el idnegocio del body, si existe, si no usa el del contexto
   const idnegocio = Number(idnegocioBody ?? req.user?.idNegocio);
@@ -70,8 +70,8 @@ export const createCategoriaModerador = async (req: AuthenticatedRequest, res: R
 
   try {
     const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO tblposcrumenwebmodref (nombremodref, fechaRegistroauditoria, usuarioauditoria, fehamodificacionauditoria, idnegocio) VALUES (?, NOW(), ?, NOW(), ?)',
-      [nombremodref, usuarioauditoria, idnegocio]
+      'INSERT INTO tblposcrumenwebmodref (nombremodref, fechaRegistroauditoria, usuarioauditoria, fehamodificacionauditoria, idnegocio, estatus, moderadores) VALUES (?, NOW(), ?, NOW(), ?, 1, ?)',
+      [nombremodref, usuarioauditoria, idnegocio, moderadores || '']
     );
     console.log('✅ Categoría creada con ID:', result.insertId);
     res.json({ idmodref: result.insertId, nombremodref });

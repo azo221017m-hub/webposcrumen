@@ -141,14 +141,7 @@ const NavegadorConfig: React.FC<NavegadorConfigProps> = ({ onNavigate }) => {
             <span className="btn-icon">📂</span>
             <span className="btn-text">Categorías Moderadores</span>
           </button>
-            {/* Submenú para Asignar Moderador */}
-            <button 
-              className="config-btn"
-              onClick={() => handleNavigate('config-asigna-moderadores' as ScreenType)}
-            >
-              <span className="btn-icon">📝</span>
-              <span className="btn-text">Asignar Moderador</span>
-            </button>
+
         </div>
       </div>
 

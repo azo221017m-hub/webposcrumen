@@ -1,3 +1,14 @@
+// Obtener los grupos de moderadores (tblposcrumenwebmodref)
+export async function getGruposModeradores(_req: Request, res: Response) {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT idmodref, nombremodref FROM tblposcrumenwebmodref WHERE estatus = 1'
+    );
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al obtener grupos', error: String(error) });
+  }
+}
 // backend/src/controllers/moderadoresMiembrosController.ts
 // Controlador para asignaciones de moderadores a grupos
 // CRUD sobre tblposcrumenwebmoderadoresmiembros

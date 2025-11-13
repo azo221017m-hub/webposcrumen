@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../hooks/useAuth'; // Importa el hook de autenticación
+import '../styles/ConfigScreens.css';
 
 // Define la interfaz para las categorías de moderadores
 interface CategoriaModerador {
@@ -9,18 +11,33 @@ interface CategoriaModerador {
 
 // Componente para gestionar categorías de moderadores
 const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  // Estado para edición
+  // Estados para el formulario de agregar categoría con moderadores
+  const [showCategoriaModal, setShowCategoriaModal] = useState(false);
+  const [nombreNuevaCategoria, setNombreNuevaCategoria] = useState('');
+  const [moderadores, setModeradores] = useState<{idmoderador:number, nombremoderador:string}[]>([]);
+  const [moderadoresSeleccionados, setModeradoresSeleccionados] = useState<number[]>([]);
+
+  const auth = useAuth(); // Accede al contexto de autenticación
+  const [categorias, setCategorias] = useState<CategoriaModerador[]>([]);
   const [editCategoria, setEditCategoria] = useState<CategoriaModerador | null>(null);
   const [editNombre, setEditNombre] = useState('');
-  const [categorias, setCategorias] = useState<CategoriaModerador[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [nombreCategoria, setNombreCategoria] = useState('');
-  const auth = useAuth(); // Accede al contexto de autenticación
+  useEffect(() => {
+    fetch('/api/categorias-moderadores')
+      .then((res) => res.json())
+      .then((data) => {
+        setCategorias(data);
+      })
+      .catch((err) => console.error('❌ Error al cargar categorías:', err));
+    fetch(`/api/moderadores?idnegocio=${auth.user?.idNegocio ?? 1}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) setModeradores(data.data);
+      });
+  }, [auth.user?.idNegocio]);
 
-  // Cargar categorías al montar el componente
   useEffect(() => {
     console.log('📡 Cargando categorías de moderadores...');
-    fetch('/api/categorias-moderadores')
+    fetch('/pi/categorias-moderadores')
       .then((res) => res.json())
       .then((data) => {
         console.log('✅ Categorías cargadas:', data);
@@ -29,64 +46,35 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
       .catch((err) => console.error('❌ Error al cargar categorías:', err));
   }, []);
 
-  // Manejar el envío del formulario para agregar una categoría
-  const handleAddCategoria = () => {
-    // Validación: nombre no vacío
-    if (!nombreCategoria.trim()) {
-      alert('Debes ingresar el nombre de la categoría.');
-      return;
-    }
-    // Validación: nombre único
-    if (categorias.some(c => c.nombremodref.trim().toLowerCase() === nombreCategoria.trim().toLowerCase())) {
-      alert('Ya existe una categoría con ese nombre.');
-      return;
-    }
-    // ...existing code...
-    fetch('/api/categorias-moderadores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nombremodref: nombreCategoria,
-        idnegocio: auth.user?.idNegocio ?? 1,
-        usuario: auth.user?.alias
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('✅ Categoría agregada:', data);
-        setCategorias([...categorias, data]);
-        setShowModal(false);
-        setNombreCategoria('');
-      })
-      .catch((err) => console.error('❌ Error al agregar categoría:', err));
-  };
+  useEffect(() => {
+    fetch(`/api/moderadores?idnegocio=${auth.user?.idNegocio ?? 1}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) setModeradores(data.data);
+      });
+  }, [auth.user?.idNegocio]);
+
 
   return (
     <div className="config-screen">
       {/* Botón para regresar al tablero inicial */}
       <button onClick={onBack}>← Regresar a TableroInicial</button>
 
-      {/* Tabla de categorías */}
+
       <h2>Categorías de Moderadores</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categorias.map((categoria) => (
-            <tr key={categoria.idmodref}>
-              <td>{categoria.idmodref}</td>
-              <td>{categoria.nombremodref}</td>
-              <td>
-                <button onClick={() => {
+      <div className="moderadores-card-grid">
+        {categorias.map((categoria) => (
+          <div className="moderador-card" key={categoria.idmodref}>
+            <div className="moderador-card-header">
+              <div className="moderador-avatar">
+                <span>{categoria.nombremodref.charAt(0).toUpperCase()}</span>
+              </div>
+              <div className="moderador-actions">
+                <button className="btn-edit" title="Editar" onClick={() => {
                   setEditCategoria(categoria);
                   setEditNombre(categoria.nombremodref);
-                }}>Editar</button>
-                <button onClick={() => {
+                }}><FaEdit /></button>
+                <button className="btn-delete" title="Eliminar" onClick={() => {
                   if (window.confirm('¿Seguro que deseas eliminar esta categoría?')) {
                     fetch(`/api/categorias-moderadores/${categoria.idmodref}`, {
                       method: 'DELETE',
@@ -97,28 +85,100 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
                       })
                       .catch((err) => console.error('❌ Error al eliminar categoría:', err));
                   }
-                }}>Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                }}><FaTrash /></button>
+              </div>
+            </div>
+            <div className="moderador-card-body">
+              <div className="moderador-nombre">{categoria.nombremodref}</div>
+              <div className="moderador-meta">ID: {categoria.idmodref}</div>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Botón para agregar una nueva categoría */}
-      <button onClick={() => setShowModal(true)}>Agregar Categoría Moderador</button>
+  <button onClick={() => setShowCategoriaModal(true)}>Agregar Categoría Moderador</button>
 
-      {/* Modal para agregar categoría */}
-      {showModal && (
+      {/* Modal para agregar categoría con moderadores */}
+      {showCategoriaModal && (
         <div className="modal">
-          <h3>Agregar Categoría</h3>
+          <h3>Agregar Categoría Moderador</h3>
           <input
             type="text"
             placeholder="Nombre de la categoría"
-            value={nombreCategoria}
-            onChange={(e) => setNombreCategoria(e.target.value)}
+            value={nombreNuevaCategoria}
+            onChange={e => setNombreNuevaCategoria(e.target.value)}
+            style={{marginBottom: '1rem', width: '100%'}}
           />
-          <button onClick={handleAddCategoria}>Guardar</button>
-          <button onClick={() => setShowModal(false)}>Cancelar</button>
+          <div style={{marginBottom: '1rem'}}>
+            <label style={{fontWeight: 600}}>Selecciona moderadores:</label>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem', marginTop: '0.5rem'}}>
+              {moderadores.map(mod => (
+                <label key={mod.idmoderador} style={{display: 'flex', alignItems: 'center', gap: '0.7rem', cursor: 'pointer'}}>
+                  <input
+                    type="checkbox"
+                    checked={moderadoresSeleccionados.includes(mod.idmoderador)}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setModeradoresSeleccionados(prev => [...prev, mod.idmoderador]);
+                      } else {
+                        setModeradoresSeleccionados(prev => prev.filter(id => id !== mod.idmoderador));
+                      }
+                    }}
+                    style={{accentColor: '#6366f1', width: 22, height: 22}}
+                  />
+                  <span style={{fontWeight: 600}}>{mod.nombremoderador}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <button onClick={async () => {
+            if (!nombreNuevaCategoria.trim()) {
+              alert('Debes ingresar el nombre de la categoría.');
+              return;
+            }
+            if (moderadoresSeleccionados.length === 0) {
+              alert('Selecciona al menos un moderador.');
+              return;
+            }
+            // Construir string de moderadores
+            const nombresModeradores = moderadores
+              .filter(m => moderadoresSeleccionados.includes(m.idmoderador))
+              .map(m => m.nombremoderador)
+              .join('+');
+            // Construir payload
+            const payload = {
+              nombremodref: nombreNuevaCategoria,
+              moderadores: nombresModeradores,
+              idnegocio: auth.user?.idNegocio ?? 1,
+              usuarioauditoria: auth.user?.alias ?? '',
+              estatus: 1
+            };
+            // POST al endpoint correspondiente
+            const res = await fetch('/api/categorias-moderadores', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.idmodref || data.success) {
+              alert('Categoría de moderador guardada correctamente');
+              setShowCategoriaModal(false);
+              setNombreNuevaCategoria('');
+              setModeradoresSeleccionados([]);
+              // Recargar categorías
+              fetch('/api/categorias-moderadores')
+                .then(res => res.json())
+                .then(data => setCategorias(data));
+            } else {
+              alert('Error al guardar la categoría: ' + (data.message || ''));
+            }
+          }}>Guardar</button>
+          <button onClick={() => {
+            setShowCategoriaModal(false);
+            setNombreNuevaCategoria('');
+            setModeradoresSeleccionados([]);
+          }}>Cancelar</button>
         </div>
       )}
 
@@ -149,6 +209,6 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
       )}
     </div>
   );
-};
+}
 
 export default ConfigCategoriaModeradores;
