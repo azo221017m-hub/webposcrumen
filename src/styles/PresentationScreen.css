@@ -50,9 +50,9 @@
 /* Contenedor del contenido de la presentación */
 .presentation-content {
   text-align: center;
-  max-width: 800px;
-  width: 100%;
-  padding: 4rem;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
   z-index: 2;
   position: relative;
   display: flex;

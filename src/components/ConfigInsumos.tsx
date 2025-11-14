@@ -8,7 +8,6 @@ import type {
   UnidadMedidaInsumo,
   CuentaContable
 } from '../types';
-import '../styles/FormStyles.css';
 import { UNIDADES_MEDIDA_INSUMO } from '../types';
 import Toast from './Toast';
 // import apiService from '../services/api'; // No usado actualmente

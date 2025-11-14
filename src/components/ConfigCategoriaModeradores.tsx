@@ -7,6 +7,7 @@ import '../styles/ConfigScreens.css';
 interface CategoriaModerador {
   idmodref: number;
   nombremodref: string;
+  moderadores?: string;
 }
 
 // Componente para gestionar categorías de moderadores
@@ -137,6 +138,11 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
               alert('Debes ingresar el nombre de la categoría.');
               return;
             }
+            // Validar nombre único (case-insensitive)
+            if (categorias.some(c => c.nombremodref.trim().toLowerCase() === nombreNuevaCategoria.trim().toLowerCase())) {
+              alert('Ya existe una categoría con ese nombre.');
+              return;
+            }
             if (moderadoresSeleccionados.length === 0) {
               alert('Selecciona al menos un moderador.');
               return;
@@ -190,16 +196,62 @@ const ConfigCategoriaModeradores: React.FC<{ onBack: () => void }> = ({ onBack }
             type="text"
             value={editNombre}
             onChange={(e) => setEditNombre(e.target.value)}
+            style={{marginBottom: '1rem', width: '100%'}}
           />
+          <div style={{marginBottom: '1rem'}}>
+            <label style={{fontWeight: 600}}>Selecciona moderadores:</label>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem', marginTop: '0.5rem'}}>
+              {moderadores.map(mod => {
+                // Determinar si el moderador está en la categoría actual
+                let checked = false;
+                if (editCategoria && editCategoria.moderadores) {
+                  const mods = editCategoria.moderadores.split('+');
+                  checked = mods.includes(mod.nombremoderador);
+                }
+                return (
+                  <label key={mod.idmoderador} style={{display: 'flex', alignItems: 'center', gap: '0.7rem', cursor: 'pointer'}}>
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={e => {
+                        // Actualizar el array de moderadores seleccionados para edición
+                        let nuevos;
+                        if (e.target.checked) {
+                          nuevos = [...(editCategoria.moderadores ? editCategoria.moderadores.split('+') : []), mod.nombremoderador];
+                        } else {
+                          nuevos = (editCategoria.moderadores ? editCategoria.moderadores.split('+') : []).filter(m => m !== mod.nombremoderador);
+                        }
+                        setEditCategoria({ ...editCategoria, moderadores: nuevos.join('+') });
+                      }}
+                      style={{accentColor: '#6366f1', width: 22, height: 22}}
+                    />
+                    <span style={{fontWeight: 600}}>{mod.nombremoderador}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
           <button onClick={() => {
+            // Construir string de moderadores seleccionados
+            const modsSeleccionados = moderadores
+              .filter(mod => {
+                let checked = false;
+                if (editCategoria && editCategoria.moderadores) {
+                  const mods = editCategoria.moderadores.split('+');
+                  checked = mods.includes(mod.nombremoderador);
+                }
+                return checked;
+              })
+              .map(mod => mod.nombremoderador)
+              .join('+');
             fetch(`/api/categorias-moderadores/${editCategoria.idmodref}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ nombremodref: editNombre }),
+              body: JSON.stringify({ nombremodref: editNombre, moderadores: modsSeleccionados }),
             })
               .then((res) => res.json())
               .then(() => {
-                setCategorias(categorias.map(c => c.idmodref === editCategoria.idmodref ? { ...c, nombremodref: editNombre } : c));
+                setCategorias(categorias.map(c => c.idmodref === editCategoria.idmodref ? { ...c, nombremodref: editNombre, moderadores: modsSeleccionados } : c));
                 setEditCategoria(null);
               })
               .catch((err) => console.error('❌ Error al editar categoría:', err));

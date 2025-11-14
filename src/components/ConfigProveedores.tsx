@@ -3,7 +3,6 @@ import type { ScreenType, Proveedor, CreateProveedorData, UpdateProveedorData } 
 import { useAuth } from '../hooks/useAuth';
 import Toast from './Toast';
 import apiService from '../services/api';
-import '../styles/FormStyles.css';
 
 interface Props {
   onNavigate: (screen: ScreenType) => void;
